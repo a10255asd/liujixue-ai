@@ -1,0 +1,35 @@
+[
+  {
+    "slug": "what-is-token",
+    "title": "什么是 Token",
+    "category": "llm",
+    "level": "入门",
+    "summary": "Token 是模型处理文本的基本单位，影响上下文长度、计费和生成限制。",
+    "whyItMatters": "不会估算 Token，就很难控制成本、上下文和长文档处理。",
+    "explanation": "模型不是直接按汉字或英文单词理解输入，而是把文本切成 token 序列。不同模型的 tokenizer 不完全一样。",
+    "engineeringNotes": ["长上下文任务要控制输入 token", "输出 token 也会计费", "RAG 要避免把无关片段塞满上下文"],
+    "example": "同一段中文、英文、代码会被切成不同数量的 token。",
+    "commonMistakes": ["把 token 等同于字符", "只算输入不算输出", "忽略系统提示词也占上下文"],
+    "interviewAnswer": "Token 是模型处理文本的基本单位，影响上下文窗口、计费和输出长度。工程上要通过摘要、检索和裁剪控制 token 使用。",
+    "relatedQuestions": [],
+    "relatedProjects": [],
+    "references": ["openai-platform-docs"]
+  },
+  {
+    "slug": "agent-loop",
+    "title": "Agent Loop",
+    "category": "agent",
+    "level": "进阶",
+    "summary": "Agent Loop 是模型根据目标反复计划、调用工具、观察结果并继续执行的控制流程。",
+    "whyItMatters": "Agent 是否可靠，核心取决于循环控制、终止条件、工具权限和错误处理。",
+    "explanation": "一个典型 Agent Loop 会包含目标输入、模型决策、工具调用、结果观察、状态更新和下一步判断。",
+    "engineeringNotes": ["必须设计最大步数和终止条件", "工具失败要可恢复", "危险动作需要人工确认"],
+    "example": "让 Agent 分析 GitHub issue：读取 issue、分类、查相关文件、生成修复建议。",
+    "commonMistakes": ["没有最大步数", "工具权限过大", "没有 trace，出错无法复盘"],
+    "interviewAnswer": "Agent Loop 是 Agent 多步骤执行的核心，模型不是一次性回答，而是在状态和工具结果基础上迭代决策。",
+    "relatedQuestions": ["agent-vs-chatbot"],
+    "relatedProjects": ["task-planning-agent"],
+    "references": ["openai-agents-sdk", "langgraph-docs"]
+  }
+]
+

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "rag-vs-prompt",
+    "question": "RAG 和普通 Prompt 有什么区别？",
+    "category": "rag",
+    "level": "初级",
+    "tags": ["RAG", "Prompt", "Embedding"],
+    "whatItTests": ["是否理解外部知识注入", "是否理解检索和生成的边界", "是否知道幻觉控制"],
+    "shortAnswer": "普通 Prompt 只依赖输入上下文和模型已有能力，RAG 会先从外部知识源检索相关内容，再把检索结果提供给模型生成答案。",
+    "fullAnswer": "RAG 的核心是 Retrieval Augmented Generation。它通常包含文档切分、Embedding、向量检索、可选重排和生成环节。相比普通 Prompt，RAG 更适合回答私有知识、频繁变化知识和需要引用来源的问题，但它的质量取决于切片、召回、排序和上下文组织。",
+    "bonusPoints": ["能提到 chunking、rerank、hybrid search", "能提到引用来源和评估", "能结合自己的知识库项目说明"],
+    "commonMistakes": ["把 RAG 等同于向量数据库", "认为加了 RAG 就不会幻觉", "忽略数据清洗和评估"],
+    "followUps": ["如何评估 RAG 效果？", "召回结果不准怎么办？", "什么时候不适合用 RAG？"],
+    "projectConnection": "可以结合 RAG 知识库问答项目回答：文档入库、检索、引用和答案生成是如何串起来的。",
+    "references": ["vercel-ai-sdk-docs"]
+  },
+  {
+    "id": "agent-vs-chatbot",
+    "question": "Agent 和普通 Chatbot 有什么区别？",
+    "category": "agent",
+    "level": "初级",
+    "tags": ["Agent", "Tool Calling", "Planning"],
+    "whatItTests": ["是否理解 Agent 的任务执行能力", "是否知道工具调用和状态管理", "是否能说清边界"],
+    "shortAnswer": "普通 Chatbot 主要根据上下文生成回复，Agent 通常能围绕目标进行多步骤执行、调用工具、维护状态，并根据中间结果继续决策。",
+    "fullAnswer": "Agent 不是一个神秘概念，工程上可以理解为模型、工具、状态、控制循环和安全边界的组合。它会根据任务选择工具，观察结果，再决定下一步。相比 Chatbot，它更适合执行复杂任务，但也更需要权限控制、可观测性、失败处理和人工确认。",
+    "bonusPoints": ["能提到 Agent Loop", "能提到 human-in-the-loop", "能提到 trace/eval/guardrails"],
+    "commonMistakes": ["把所有 LLM 应用都叫 Agent", "忽略工具权限", "没有终止条件"],
+    "followUps": ["如何设计 Agent 的停止条件？", "工具调用失败怎么办？", "如何评估 Agent 是否可靠？"],
+    "projectConnection": "可以结合任务拆解 Agent 或 GitHub Issue 分析 Agent 回答。",
+    "references": ["openai-agents-sdk", "langgraph-docs"]
+  },
+  {
+    "id": "what-is-mcp",
+    "question": "MCP 是什么，为什么它对 Agent 很重要？",
+    "category": "mcp",
+    "level": "中级",
+    "tags": ["MCP", "Tools", "Resources"],
+    "whatItTests": ["是否理解 AI 应用连接外部工具的协议化趋势", "是否知道 Server/Client 关系", "是否理解安全边界"],
+    "shortAnswer": "MCP 是 Model Context Protocol，用来标准化 AI 应用和外部工具、数据源之间的连接方式。",
+    "fullAnswer": "MCP 可以把文件、数据库、API、工具能力包装成统一接口，供支持 MCP 的客户端使用。对 Agent 来说，它降低了工具接入成本，也让工具权限、资源暴露和上下文提供更有结构。但实现时仍然要关注鉴权、最小权限、数据泄露和用户确认。",
+    "bonusPoints": ["能区分 Tools、Resources、Prompts", "能说出 MCP Server 和 Client", "能提到最小权限"],
+    "commonMistakes": ["把 MCP 当成模型", "认为 MCP 自动解决安全问题", "不区分工具调用和资源读取"],
+    "followUps": ["如何设计一个文件系统 MCP Server？", "MCP 工具要如何做权限控制？"],
+    "projectConnection": "可以结合 MCP 文件助手项目回答。",
+    "references": ["mcp-docs"]
+  }
+]
+

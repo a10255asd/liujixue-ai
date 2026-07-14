@@ -1,0 +1,59 @@
+[
+  {
+    "slug": "ai-user-basics",
+    "title": "AI 使用基础",
+    "order": 1,
+    "level": "入门",
+    "summary": "理解模型、Token、上下文和常见 AI 工具，先成为稳定的 AI 使用者。",
+    "goals": ["理解 LLM 请求的基本过程", "掌握基础 Prompt 写法", "知道 ChatGPT、Claude、Cursor、Codex 的分工"],
+    "prerequisites": [],
+    "topics": ["模型", "Token", "上下文窗口", "系统提示词", "温度参数"],
+    "outputs": ["整理一份 AI 工具使用清单"],
+    "interviewFocus": ["什么是 Token", "上下文窗口为什么重要"],
+    "projectRefs": [],
+    "resourceRefs": ["openai-platform-docs"]
+  },
+  {
+    "slug": "llm-api",
+    "title": "LLM API 开发",
+    "order": 2,
+    "level": "入门",
+    "summary": "学会把大模型作为一个可控的工程依赖调用。",
+    "goals": ["完成文本生成调用", "理解结构化输出", "理解流式响应和错误处理"],
+    "prerequisites": ["ai-user-basics"],
+    "topics": ["模型参数", "JSON 输出", "流式响应", "函数调用", "成本控制"],
+    "outputs": ["Prompt 调试器"],
+    "interviewFocus": ["如何保证 LLM 输出稳定", "如何处理 API 超时和重试"],
+    "projectRefs": ["prompt-debugger"],
+    "resourceRefs": ["openai-platform-docs", "vercel-ai-sdk-docs"]
+  },
+  {
+    "slug": "rag",
+    "title": "RAG 知识库",
+    "order": 4,
+    "level": "进阶",
+    "summary": "学会把外部知识检索后提供给模型，降低幻觉并增强可追溯性。",
+    "goals": ["理解 Embedding", "理解 Chunk 和 Retriever", "能设计一个基础知识库问答流程"],
+    "prerequisites": ["llm-api"],
+    "topics": ["Embedding", "Chunking", "Vector DB", "Rerank", "引用来源", "评估"],
+    "outputs": ["AI 学习资料问答知识库"],
+    "interviewFocus": ["RAG 和普通 Prompt 的区别", "如何提升召回率和准确率"],
+    "projectRefs": ["rag-knowledge-base"],
+    "resourceRefs": ["vercel-ai-sdk-docs"]
+  },
+  {
+    "slug": "agent-engineering",
+    "title": "Agent 工程",
+    "order": 5,
+    "level": "进阶",
+    "summary": "理解工具调用、状态、规划和循环执行，让模型完成多步骤任务。",
+    "goals": ["理解 Agent Loop", "理解工具调用", "能说明 Agent 的失败模式"],
+    "prerequisites": ["rag"],
+    "topics": ["Tool Calling", "Agent Loop", "State", "Memory", "Planning", "Guardrails"],
+    "outputs": ["多步骤资料整理 Agent"],
+    "interviewFocus": ["Agent 和普通 Chatbot 的区别", "如何避免 Agent 失控"],
+    "projectRefs": ["task-planning-agent"],
+    "resourceRefs": ["openai-agents-sdk", "langgraph-docs"]
+  }
+]
+

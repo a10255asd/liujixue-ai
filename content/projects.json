@@ -1,0 +1,48 @@
+[
+  {
+    "slug": "prompt-debugger",
+    "title": "Prompt 调试器",
+    "level": "入门",
+    "summary": "输入系统提示词、用户问题和输出格式，观察模型输出稳定性。",
+    "targetUser": "刚开始学习 LLM API 的开发者。",
+    "stack": ["Next.js", "Vercel AI SDK", "OpenAI API"],
+    "features": ["Prompt 编辑", "参数调整", "结构化输出预览", "失败样例记录"],
+    "architecture": "前端表单提交到服务端 route handler，服务端调用模型并返回流式或 JSON 输出。",
+    "implementationSteps": ["搭页面", "接模型 API", "加结构化输出", "保存测试样例"],
+    "hardParts": ["输出格式稳定性", "错误处理", "成本控制"],
+    "interviewValue": "能证明理解 LLM API、Prompt 调试、结构化输出和工程化错误处理。",
+    "resumeBullet": "实现 Prompt 调试器，支持模型参数调整、结构化输出验证和失败样例复盘。",
+    "relatedQuestions": ["rag-vs-prompt"]
+  },
+  {
+    "slug": "rag-knowledge-base",
+    "title": "RAG 知识库问答",
+    "level": "进阶",
+    "summary": "把 AI 学习资料切片入库，支持带引用来源的问答。",
+    "targetUser": "想理解 RAG 工程链路的开发者。",
+    "stack": ["Next.js", "Embedding", "Vector DB", "LLM API"],
+    "features": ["文档导入", "文本切片", "向量检索", "引用来源", "答案评估"],
+    "architecture": "文档离线入库，查询时检索相关片段并作为上下文传给模型。",
+    "implementationSteps": ["准备资料", "实现 chunk", "生成 embedding", "查询检索", "生成带引用答案"],
+    "hardParts": ["切片策略", "召回准确率", "幻觉控制", "引用可信度"],
+    "interviewValue": "能覆盖 RAG、Embedding、向量库、检索评估和私有知识问答。",
+    "resumeBullet": "实现 RAG 知识库问答系统，支持文档切片、向量检索、引用来源和答案质量复盘。",
+    "relatedQuestions": ["rag-vs-prompt"]
+  },
+  {
+    "slug": "ai-interviewer",
+    "title": "AI 面试官",
+    "level": "进阶",
+    "summary": "根据岗位和题库进行模拟面试、追问和反馈。",
+    "targetUser": "准备 AI Agent 工程师岗位的人。",
+    "stack": ["Next.js", "LLM API", "Interview Question Bank"],
+    "features": ["题目抽取", "连续追问", "回答评分", "改进建议"],
+    "architecture": "题库提供结构化题目，模型根据候选人回答生成追问和反馈。",
+    "implementationSteps": ["整理题库", "设计面试流程", "生成追问", "输出反馈报告"],
+    "hardParts": ["评分标准", "追问质量", "避免空泛建议"],
+    "interviewValue": "能展示 Agent 场景中的状态管理、问答流程和评估思路。",
+    "resumeBullet": "实现 AI 模拟面试系统，支持按岗位抽题、上下文追问和结构化反馈。",
+    "relatedQuestions": ["agent-vs-chatbot"]
+  }
+]
+
