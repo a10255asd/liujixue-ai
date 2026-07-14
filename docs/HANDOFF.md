@@ -14,7 +14,7 @@
 
 ## 当前阶段
 
-当前只完成项目创建和设计文档沉淀。
+当前已完成项目创建、产品设计和详细技术设计文档沉淀。
 
 不要直接部署，不要创建 Vercel 项目，除非用户明确说开始部署。
 
@@ -22,21 +22,23 @@
 
 1. `README.md`
 2. `docs/PRODUCT_DESIGN.md`
-3. `docs/CONTENT_MODEL.md`
-4. `docs/IMPLEMENTATION_PLAN.md`
-5. `docs/REFERENCE_SOURCES.md`
-6. `content/*.json`
+3. `docs/TECHNICAL_DESIGN.md`
+4. `docs/CONTENT_MODEL.md`
+5. `docs/IMPLEMENTATION_PLAN.md`
+6. `docs/REFERENCE_SOURCES.md`
+7. `content/*.json`
 
 ## 下一步推荐
 
 优先执行 `docs/IMPLEMENTATION_PLAN.md` 的 Batch 1：
 
 1. 安装依赖。
-2. 创建 `app/layout.jsx`、`app/page.jsx`、`app/globals.css`。
-3. 建立核心路由。
-4. 从 `content/*.json` 渲染页面。
-5. 添加基本测试。
-6. 本地 `npm run build` 通过。
+2. 按技术设计补 TypeScript、Zod、Lucide 和 Playwright 基础依赖。
+3. 创建 `app/layout.tsx`、`app/page.tsx`、`app/globals.css`。
+4. 创建 `lib/content` Schema、仓储层和关系层。
+5. 建立核心路由并从仓储层读取内容。
+6. 添加基本测试和移动端截图检查。
+7. 本地 `npm run build` 通过。
 
 ## 内容边界
 
@@ -75,6 +77,7 @@
 - 不做夸张科技感。
 - 不做大面积紫蓝渐变。
 - 不用大量卡片堆叠。
+- 不使用纯黑或成功绿色作为默认主按钮。
 - 手机端文字不能挤压或溢出。
 
 ## 验证命令
@@ -99,6 +102,6 @@ npm run build
 - 创建项目目录 `/Users/LIU/Documents/workTable/liujixue-ai`。
 - 添加 Next.js 基础配置。
 - 添加设计文档、内容模型、实施计划和接手说明。
+- 添加详细技术设计，明确静态优先架构、内容仓储层、测试、部署及动态演进边界。
 - 添加初始内容种子。
 - 尚未初始化远端仓库，尚未部署。
-

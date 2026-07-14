@@ -8,6 +8,7 @@
 
 - 创建 `liujixue-ai` 项目目录。
 - 保存产品设计文档、内容模型、实施计划、交接文档和参考资料。
+- 完成详细技术设计，明确模块边界、内容协议、测试与部署方案。
 - 创建 Next.js 项目基础配置文件。
 - 添加少量内容种子文件，方便后续页面开发。
 
@@ -29,19 +30,24 @@
 任务：
 
 1. `npm install`。
-2. 创建 `app/layout.jsx`、`app/page.jsx`、`app/globals.css`。
-3. 创建这些路由：
+2. 添加 TypeScript 严格配置、Zod、Lucide 和 Playwright 基础依赖。
+3. 创建 `app/layout.tsx`、`app/page.tsx`、`app/globals.css`。
+4. 创建这些路由：
    - `/roadmap`
    - `/knowledge`
+   - `/agent`
    - `/interview`
    - `/projects`
    - `/resources`
    - `/journal`
-4. 创建共享数据读取模块：
-   - `lib/content.js`
-   - `lib/site-data.js`
-5. 建立首页导航和 footer。
-6. 添加 `app/sitemap.js`、`app/robots.js`。
+5. 创建共享数据读取模块：
+   - `lib/content/schemas.ts`
+   - `lib/content/repository.ts`
+   - `lib/content/relations.ts`
+   - `lib/site-config.ts`
+6. 建立首页导航和 footer。
+7. 添加 `app/sitemap.ts`、`app/robots.ts` 和 `app/not-found.tsx`。
+8. 添加内容校验、路由冒烟测试和桌面/移动端截图检查。
 
 验收：
 
@@ -54,9 +60,11 @@ npm run build
 页面检查：
 
 - 首页能说明项目定位。
-- 7 个核心页面都可访问。
+- 首页及 7 个核心页面都可访问。
 - 移动端导航不遮挡内容。
-- 私有、求职、学习三个目标表达清楚。
+- 自用学习、求职展示和对外分享三个目标表达清楚。
+- 页面组件不直接读取 JSON，所有内容从仓储层获取。
+- 390px 与 1440px 视口无横向滚动、按钮错位和文字遮挡。
 
 ## Batch 2：内容数据和列表页
 
@@ -172,4 +180,3 @@ npm run build
 - 复制外部课程、书籍或网站长文。
 - 尚未本地 build 通过就部署。
 - 未明确域名/DNS 状态就宣称上线完成。
-

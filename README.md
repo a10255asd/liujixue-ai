@@ -11,6 +11,7 @@
 ## 必读文档
 
 - [docs/PRODUCT_DESIGN.md](docs/PRODUCT_DESIGN.md)：完整产品设计文档。
+- [docs/TECHNICAL_DESIGN.md](docs/TECHNICAL_DESIGN.md)：架构、代码组织、内容协议、测试、部署与演进方案。
 - [docs/CONTENT_MODEL.md](docs/CONTENT_MODEL.md)：知识点、面试题、项目实战、学习路线数据模型。
 - [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md)：分批开发计划和验收标准。
 - [docs/HANDOFF.md](docs/HANDOFF.md)：给后续 AI agent 的接手说明。
@@ -18,9 +19,9 @@
 
 ## 预期技术栈
 
-- Next.js App Router
+- Next.js App Router + TypeScript
 - React Server Components
-- 静态 JSON/TS 内容数据源
+- 静态 JSON 内容数据源 + 构建期 Schema 校验
 - Vercel 部署
 - 第一版不做登录、不做数据库、不做 AI 生成内容
 
@@ -39,6 +40,7 @@ npm run build
 - 首页：AI Agent 学习控制台。
 - `/roadmap`：从 0 到 Agent 工程师学习路线。
 - `/knowledge`：AI 工程知识库。
+- `/agent`：Agent 工程专题地图。
 - `/interview`：AI 面试题库。
 - `/projects`：求职导向的项目实战清单。
 - `/resources`：官方文档和高质量资料导航。
@@ -50,4 +52,3 @@ npm run build
 - 不复制付费课程、书籍或网站长文。
 - 不把未经验证的网上说法写成结论。
 - 不在第一版接用户系统、收藏、错题本或付费会员。
-
