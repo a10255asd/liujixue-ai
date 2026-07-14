@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "build-ai-learning-map",
+    "title": "先建立 Agent 工程学习地图",
+    "date": "2026-07-15",
+    "stage": "ai-user-basics",
+    "learned": ["Agent 工程需要把模型、工具、状态、评估和部署放在同一条链路理解"],
+    "blockers": ["资料很多，但缺少按求职目标组织的学习顺序"],
+    "solved": ["将学习内容拆为七个阶段，并让每个阶段绑定产出和面试题"],
+    "artifacts": ["产品设计文档", "技术设计文档", "内容数据模型"],
+    "interviewTakeaways": ["能解释 Agent 与普通 Chatbot 的工程差异"],
+    "nextActions": ["实现知识库页面骨架", "补齐第一批核心知识点"]
+  }
+]

@@ -1,5 +1,19 @@
 [
   {
+    "slug": "prompt-context",
+    "title": "Prompt 与上下文工程",
+    "order": 3,
+    "level": "进阶",
+    "summary": "学会拆任务、组织上下文并约束输出，让模型在真实业务中稳定工作。",
+    "goals": ["理解 Prompt 与 Context Engineering 的边界", "掌握 Few-shot 和结构化约束", "能控制长任务上下文"],
+    "prerequisites": ["llm-api"],
+    "topics": ["任务拆解", "Few-shot", "上下文压缩", "输出约束", "交接文档"],
+    "outputs": ["需求转 AI 任务包模板"],
+    "interviewFocus": ["如何提升模型输出稳定性", "上下文过长时如何处理"],
+    "projectRefs": ["prompt-debugger"],
+    "resourceRefs": ["openai-platform-docs"]
+  },
+  {
     "slug": "ai-user-basics",
     "title": "AI 使用基础",
     "order": 1,
@@ -54,6 +68,33 @@
     "interviewFocus": ["Agent 和普通 Chatbot 的区别", "如何避免 Agent 失控"],
     "projectRefs": ["task-planning-agent"],
     "resourceRefs": ["openai-agents-sdk", "langgraph-docs"]
+  },
+  {
+    "slug": "mcp-ecosystem",
+    "title": "MCP 与工具生态",
+    "order": 6,
+    "level": "高级",
+    "summary": "用标准协议把 Agent 与文件、数据库和业务工具连接起来。",
+    "goals": ["理解 MCP Client 与 Server", "区分 Tools、Resources 和 Prompts", "建立最小权限意识"],
+    "prerequisites": ["agent-engineering"],
+    "topics": ["MCP Server", "MCP Client", "Tools", "Resources", "权限控制"],
+    "outputs": ["本地文件 MCP 助手"],
+    "interviewFocus": ["MCP 解决什么问题", "如何保护 MCP 工具权限"],
+    "projectRefs": ["task-planning-agent"],
+    "resourceRefs": ["mcp-docs"]
+  },
+  {
+    "slug": "production-career",
+    "title": "工程化与求职",
+    "order": 7,
+    "level": "求职",
+    "summary": "补齐评估、追踪、成本、部署和项目表达，形成可投递能力。",
+    "goals": ["能为 AI 应用设计 Eval", "理解日志、Trace 与成本控制", "完成项目和面试表达"],
+    "prerequisites": ["mcp-ecosystem"],
+    "topics": ["Eval", "Observability", "Deployment", "Cost", "Resume", "Interview"],
+    "outputs": ["可演示 Agent 项目", "项目讲解稿", "AI 面试回答集"],
+    "interviewFocus": ["如何评估 Agent 可靠性", "如何控制模型成本", "项目最难的问题是什么"],
+    "projectRefs": ["ai-interviewer", "task-planning-agent"],
+    "resourceRefs": ["openai-agents-sdk", "vercel-ai-sdk-docs"]
   }
 ]
-

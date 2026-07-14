@@ -14,7 +14,7 @@
 
 ## 当前阶段
 
-当前已完成项目创建、产品设计和详细技术设计文档沉淀。
+当前已完成 Batch 1：设计基线、TypeScript 技术骨架、内容仓储层、全部核心页面、详情页、SEO 基础和响应式视觉验收。
 
 不要直接部署，不要创建 Vercel 项目，除非用户明确说开始部署。
 
@@ -25,20 +25,20 @@
 3. `docs/TECHNICAL_DESIGN.md`
 4. `docs/CONTENT_MODEL.md`
 5. `docs/IMPLEMENTATION_PLAN.md`
-6. `docs/REFERENCE_SOURCES.md`
-7. `content/*.json`
+6. `docs/PROGRESS_LOG.md`
+7. `docs/REFERENCE_SOURCES.md`
+8. `content/*.json`
 
 ## 下一步推荐
 
-优先执行 `docs/IMPLEMENTATION_PLAN.md` 的 Batch 1：
+优先执行 `docs/IMPLEMENTATION_PLAN.md` 的 Batch 2：
 
-1. 安装依赖。
-2. 按技术设计补 TypeScript、Zod、Lucide 和 Playwright 基础依赖。
-3. 创建 `app/layout.tsx`、`app/page.tsx`、`app/globals.css`。
-4. 创建 `lib/content` Schema、仓储层和关系层。
-5. 建立核心路由并从仓储层读取内容。
-6. 添加基本测试和移动端截图检查。
-7. 本地 `npm run build` 通过。
+1. 先阅读 `docs/PROGRESS_LOG.md` 的“下一步唯一主线”。
+2. 扩充知识点、面试题、项目与官方资源。
+3. 为列表页增加分类、难度、标签和关键词筛选。
+4. 筛选状态同步 URL query，分享链接可恢复状态。
+5. 增加内容审核字段和关系测试。
+6. 本地完整验证通过后更新进度日志。
 
 ## 内容边界
 
@@ -84,6 +84,8 @@
 
 ```bash
 npm run test:unit
+npm run validate:content
+npm run typecheck
 npm run lint
 npm run build
 ```
@@ -104,4 +106,7 @@ npm run build
 - 添加设计文档、内容模型、实施计划和接手说明。
 - 添加详细技术设计，明确静态优先架构、内容仓储层、测试、部署及动态演进边界。
 - 添加初始内容种子。
-- 尚未初始化远端仓库，尚未部署。
+- 完成 TypeScript、Zod 内容校验、仓储层、关系层和测试基线。
+- 完成首页、7 个核心页面、3 类详情页、SEO 与响应式 UI。
+- 浏览器验证 1440×900 和 390×844，无横向溢出，移动导航可用。
+- 尚未创建远端仓库，尚未部署。

@@ -43,6 +43,20 @@
     "interviewValue": "能展示 Agent 场景中的状态管理、问答流程和评估思路。",
     "resumeBullet": "实现 AI 模拟面试系统，支持按岗位抽题、上下文追问和结构化反馈。",
     "relatedQuestions": ["agent-vs-chatbot"]
+  },
+  {
+    "slug": "task-planning-agent",
+    "title": "任务规划 Agent",
+    "level": "高级",
+    "summary": "把模糊目标拆成可执行步骤，按权限调用工具并输出完整执行记录。",
+    "targetUser": "希望理解 Agent Loop、状态、工具权限和失败恢复的开发者。",
+    "stack": ["Python", "OpenAI Agents SDK", "MCP", "PostgreSQL"],
+    "features": ["任务拆解", "工具选择", "执行状态", "人工确认", "Trace 复盘"],
+    "architecture": "控制层维护任务状态和终止条件，模型负责决策，工具层按最小权限执行，Trace 记录每一步输入输出。",
+    "implementationSteps": ["定义任务状态", "设计工具协议", "实现循环和终止条件", "加入人工确认", "建立评估样例"],
+    "hardParts": ["终止条件", "工具失败恢复", "权限边界", "可重复评估"],
+    "interviewValue": "可系统展示 Agent Loop、状态管理、工具安全、可观测性和 Eval 能力。",
+    "resumeBullet": "实现任务规划 Agent，支持受控工具调用、执行状态持久化、人工确认和 Trace 复盘。",
+    "relatedQuestions": ["agent-vs-chatbot", "what-is-mcp"]
   }
 ]
-

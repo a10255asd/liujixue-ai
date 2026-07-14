@@ -8,7 +8,7 @@ function readJson(path) {
 
 test('roadmap stages have executable learning outputs', () => {
   const stages = readJson('../content/roadmap.json')
-  assert.ok(stages.length >= 4)
+  assert.equal(stages.length, 7)
   for (const stage of stages) {
     assert.ok(stage.slug)
     assert.ok(stage.title)
@@ -43,4 +43,3 @@ test('practical projects include resume value', () => {
     assert.ok(Array.isArray(project.hardParts) && project.hardParts.length > 0)
   }
 })
-

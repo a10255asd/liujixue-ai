@@ -1,0 +1,52 @@
+[
+  {
+    "id": "openai-platform-docs",
+    "title": "OpenAI Platform Docs",
+    "sourceType": "official-doc",
+    "category": "llm-api",
+    "url": "https://platform.openai.com/docs",
+    "summary": "模型调用、结构化输出、工具调用和生产实践的官方文档。",
+    "recommendedFor": ["LLM API 开发", "结构化输出", "工具调用"],
+    "priority": 1
+  },
+  {
+    "id": "openai-agents-sdk",
+    "title": "OpenAI Agents SDK",
+    "sourceType": "official-doc",
+    "category": "agent",
+    "url": "https://openai.github.io/openai-agents-python/",
+    "summary": "理解 Agent、工具、交接、护栏与追踪能力的官方工程资料。",
+    "recommendedFor": ["Agent Loop", "工具调用", "可观测性"],
+    "priority": 1
+  },
+  {
+    "id": "mcp-docs",
+    "title": "Model Context Protocol Docs",
+    "sourceType": "official-doc",
+    "category": "mcp",
+    "url": "https://modelcontextprotocol.io/docs",
+    "summary": "MCP Client、Server、Tools 与 Resources 的协议文档。",
+    "recommendedFor": ["MCP 入门", "工具协议", "权限边界"],
+    "priority": 1
+  },
+  {
+    "id": "vercel-ai-sdk-docs",
+    "title": "Vercel AI SDK Docs",
+    "sourceType": "official-doc",
+    "category": "framework",
+    "url": "https://ai-sdk.dev/docs",
+    "summary": "面向 TypeScript 的 AI 应用开发、流式输出和工具调用文档。",
+    "recommendedFor": ["Next.js AI 应用", "流式响应", "Agent UI"],
+    "priority": 1
+  },
+  {
+    "id": "langgraph-docs",
+    "title": "LangGraph Docs",
+    "sourceType": "official-doc",
+    "category": "agent",
+    "url": "https://langchain-ai.github.io/langgraph/",
+    "summary": "有状态 Agent 工作流、持久化和人工确认的工程文档。",
+    "recommendedFor": ["Agent 状态", "工作流", "Human in the loop"],
+    "priority": 2
+  }
+]
