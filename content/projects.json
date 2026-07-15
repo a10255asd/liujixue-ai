@@ -80,14 +80,14 @@
     "slug": "rag-knowledge-base",
     "title": "可评估 RAG 知识库",
     "level": "进阶",
-    "deliveryStatus": "blueprint",
-    "summary": "从文档解析、混合检索、重排到引用校验，建立可测量的知识问答链路。",
+    "deliveryStatus": "prototype",
+    "summary": "用版本化内部手册跑通章节切分、混合检索、引用回答和离线评估，建立可测量的 RAG 最小闭环。",
     "targetUser": "需要用私有资料构建可信问答的团队。",
     "stack": [
       "Next.js",
-      "PostgreSQL",
-      "pgvector",
-      "OpenAI API"
+      "TypeScript",
+      "Zod",
+      "Node Test"
     ],
     "features": [
       "文档版本管理",
@@ -139,9 +139,19 @@
       "rag-evaluation"
     ],
     "evidence": {
-      "summary": "当前仅完成架构、测试、部署和验收模板，尚无对应代码仓库、可运行 Demo 或测试输出。",
-      "commands": [],
-      "artifacts": []
+      "summary": "站内已提供确定性 RAG 原型：8 份版本化手册切为 16 个章节块，13 条评估题覆盖混合检索、稳定引用和未知问题拒答；暂未接入向量数据库与生成模型。",
+      "repositoryUrl": "https://github.com/a10255asd/liujixue-ai",
+      "demoPath": "/labs/rag-retrieval",
+      "verifiedAt": "2026-07-16",
+      "commands": [
+        "npm run test:unit",
+        "npm run build"
+      ],
+      "artifacts": [
+        "确定性文档摄取与混合检索引擎",
+        "13 条固定检索评估集与引用/拒答测试",
+        "桌面和手机端交互验收"
+      ]
     },
     "status": "published",
     "lastReviewedAt": "2026-07-15",

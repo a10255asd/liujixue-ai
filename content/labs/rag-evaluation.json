@@ -1,0 +1,15 @@
+[
+  { "id": "refund-window", "query": "退款成功后银行卡多久能到账？", "relevantChunkIds": ["refund-arrival-window"] },
+  { "id": "refund-overdue", "query": "退款超过七个工作日还没收到该怎么升级？", "relevantChunkIds": ["refund-escalation"] },
+  { "id": "account-hijack", "query": "收到不是本人操作的异地登录提醒怎么办？", "relevantChunkIds": ["suspicious-login-response"] },
+  { "id": "lost-mfa", "query": "双重验证设备丢了，也没有恢复码怎么办？", "relevantChunkIds": ["mfa-recovery"] },
+  { "id": "phone-disabled", "query": "原来的手机号码停用了，如何找回账号？", "relevantChunkIds": ["inactive-phone-recovery"] },
+  { "id": "appeal-time", "query": "账号申诉一般需要处理几天？", "relevantChunkIds": ["recovery-service-time"] },
+  { "id": "audit-format", "query": "团队版能不能把审计记录导成 CSV？", "relevantChunkIds": ["audit-export"] },
+  { "id": "audit-days", "query": "企业版的操作日志可以在线保存多久？", "relevantChunkIds": ["audit-retention"] },
+  { "id": "security-sla", "query": "数据泄露工单要求多久首次响应？", "relevantChunkIds": ["sla-priority"] },
+  { "id": "transfer-owner", "query": "管理员可以直接转让团队所有权吗？", "relevantChunkIds": ["ownership-transfer", "role-permissions"] },
+  { "id": "delete-recovery", "query": "团队空间删除后还能恢复多长时间？", "relevantChunkIds": ["workspace-deletion"] },
+  { "id": "api-backoff", "query": "接口返回 429 时应该怎样重试？", "relevantChunkIds": ["api-retry-policy", "api-rate-limit"] },
+  { "id": "unknown-pricing", "query": "个人专业版每个月具体多少钱？", "relevantChunkIds": [] }
+]

@@ -53,6 +53,7 @@ npm run build
 - `/interview`：AI 面试题库。
 - `/projects`：求职导向的项目实战清单。
 - `/labs/prompt-regression`：固定夹具驱动的 Prompt 回归原型，比较 Schema、业务规则、延迟和成本。
+- `/labs/rag-retrieval`：确定性 RAG 原型，覆盖版本化文档、混合检索、稳定引用、离线评估和未知问题拒答。
 - `/resources`：官方文档和高质量资料导航。
 - `/journal`：学习日志。
 

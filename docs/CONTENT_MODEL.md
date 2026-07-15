@@ -198,6 +198,8 @@ type PracticalProject = {
 - `verified`：在原型证据上增加真实代码仓库和完整验收记录。
 - 未达到 `verified` 时，`resumeBullet` 只能作为完成后的目标表达。
 
+实验室数据放在 `content/labs/`，不并入知识点计数。RAG 原型的文档与评估题分别由页面引擎使用 Zod 校验；文档章节 ID 必须稳定，因为检索评估和引用均以它作为契约。
+
 ## 5. 求职路径 CareerGuide
 
 `content/career.json` 是一个带公共审核字段的单例对象：

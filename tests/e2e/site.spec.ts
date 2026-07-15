@@ -10,6 +10,7 @@ const routes = [
   '/interview',
   '/projects',
   '/labs/prompt-regression',
+  '/labs/rag-retrieval',
   '/resources',
   '/journal'
 ]
@@ -72,14 +73,14 @@ test('training workspace restores selected track and local progress', async ({ p
 
 test('project catalog separates runnable evidence from blueprints', async ({ page }) => {
   await page.goto('/projects')
-  await expect(page.locator('.delivery-badge--prototype')).toHaveCount(1)
-  await expect(page.locator('.delivery-badge--blueprint')).toHaveCount(5)
+  await expect(page.locator('.delivery-badge--prototype')).toHaveCount(2)
+  await expect(page.locator('.delivery-badge--blueprint')).toHaveCount(4)
 
   await page.goto('/projects/prompt-debugger')
   await expect(page.getByRole('link', { name: /运行原型/ })).toBeVisible()
   await expect(page.getByText('固定响应夹具')).toBeVisible()
 
-  await page.goto('/projects/rag-knowledge-base')
+  await page.goto('/projects/task-planning-agent')
   await expect(page.getByText('尚无可执行命令')).toBeVisible()
   await expect(page.getByRole('link', { name: /运行原型/ })).toHaveCount(0)
 })
@@ -92,4 +93,20 @@ test('prompt regression prototype compares deterministic fixture reports', async
   await page.getByRole('tab', { name: /V2 契约化指令/ }).click()
   await expect(page.getByTestId('business-pass-rate')).toHaveText('100%')
   await expect(page.locator('.prompt-case .fail')).toHaveCount(0)
+})
+
+test('RAG prototype returns stable citations and rejects unsupported questions', async ({ page }) => {
+  await page.goto('/labs/rag-retrieval')
+  await expect(page.getByTestId('rag-eval-mrr')).toHaveText('1.000')
+  await expect(page.getByTestId('rag-citation')).toHaveCount(2)
+
+  await page.getByTestId('rag-query').fill('个人专业版每个月具体多少钱？')
+  await page.getByRole('button', { name: '检索并生成引用答案' }).click()
+  await expect(page.getByTestId('rag-answer')).toContainText('没有足够证据')
+  await expect(page.getByTestId('rag-citation')).toHaveCount(0)
+
+  await page.getByTestId('rag-query').fill('接口返回 429 时应该怎样重试？')
+  await page.getByRole('button', { name: '检索并生成引用答案' }).click()
+  await expect(page.getByTestId('rag-answer')).toContainText('指数退避')
+  await expect(page.getByTestId('rag-citation')).toHaveCount(2)
 })
