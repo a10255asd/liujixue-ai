@@ -13,6 +13,7 @@ const projects = readJson('../content/projects.json')
 const resources = readJson('../content/resources.json')
 const journals = readJson('../content/journals.json')
 const career = readJson('../content/career.json')
+const trainingTracks = readJson('../content/training-tracks.json')
 
 function assertUnique(items, key, label) {
   const values = items.map((item) => item[key])
@@ -33,6 +34,7 @@ test('all content identifiers are unique', () => {
   assertUnique(career.capabilities, 'id', '求职能力 id')
   assertUnique(career.weeks, 'week', '求职周次')
   assertUnique(career.assessment, 'id', '自测 id')
+  assertUnique(trainingTracks, 'slug', '训练路径 slug')
 })
 
 test('cross-content references resolve to real records', () => {
@@ -67,4 +69,12 @@ test('cross-content references resolve to real records', () => {
     assertRefs([week.projectRef], projectIds, `第 ${week.week} 周`)
   }
   for (const item of career.assessment) assertRefs([item.capabilityId], capabilityIds, `自测 ${item.id}`)
+  for (const track of trainingTracks) {
+    assertUnique(track.tasks, 'id', `训练路径 ${track.slug} 任务 id`)
+    for (const task of track.tasks) {
+      assertRefs(task.knowledgeRefs, new Set(knowledge.map((item) => item.slug)), `训练任务 ${track.slug}/${task.id}`)
+      assertRefs(task.questionRefs, questionIds, `训练任务 ${track.slug}/${task.id}`)
+      assertRefs(task.projectRefs, projectIds, `训练任务 ${track.slug}/${task.id}`)
+    }
+  }
 })

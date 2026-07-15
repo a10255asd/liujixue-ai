@@ -45,6 +45,7 @@ npm run build
 ## 第一版目标
 
 - 首页：AI Agent 学习控制台。
+- `/tracks`：三条从任务到项目证据和面试表达的实战训练路径，进度保存在本地浏览器。
 - `/roadmap`：从 0 到 Agent 工程师学习路线。
 - `/knowledge`：AI 工程知识库。
 - `/agent`：Agent 工程专题地图。

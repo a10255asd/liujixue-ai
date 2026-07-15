@@ -9,7 +9,8 @@ import {
   getJournals,
   getKnowledgePoints,
   getProjects,
-  getRoadmapStages
+  getRoadmapStages,
+  getTrainingTracks
 } from '@/lib/content/repository'
 
 export default function HomePage() {
@@ -18,6 +19,7 @@ export default function HomePage() {
   const questions = getInterviewQuestions()
   const projects = getProjects()
   const journals = getJournals()
+  const tracks = getTrainingTracks()
 
   return (
     <>
@@ -37,8 +39,8 @@ export default function HomePage() {
               一条给后端与全栈开发者的转型路径。知识、项目和面试题互相连接，每学一段都有可验证的工程产出。
             </p>
             <div className="hero-actions">
-              <Link className="button button--primary" href="/roadmap">
-                开始学习路线 <ArrowRight size={17} aria-hidden="true" />
+              <Link className="button button--primary" href="/tracks">
+                开始实战路径 <ArrowRight size={17} aria-hidden="true" />
               </Link>
               <Link className="button button--secondary" href="/career">查看求职能力矩阵</Link>
             </div>
@@ -73,20 +75,20 @@ export default function HomePage() {
       <section className="page-section page-shell">
         <SectionHeading
           index="01"
-          title="一条可执行的学习路线"
-          description="先建立共同语言，再进入 RAG、Agent、MCP 和生产工程。"
-          action={<Link className="text-link" href="/roadmap">查看完整路线 <ArrowRight size={16} /></Link>}
+          title="三条必须交付的实战路径"
+          description="从模型服务、生产级 RAG 到受控 Agent，每条路径都以验收证据结束。"
+          action={<Link className="text-link" href="/tracks">进入训练工作台 <ArrowRight size={16} /></Link>}
         />
         <div className="roadmap-preview">
-          {stages.map((stage) => (
-            <article className="roadmap-preview__item" key={stage.slug}>
-              <div className="roadmap-preview__index">{String(stage.order).padStart(2, '0')}</div>
+          {tracks.map((track) => (
+            <Link className="roadmap-preview__item" href={`/tracks#${track.slug}`} key={track.slug}>
+              <div className="roadmap-preview__index">{String(track.order).padStart(2, '0')}</div>
               <div>
-                <span>{stage.level}</span>
-                <h3>{stage.title}</h3>
-                <p>{stage.summary}</p>
+                <span>{track.durationWeeks} 周闭环</span>
+                <h3>{track.title}</h3>
+                <p>{track.summary}</p>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </section>

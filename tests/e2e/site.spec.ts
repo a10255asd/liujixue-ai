@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 const routes = [
   '/',
+  '/tracks',
   '/roadmap',
   '/knowledge',
   '/agent',
@@ -54,4 +55,16 @@ test('career assessment recommends the first unfinished week', async ({ page }) 
   await page.getByRole('checkbox', { name: '我能独立完成一次服务端模型调用，并正确管理密钥。' }).check()
   await expect(page.getByTestId('assessment-score')).toHaveText('8')
   await expect(page.getByTestId('assessment-next')).toContainText('建议从第 1 周开始')
+})
+
+test('training workspace restores selected track and local progress', async ({ page }) => {
+  await page.goto('/tracks#production-rag')
+  await expect(page.getByRole('tab', { name: /生产级 RAG/ })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByTestId('track-progress')).toHaveText('0')
+
+  await page.locator('.track-task input[type="checkbox"]').first().check()
+  await expect(page.getByTestId('track-progress')).toHaveText('50')
+
+  await page.reload()
+  await expect(page.getByTestId('track-progress')).toHaveText('50')
 })

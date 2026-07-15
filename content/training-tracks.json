@@ -1,0 +1,129 @@
+[
+  {
+    "slug": "llm-service-foundation",
+    "order": 1,
+    "kicker": "FOUNDATION",
+    "title": "LLM 服务工程起步",
+    "durationWeeks": 2,
+    "summary": "从一次模型调用开始，做到结构化输出、错误分支、回归样例和成本记录都可验证。",
+    "forWho": "还停留在聊天产品或零散 API Demo，希望建立第一份工程证据的人。",
+    "prerequisites": ["能阅读基础 TypeScript 或 Java 代码", "能使用 Git 和命令行运行项目"],
+    "outcomes": ["一个可运行的 Prompt 调试与回归台", "一份请求错误矩阵和质量对比报告", "一段能回答连续追问的 3 分钟项目讲解"],
+    "tasks": [
+      {
+        "id": "request-contract",
+        "title": "把模型调用写成服务契约",
+        "goal": "理解 Token、请求生命周期、限流、超时和可重试错误，不把 SDK 示例当作完整服务。",
+        "deliverable": "提交一个服务端调用接口，并附请求字段、错误分类、超时和密钥边界说明。",
+        "evidence": ["接口可在本地运行", "密钥只存在服务端环境变量", "至少覆盖参数错误、限流和超时三类失败"],
+        "knowledgeRefs": ["what-is-token", "responses-api-lifecycle"],
+        "questionRefs": ["token-basics", "responses-api-lifecycle", "llm-api-retry"],
+        "projectRefs": ["prompt-debugger"]
+      },
+      {
+        "id": "schema-regression",
+        "title": "建立结构化输出回归门禁",
+        "goal": "让输出同时通过 Schema 校验和业务校验，并能比较不同 Prompt 版本。",
+        "deliverable": "完成 Prompt 调试台最小版本、20 条固定样例以及质量、延迟、Token 对比表。",
+        "evidence": ["Schema 失败有独立处理分支", "20 条样例可重复执行", "版本对比不依赖主观印象"],
+        "knowledgeRefs": ["structured-outputs", "prompt-contract", "context-engineering"],
+        "questionRefs": ["structured-output-vs-json-mode", "prompt-contract-design", "prompt-versioning"],
+        "projectRefs": ["prompt-debugger"]
+      }
+    ],
+    "acceptanceChecklist": ["新环境能按 README 在 10 分钟内启动", "测试覆盖成功、Schema 失败、超时和限流", "报告包含质量、P95 延迟和单次成本", "3 分钟内能讲清目标、契约、失败处理和改进结果"],
+    "pitchPrompt": "为什么一次能返回文本的模型调用，还不能算生产可用的 AI 服务？请结合你的错误分类、Schema 校验和回归数据回答。",
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": ["Jixue Lab"],
+    "reviewers": ["Codex content review"]
+  },
+  {
+    "slug": "production-rag",
+    "order": 2,
+    "kicker": "CORE PROJECT",
+    "title": "生产级 RAG 闭环",
+    "durationWeeks": 2,
+    "summary": "不止做向量检索 Demo，而是把文档版本、混合检索、引用和分层评估连成完整证据链。",
+    "forWho": "已经会调用模型，准备完成第一项能写进 Agent 工程师简历的核心项目的人。",
+    "prerequisites": ["已完成 LLM 服务工程起步，或具备等价能力", "理解 HTTP API、数据库和基础检索概念"],
+    "outcomes": ["一个带来源引用的文档问答系统", "一套区分召回与生成失败的评估集", "一份可用于系统设计面试的架构和取舍说明"],
+    "tasks": [
+      {
+        "id": "retrieval-baseline",
+        "title": "做出可追踪的检索基线",
+        "goal": "完成文档解析、切片、Embedding、索引和带来源回答，并让文档与片段版本可追踪。",
+        "deliverable": "导入一组真实文档，输出检索片段、分数、文档版本和最终引用。",
+        "evidence": ["每条引用可回到原文", "切片策略和 top-k 有对照依据", "文档更新后能识别并重建受影响片段"],
+        "knowledgeRefs": ["embedding-basics", "chunking-strategy", "vector-search"],
+        "questionRefs": ["embedding-and-vector-search", "rag-chunking"],
+        "projectRefs": ["rag-knowledge-base"]
+      },
+      {
+        "id": "rag-quality-gate",
+        "title": "把 RAG 质量拆开评估",
+        "goal": "加入混合检索和重排，用固定数据集分别衡量召回、引用和答案忠实度。",
+        "deliverable": "提交不少于 30 条带正确证据的评估集，以及改动前后的分层报告。",
+        "evidence": ["能定位召回失败还是生成失败", "混合检索和重排有量化对比", "答案无证据时明确拒答或降级"],
+        "knowledgeRefs": ["hybrid-search", "reranking", "rag-evaluation"],
+        "questionRefs": ["hybrid-search-design", "rag-evaluation", "design-production-rag"],
+        "projectRefs": ["rag-knowledge-base"]
+      }
+    ],
+    "acceptanceChecklist": ["所有答案引用都能定位原文与版本", "至少 30 条评估样例覆盖命中、干扰和无答案场景", "报告分别呈现召回、重排、忠实度和延迟", "能解释为什么选择当前切片、top-k、检索和重排方案"],
+    "pitchPrompt": "你的 RAG 回答错误时，怎样判断问题发生在入库、召回、重排还是生成阶段？请结合评估数据和一次真实修复回答。",
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": ["Jixue Lab"],
+    "reviewers": ["Codex content review"]
+  },
+  {
+    "slug": "controlled-agent-production",
+    "order": 3,
+    "kicker": "JOB READY",
+    "title": "受控 Agent 生产化",
+    "durationWeeks": 3,
+    "summary": "用状态、工具契约、预算、人工确认和评估门禁，把多步骤 Agent 做到可恢复、可观测、可上线。",
+    "forWho": "已有一个可运行 AI 项目，希望证明自己具备 Agent 编排、评估和生产可靠性的人。",
+    "prerequisites": ["已完成生产级 RAG 或具备等价项目经验", "能独立设计 API、状态模型和自动化测试"],
+    "outcomes": ["一个有明确状态和终止条件的任务 Agent", "一套包含成功与失败轨迹的评估控制台", "完整的部署、监控、回滚和成本预算证据"],
+    "tasks": [
+      {
+        "id": "controlled-loop",
+        "title": "实现可停止、可恢复的 Agent Loop",
+        "goal": "把目标拆解、状态流转、工具白名单、预算和终止条件写成显式控制逻辑。",
+        "deliverable": "完成受控任务 Agent，并记录成功、阻塞、失败和恢复轨迹各至少 3 条。",
+        "evidence": ["状态机可解释并可恢复", "达到预算或终止条件后不会继续调用", "高风险工具需要明确人工确认"],
+        "knowledgeRefs": ["agent-loop", "tool-contract-design", "agent-stop-conditions", "human-in-the-loop"],
+        "questionRefs": ["agent-loop-control", "agent-tool-schema", "agent-stop-conditions", "human-in-the-loop"],
+        "projectRefs": ["task-planning-agent"]
+      },
+      {
+        "id": "trace-and-eval",
+        "title": "用轨迹评估定位失败步骤",
+        "goal": "为规划、工具调用、状态更新和最终结果建立 Trace 与固定评估集。",
+        "deliverable": "完成 Agent 评估控制台，展示结果分、轨迹分、失败分类和版本回归。",
+        "evidence": ["每次运行可定位具体失败步骤", "版本发布前有固定回归门禁", "工具参数、状态变化和耗时可追踪"],
+        "knowledgeRefs": ["agent-tracing", "agent-evaluation", "planning-routing"],
+        "questionRefs": ["agent-tracing", "agent-evaluation", "eval-regression-gate", "tool-call-evaluation"],
+        "projectRefs": ["agent-evaluation-console", "task-planning-agent"]
+      },
+      {
+        "id": "production-gate",
+        "title": "通过生产可靠性门禁",
+        "goal": "补齐幂等、超时、重试、权限、部署、监控、回滚、延迟和成本预算。",
+        "deliverable": "提交生产运行手册、故障演练记录和质量、P95、成本三项上线基线。",
+        "evidence": ["重复请求不会造成重复副作用", "关键故障有降级或回滚路径", "上线指标有阈值而非只看日志"],
+        "knowledgeRefs": ["production-reliability", "cost-latency-budget", "secrets-and-data-boundaries"],
+        "questionRefs": ["agent-idempotency-event-log", "latency-budgeting", "production-secret-management"],
+        "projectRefs": ["task-planning-agent", "agent-evaluation-console"]
+      }
+    ],
+    "acceptanceChecklist": ["工具权限、预算和终止条件都有自动化测试", "成功与失败轨迹能在控制台定位到具体步骤", "部署、监控、告警、回滚和故障演练记录完整", "质量、P95 延迟和单任务成本满足预设门禁", "能在 3 分钟讲解后继续回答状态、幂等、权限和评估追问"],
+    "pitchPrompt": "你的 Agent 为什么不会无限循环、重复执行副作用或越权调用工具？请结合状态机、幂等、预算、人工确认和评估轨迹回答。",
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": ["Jixue Lab"],
+    "reviewers": ["Codex content review"]
+  }
+]

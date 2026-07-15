@@ -12,7 +12,8 @@ export function SiteFooter() {
           <p className="site-footer__note">把学习过程沉淀成能复用、能展示、能面试的工程资产。</p>
         </div>
         <nav className="site-footer__nav" aria-label="页脚导航">
-          <Link href="/roadmap">学习路线</Link>
+          <Link href="/tracks">实战训练</Link>
+          <Link href="/roadmap">知识路线</Link>
           <Link href="/career">求职路径</Link>
           <Link href="/interview">面试题库</Link>
           <Link href="/projects">项目实战</Link>

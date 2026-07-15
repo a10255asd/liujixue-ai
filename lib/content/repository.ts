@@ -5,6 +5,7 @@ import knowledgeData from '@/content/knowledge-points.json'
 import projectData from '@/content/projects.json'
 import resourceData from '@/content/resources.json'
 import roadmapData from '@/content/roadmap.json'
+import trainingTracksData from '@/content/training-tracks.json'
 
 import {
   careerGuideSchema,
@@ -14,13 +15,15 @@ import {
   projectsSchema,
   resourcesSchema,
   roadmapSchema,
+  trainingTracksSchema,
   type CareerGuide,
   type InterviewQuestion,
   type KnowledgePoint,
   type LearningJournal,
   type PracticalProject,
   type ResourceLink,
-  type RoadmapStage
+  type RoadmapStage,
+  type TrainingTrack
 } from './schemas'
 
 const published = <T extends { status: string }>(items: T[]) =>
@@ -36,6 +39,7 @@ const journals = journalsSchema
   .filter((item) => item.status === 'published')
   .sort((a, b) => b.date.localeCompare(a.date))
 const careerGuide = careerGuideSchema.parse(careerData)
+const trainingTracks = published(trainingTracksSchema.parse(trainingTracksData)).sort((a, b) => a.order - b.order)
 
 export function getRoadmapStages(): RoadmapStage[] {
   return roadmap
@@ -75,4 +79,8 @@ export function getJournals(): LearningJournal[] {
 
 export function getCareerGuide(): CareerGuide {
   return careerGuide
+}
+
+export function getTrainingTracks(): TrainingTrack[] {
+  return trainingTracks
 }

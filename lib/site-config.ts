@@ -6,7 +6,7 @@ export const siteConfig = {
   mainSiteUrl: 'https://liujixue.cn',
   blogUrl: 'https://blog.liujixue.cn',
   navigation: [
-    { href: '/roadmap', label: '路线' },
+    { href: '/tracks', label: '训练' },
     { href: '/knowledge', label: '知识库' },
     { href: '/agent', label: 'Agent' },
     { href: '/career', label: '求职' },

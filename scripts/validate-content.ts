@@ -5,7 +5,8 @@ import {
   getKnowledgePoints,
   getProjects,
   getResources,
-  getRoadmapStages
+  getRoadmapStages,
+  getTrainingTracks
 } from '../lib/content/repository'
 
 function assertUnique(values: string[], label: string): void {
@@ -36,6 +37,7 @@ const projects = getProjects()
 const resources = getResources()
 const journals = getJournals()
 const career = getCareerGuide()
+const trainingTracks = getTrainingTracks()
 
 assertUnique(roadmap.map((item) => item.slug), '路线 slug')
 assertUnique(roadmap.map((item) => String(item.order)), '路线 order')
@@ -47,6 +49,8 @@ assertUnique(journals.map((item) => item.slug), '日志 slug')
 assertUnique(career.capabilities.map((item) => item.id), '求职能力 id')
 assertUnique(career.weeks.map((item) => String(item.week)), '求职周次')
 assertUnique(career.assessment.map((item) => item.id), '自测 id')
+assertUnique(trainingTracks.map((item) => item.slug), '训练路径 slug')
+assertUnique(trainingTracks.map((item) => String(item.order)), '训练路径 order')
 
 const roadmapIds = new Set(roadmap.map((item) => item.slug))
 const questionIds = new Set(questions.map((item) => item.id))
@@ -96,6 +100,15 @@ for (const item of career.assessment) {
   assertReferences(`自测 ${item.id}`, [item.capabilityId], capabilityIds, '求职能力')
 }
 
+for (const track of trainingTracks) {
+  assertUnique(track.tasks.map((task) => task.id), `训练路径 ${track.slug} 任务 id`)
+  for (const task of track.tasks) {
+    assertReferences(`训练任务 ${track.slug}/${task.id}`, task.knowledgeRefs, knowledgeIds, '知识点')
+    assertReferences(`训练任务 ${track.slug}/${task.id}`, task.questionRefs, questionIds, '面试题')
+    assertReferences(`训练任务 ${track.slug}/${task.id}`, task.projectRefs, projectIds, '项目')
+  }
+}
+
 console.log(
-  `内容校验通过：${roadmap.length} 阶段、${knowledge.length} 知识点、${questions.length} 面试题、${projects.length} 项目、${resources.length} 资料、${journals.length} 日志、${career.capabilities.length} 求职能力`
+  `内容校验通过：${roadmap.length} 阶段、${trainingTracks.length} 训练路径、${knowledge.length} 知识点、${questions.length} 面试题、${projects.length} 项目、${resources.length} 资料、${journals.length} 日志、${career.capabilities.length} 求职能力`
 )

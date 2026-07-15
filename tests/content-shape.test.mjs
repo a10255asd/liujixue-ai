@@ -32,7 +32,8 @@ test('all published records carry audit fields', () => {
     '../content/interview-questions.json',
     '../content/projects.json',
     '../content/resources.json',
-    '../content/journals.json'
+    '../content/journals.json',
+    '../content/training-tracks.json'
   ]
 
   for (const file of files) {
@@ -41,6 +42,25 @@ test('all published records carry audit fields', () => {
       assert.match(item.lastReviewedAt, /^\d{4}-\d{2}-\d{2}$/)
       assert.ok(Array.isArray(item.authors) && item.authors.length > 0)
       assert.ok(Array.isArray(item.reviewers) && item.reviewers.length > 0)
+    }
+  }
+})
+
+test('training tracks define three evidence-driven delivery loops', () => {
+  const tracks = readJson('../content/training-tracks.json')
+  assert.equal(tracks.length, 3)
+  assert.deepEqual(tracks.map((item) => item.order), [1, 2, 3])
+
+  for (const track of tracks) {
+    assert.ok(track.tasks.length >= 2)
+    assert.ok(track.acceptanceChecklist.length >= 4)
+    assert.ok(track.pitchPrompt)
+    for (const task of track.tasks) {
+      assert.ok(task.deliverable)
+      assert.ok(task.evidence.length >= 2)
+      assert.ok(task.knowledgeRefs.length > 0)
+      assert.ok(task.questionRefs.length > 0)
+      assert.ok(task.projectRefs.length > 0)
     }
   }
 })

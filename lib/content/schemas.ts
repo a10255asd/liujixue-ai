@@ -144,6 +144,32 @@ export const careerGuideSchema = z.object({
   assessment: z.array(assessmentItemSchema).min(8)
 }).merge(contentAuditFieldsSchema)
 
+export const trainingTaskSchema = z.object({
+  id: nonEmptyString,
+  title: nonEmptyString,
+  goal: nonEmptyString,
+  deliverable: nonEmptyString,
+  evidence: stringList.min(2),
+  knowledgeRefs: stringList.min(1),
+  questionRefs: stringList.min(1),
+  projectRefs: stringList.min(1)
+})
+
+export const trainingTrackSchema = z.object({
+  slug: nonEmptyString,
+  order: z.number().int().positive(),
+  kicker: nonEmptyString,
+  title: nonEmptyString,
+  durationWeeks: z.number().int().min(1).max(8),
+  summary: nonEmptyString,
+  forWho: nonEmptyString,
+  prerequisites: stringList.min(1),
+  outcomes: stringList.min(2),
+  tasks: z.array(trainingTaskSchema).min(2),
+  acceptanceChecklist: stringList.min(4),
+  pitchPrompt: nonEmptyString
+}).merge(contentAuditFieldsSchema)
+
 export const resourceLinkSchema = z.object({
   id: nonEmptyString,
   title: nonEmptyString,
@@ -174,6 +200,7 @@ export const interviewSchema = z.array(interviewQuestionSchema)
 export const projectsSchema = z.array(practicalProjectSchema)
 export const resourcesSchema = z.array(resourceLinkSchema)
 export const journalsSchema = z.array(learningJournalSchema)
+export const trainingTracksSchema = z.array(trainingTrackSchema)
 
 export type RoadmapStage = z.infer<typeof roadmapStageSchema>
 export type KnowledgePoint = z.infer<typeof knowledgePointSchema>
@@ -186,3 +213,5 @@ export type CareerCapability = z.infer<typeof careerCapabilitySchema>
 export type CareerWeek = z.infer<typeof careerWeekSchema>
 export type AssessmentItem = z.infer<typeof assessmentItemSchema>
 export type CareerGuide = z.infer<typeof careerGuideSchema>
+export type TrainingTask = z.infer<typeof trainingTaskSchema>
+export type TrainingTrack = z.infer<typeof trainingTrackSchema>

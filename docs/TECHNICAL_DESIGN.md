@@ -125,6 +125,7 @@ liujixue-ai/
 │   ├── not-found.tsx
 │   ├── sitemap.ts
 │   ├── robots.ts
+│   ├── tracks/page.tsx
 │   ├── roadmap/page.tsx
 │   ├── knowledge/page.tsx
 │   ├── knowledge/[slug]/page.tsx
@@ -147,6 +148,7 @@ liujixue-ai/
 │   ├── interview-questions.json
 │   ├── projects.json
 │   ├── career.json
+│   ├── training-tracks.json
 │   ├── resources.json
 │   └── journals.json
 ├── lib/
@@ -249,6 +251,7 @@ getProjects(): PracticalProject[]
 getProjectBySlug(slug: string): PracticalProject | null
 getResources(): ResourceLink[]
 getJournals(): LearningJournal[]
+getTrainingTracks(): TrainingTrack[]
 ```
 
 关系查询放入 `lib/content/relations.ts`：
@@ -258,6 +261,7 @@ getQuestionsForKnowledge(slug: string): InterviewQuestion[]
 getProjectsForKnowledge(slug: string): PracticalProject[]
 getQuestionsForProject(slug: string): InterviewQuestion[]
 getRoadmapDependencies(slug: string): RoadmapStage[]
+getTrainingTrackWorkspace(): ResolvedTrainingTrack[]
 ```
 
 页面只能使用这些函数，不能在页面组件中重复写查找、排序和关系拼装逻辑。
@@ -311,21 +315,28 @@ type ContentAuditFields = {
 
 ### 8.1 `/` 首页
 
-数据：路线阶段、精选面试题、精选项目、最近日志。  
-主要组件：`HeroConsole`、`RoadmapPreview`、`InterviewPreview`、`ProjectPreview`、`JournalPreview`。  
+数据：三条训练路径、路线阶段、精选面试题、精选项目、最近日志。
+主要组件：`HeroConsole`、`TrainingTrackPreview`、`InterviewPreview`、`ProjectPreview`、`JournalPreview`。
 交互：只提供明确入口，不在首页做复杂筛选。  
 SEO：标题聚焦“AI Agent 工程学习路线、面试题与项目实战”。
 
 首页不是课程销售页。首屏需要在一个视口内说明：这是给谁的、能学什么、从哪里开始。
 
-### 8.2 `/roadmap`
+### 8.2 `/tracks`
+
+数据：固定 3 条 `TrainingTrack`，关系层把每个任务的知识、题目和项目引用解析成可访问链接。
+交互：Hash 直达指定路径；任务完成状态保存在 `localStorage`，键为 `jixue-ai:training-progress:v1`；不登录、不上传用户数据。
+完成定义：复选状态只是个人进度，真正完成仍以路径 `acceptanceChecklist` 和项目验收证据为准。
+响应式：桌面横向路径切换、任务四列；390px 下路径和任务全部单列，不允许横向滚动。
+
+### 8.3 `/roadmap`
 
 数据：按 `order` 升序的全部路线阶段。  
 主要组件：`RoadmapRail`、`StageSection`、`OutputChecklist`。  
 交互：移动端按阶段纵向浏览；桌面端可使用吸顶阶段导航。  
 错误处理：存在重复 order 或断裂 prerequisite 时构建失败。
 
-### 8.3 `/knowledge`
+### 8.4 `/knowledge`
 
 数据：全部已发布知识点。  
 筛选参数：`category`、`level`、`q`。  
@@ -333,49 +344,49 @@ URL：筛选状态同步到 query string，分享链接可恢复状态。
 搜索范围：标题、summary、category 和标签；首版使用标准化字符串包含匹配。  
 空状态：说明当前筛选没有结果，并提供清除筛选按钮。
 
-### 8.4 `/knowledge/[slug]`
+### 8.5 `/knowledge/[slug]`
 
 数据：知识点、关联面试题、关联项目、参考资料。  
 静态参数：由所有 published knowledge slug 生成。  
 404：slug 不存在时调用 `notFound()`。  
 页面结构：摘要、重要性、原理、工程实践、示例、误区、面试表达、关联内容、参考资料。
 
-### 8.5 `/agent`
+### 8.6 `/agent`
 
 定位：Agent 工程专题地图，不复制知识库列表。  
 数据：category 为 `agent`、`mcp`、`eval`、`security` 的知识点和相关项目。  
 结构：Agent Loop 主流程、能力地图、可靠性清单、推荐项目和面试题。
 
-### 8.6 `/interview`
+### 8.7 `/interview`
 
 数据：全部已发布面试题。  
 筛选参数：`category`、`level`、`tag`、`q`。  
 默认展示：题目、难度、考察点，答案默认折叠。  
 首版状态：刷新后不保存“已掌握”，避免伪造学习系统。
 
-### 8.7 `/interview/[id]`
+### 8.8 `/interview/[id]`
 
 数据：题目、完整答案、追问、关联项目、参考资料。  
 页面应支持分段阅读，短答案与完整答案视觉层级明确。  
 禁止：把“复制标准答案”设计成核心目标；页面应帮助用户建立回答结构。
 
-### 8.8 `/projects` 与 `/projects/[slug]`
+### 8.9 `/projects` 与 `/projects/[slug]`
 
 列表按难度和技术栈筛选。详情页必须包含：问题、目标用户、架构、功能、实现步骤、技术难点、测试策略、部署步骤、验收清单、3 分钟讲解、简历表达和面试追问。
 
 项目状态后续增加：`planned | building | shipped | archived`。只有 `shipped` 项目显示 demo URL。
 
-### 8.9 `/career`
+### 8.10 `/career`
 
 数据：`career.json` 中的 8 个能力域、8 周计划和有序自测题。关系层负责解析知识、题目和项目引用，引用不存在时内容校验失败。
 
 自测算法完全在浏览器本地执行，不保存用户数据、不调用模型：得分为已确认项占比；按顺序找到首个未确认项，并推荐其 `week` 与 `actionHref`。所有项目交付字段由 Schema 强制至少 3 项。
 
-### 8.10 `/resources`
+### 8.11 `/resources`
 
 按路线阶段和来源类型组织。外链必须带 `rel="noopener noreferrer"`。每个资源显示“适合什么时候看”，避免变成链接仓库。
 
-### 8.11 `/journal`
+### 8.12 `/journal`
 
 日志按日期倒序。每条记录必须关联一个路线阶段和至少一个产出。后续可增加详情页，但 Batch 1 只做列表。
 

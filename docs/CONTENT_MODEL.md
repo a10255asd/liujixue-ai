@@ -224,6 +224,38 @@ type CareerGuide = {
 
 能力、周次、自测 order 必须唯一；所有跨内容引用必须在构建时解析成功。自测顺序就是推荐算法的先修顺序，不允许页面自行重排。
 
+## 5A. 实战训练路径 TrainingTrack
+
+`content/training-tracks.json` 只保留 3 条核心交付路径，不用于继续扩张内容数量：
+
+```ts
+type TrainingTrack = ContentAuditFields & {
+  slug: string
+  order: number
+  kicker: string
+  title: string
+  durationWeeks: number
+  summary: string
+  forWho: string
+  prerequisites: string[]
+  outcomes: string[]
+  tasks: Array<{
+    id: string
+    title: string
+    goal: string
+    deliverable: string
+    evidence: string[]
+    knowledgeRefs: string[]
+    questionRefs: string[]
+    projectRefs: string[]
+  }>
+  acceptanceChecklist: string[]
+  pitchPrompt: string
+}
+```
+
+约束：路径 slug 和 order 唯一；同一路径内任务 ID 唯一；每个任务必须同时引用真实知识点、面试题和项目；验收清单至少 4 项。浏览器进度只记录任务复选状态，不代表项目已经验收通过。
+
 ## 6. 资料 ResourceLink
 
 ```ts

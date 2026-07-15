@@ -5,7 +5,8 @@ import {
   getKnowledgeBySlug,
   getProjectBySlug,
   getProjects,
-  getRoadmapStages
+  getRoadmapStages,
+  getTrainingTracks
 } from './repository'
 import type { InterviewQuestion, PracticalProject, RoadmapStage } from './schemas'
 
@@ -79,4 +80,25 @@ export function getCareerWeekEvidence(weekNumber: number) {
     }),
     project: getProjectBySlug(week.projectRef)
   }
+}
+
+export function getTrainingTrackWorkspace() {
+  return getTrainingTracks().map((track) => ({
+    ...track,
+    tasks: track.tasks.map((task) => ({
+      ...task,
+      knowledge: task.knowledgeRefs.flatMap((slug) => {
+        const item = getKnowledgeBySlug(slug)
+        return item ? [{ slug: item.slug, title: item.title }] : []
+      }),
+      questions: task.questionRefs.flatMap((id) => {
+        const item = getInterviewQuestionById(id)
+        return item ? [{ id: item.id, title: item.question }] : []
+      }),
+      projects: task.projectRefs.flatMap((slug) => {
+        const item = getProjectBySlug(slug)
+        return item ? [{ slug: item.slug, title: item.title }] : []
+      })
+    }))
+  }))
 }
