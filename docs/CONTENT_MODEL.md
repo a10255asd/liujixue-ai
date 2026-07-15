@@ -159,6 +159,10 @@ type PracticalProject = {
   architecture: string
   implementationSteps: string[]
   hardParts: string[]
+  testStrategy: string[]
+  deploymentPlan: string[]
+  acceptanceChecklist: string[]
+  pitchOutline: string[]
   interviewValue: string
   resumeBullet: string
   relatedQuestions: string[]
@@ -174,9 +178,53 @@ type PracticalProject = {
 - 技术栈是什么。
 - 核心架构是什么。
 - 难点在哪里。
+- 如何测试、部署和验收。
+- 如何在 3 分钟内讲清目标、架构、难点、测试和结果。
 - 面试官会怎么追问。
 
-## 5. 资料 ResourceLink
+## 5. 求职路径 CareerGuide
+
+`content/career.json` 是一个带公共审核字段的单例对象：
+
+```ts
+type CareerGuide = {
+  capabilities: Array<{
+    id: string
+    order: number
+    title: string
+    priority: '基础' | '核心' | '加分'
+    summary: string
+    jdSignals: string[]
+    proofPoints: string[]
+    knowledgeRefs: string[]
+    questionRefs: string[]
+    projectRefs: string[]
+  }>
+  weeks: Array<{
+    week: number
+    title: string
+    focus: string
+    deliverables: string[]
+    exitCriteria: string[]
+    knowledgeRefs: string[]
+    questionRefs: string[]
+    projectRef: string
+  }>
+  assessment: Array<{
+    id: string
+    order: number
+    capabilityId: string
+    week: number
+    statement: string
+    actionHref: string
+    actionLabel: string
+  }>
+}
+```
+
+能力、周次、自测 order 必须唯一；所有跨内容引用必须在构建时解析成功。自测顺序就是推荐算法的先修顺序，不允许页面自行重排。
+
+## 6. 资料 ResourceLink
 
 ```ts
 type ResourceLink = {
@@ -197,7 +245,7 @@ type ResourceLink = {
 2. 可运行示例优先。
 3. 与当前路线阶段相关优先。
 
-## 6. 学习日志 LearningJournal
+## 7. 学习日志 LearningJournal
 
 ```ts
 type LearningJournal = {
@@ -223,7 +271,7 @@ type LearningJournal = {
 - 能转成哪道面试题。
 - 下一步做什么。
 
-## 7. 标签系统
+## 8. 标签系统
 
 建议基础标签：
 
@@ -247,7 +295,7 @@ Interview
 Resume
 ```
 
-## 8. URL 规则
+## 9. URL 规则
 
 - 知识点：`/knowledge/[slug]`
 - 面试题：`/interview/[id]`

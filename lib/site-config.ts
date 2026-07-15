@@ -9,6 +9,7 @@ export const siteConfig = {
     { href: '/roadmap', label: '路线' },
     { href: '/knowledge', label: '知识库' },
     { href: '/agent', label: 'Agent' },
+    { href: '/career', label: '求职' },
     { href: '/interview', label: '面试题' },
     { href: '/projects', label: '项目' },
     { href: '/resources', label: '资料' },

@@ -1,0 +1,192 @@
+{
+  "capabilities": [
+    {
+      "id": "llm-api-engineering",
+      "title": "LLM API 工程",
+      "priority": "基础",
+      "summary": "把模型调用做成可校验、可重试、可观测的服务能力。",
+      "jdSignals": ["熟悉主流大模型 API", "掌握流式响应与结构化输出", "具备成本和限流意识"],
+      "proofPoints": ["展示 Schema 校验失败如何处理", "用固定样例比较质量、延迟和 Token"],
+      "knowledgeRefs": ["responses-api-lifecycle", "structured-outputs", "streaming-responses"],
+      "questionRefs": ["responses-api-lifecycle", "structured-output-vs-json-mode", "llm-api-retry"],
+      "projectRefs": ["prompt-debugger"]
+    },
+    {
+      "id": "prompt-context",
+      "title": "Prompt 与上下文工程",
+      "priority": "基础",
+      "summary": "把指令、状态和不可信数据组织成可测试的上下文契约。",
+      "jdSignals": ["掌握 Prompt Engineering", "理解上下文管理", "了解 Prompt Injection"],
+      "proofPoints": ["提交版本化 Prompt 与回归集", "能说明数据和指令的安全边界"],
+      "knowledgeRefs": ["prompt-contract", "context-engineering", "prompt-injection-defense"],
+      "questionRefs": ["prompt-contract-design", "context-engineering-vs-prompt", "prompt-injection-defense"],
+      "projectRefs": ["prompt-debugger"]
+    },
+    {
+      "id": "rag-engineering",
+      "title": "RAG 检索工程",
+      "priority": "核心",
+      "summary": "独立完成文档入库、混合检索、重排、引用和分层评估。",
+      "jdSignals": ["有 RAG 项目经验", "熟悉向量数据库", "理解召回、重排与评估"],
+      "proofPoints": ["展示带正确证据的评估集", "能定位召回失败和生成失败"],
+      "knowledgeRefs": ["chunking-strategy", "hybrid-search", "rag-evaluation"],
+      "questionRefs": ["rag-chunking", "hybrid-search-design", "rag-evaluation"],
+      "projectRefs": ["rag-knowledge-base"]
+    },
+    {
+      "id": "agent-orchestration",
+      "title": "Agent 控制与编排",
+      "priority": "核心",
+      "summary": "用状态、工具契约、预算和终止条件控制多步骤执行。",
+      "jdSignals": ["理解 Agent 架构", "有 Tool Calling 实践", "熟悉状态与工作流编排"],
+      "proofPoints": ["展示可恢复状态机和工具轨迹", "说明何时使用工作流而非 Agent"],
+      "knowledgeRefs": ["agent-loop", "tool-contract-design", "agent-stop-conditions"],
+      "questionRefs": ["agent-loop-control", "agent-tool-schema", "workflow-vs-agent"],
+      "projectRefs": ["task-planning-agent", "ai-interviewer"]
+    },
+    {
+      "id": "mcp-tools",
+      "title": "MCP 与工具接入",
+      "priority": "加分",
+      "summary": "按协议角色和最小权限原则暴露外部工具与数据。",
+      "jdSignals": ["了解 MCP 协议", "能开发 MCP Server", "具备工具权限意识"],
+      "proofPoints": ["实现可运行的 MCP Server", "提供路径沙箱、审计和协议测试"],
+      "knowledgeRefs": ["mcp-architecture", "mcp-primitives", "mcp-security"],
+      "questionRefs": ["mcp-architecture-question", "mcp-primitives", "mcp-security"],
+      "projectRefs": ["mcp-file-assistant"]
+    },
+    {
+      "id": "eval-observability",
+      "title": "Eval 与可观测性",
+      "priority": "核心",
+      "summary": "用数据集、轨迹和质量门禁判断版本是否真的更好。",
+      "jdSignals": ["具备 AI 评估经验", "熟悉 Trace 与监控", "能建立质量指标"],
+      "proofPoints": ["展示结果分与轨迹分", "用回归门禁比较模型或 Prompt 版本"],
+      "knowledgeRefs": ["agent-tracing", "agent-evaluation", "rag-evaluation"],
+      "questionRefs": ["agent-evaluation", "eval-regression-gate", "tool-call-evaluation"],
+      "projectRefs": ["agent-evaluation-console", "rag-knowledge-base"]
+    },
+    {
+      "id": "production-reliability",
+      "title": "生产稳定性",
+      "priority": "核心",
+      "summary": "处理重试、幂等、权限、部署、延迟与成本预算。",
+      "jdSignals": ["具备生产部署经验", "理解高并发与故障恢复", "重视安全和成本"],
+      "proofPoints": ["提供部署和回滚步骤", "展示幂等、超时与降级测试"],
+      "knowledgeRefs": ["production-reliability", "cost-latency-budget", "secrets-and-data-boundaries"],
+      "questionRefs": ["llm-api-retry", "latency-budgeting", "production-secret-management"],
+      "projectRefs": ["task-planning-agent", "agent-evaluation-console"]
+    },
+    {
+      "id": "system-design-communication",
+      "title": "系统设计与项目表达",
+      "priority": "核心",
+      "summary": "把业务目标、架构取舍、失败处理和量化结果讲成完整证据链。",
+      "jdSignals": ["具备系统设计能力", "能独立推进项目", "沟通和文档能力良好"],
+      "proofPoints": ["完成 3 分钟项目讲解", "能用架构图、测试和指标回答连续追问"],
+      "knowledgeRefs": ["planning-routing", "agent-evaluation", "production-reliability"],
+      "questionRefs": ["design-support-agent", "design-production-rag", "agent-idempotency-event-log"],
+      "projectRefs": ["rag-knowledge-base", "task-planning-agent", "agent-evaluation-console"]
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "title": "模型调用基础",
+      "focus": "从会用聊天产品转为能解释并封装一次模型请求。",
+      "deliverables": ["可运行的 Responses API 示例", "Token、错误和延迟记录表"],
+      "exitCriteria": ["能解释请求生命周期", "能正确处理密钥和基础错误"],
+      "knowledgeRefs": ["what-is-token", "responses-api-lifecycle"],
+      "questionRefs": ["token-basics", "responses-api-lifecycle"],
+      "projectRef": "prompt-debugger"
+    },
+    {
+      "week": 2,
+      "title": "Prompt 调试与结构化输出",
+      "focus": "把提示词、Schema 和失败样例做成可回归的工程流程。",
+      "deliverables": ["Prompt 调试与回归台最小版本", "不少于 20 条固定评估样例"],
+      "exitCriteria": ["Schema 失败有明确分支", "不同版本可比较质量和成本"],
+      "knowledgeRefs": ["structured-outputs", "prompt-contract"],
+      "questionRefs": ["structured-output-vs-json-mode", "prompt-versioning"],
+      "projectRef": "prompt-debugger"
+    },
+    {
+      "week": 3,
+      "title": "RAG 最小闭环",
+      "focus": "完成文档切分、Embedding、检索和带来源回答。",
+      "deliverables": ["可导入文档的 RAG 原型", "检索结果与引用展示"],
+      "exitCriteria": ["文档版本和片段可追踪", "能解释切片与 top-k 选择"],
+      "knowledgeRefs": ["embedding-basics", "chunking-strategy", "vector-search"],
+      "questionRefs": ["embedding-and-vector-search", "rag-chunking"],
+      "projectRef": "rag-knowledge-base"
+    },
+    {
+      "week": 4,
+      "title": "RAG 质量与评估",
+      "focus": "加入混合检索、重排、引用校验和分层评估。",
+      "deliverables": ["带正确证据的评估集", "检索与生成分层报告"],
+      "exitCriteria": ["能区分召回和生成失败", "改动前后有量化对比"],
+      "knowledgeRefs": ["hybrid-search", "reranking", "rag-evaluation"],
+      "questionRefs": ["hybrid-search-design", "rag-evaluation"],
+      "projectRef": "rag-knowledge-base"
+    },
+    {
+      "week": 5,
+      "title": "受控 Agent",
+      "focus": "实现状态、工具、停止、预算和人工确认。",
+      "deliverables": ["受控任务 Agent 最小版本", "成功与失败轨迹各 5 条"],
+      "exitCriteria": ["模型不能突破工具白名单", "任务可完成、阻塞、失败和恢复"],
+      "knowledgeRefs": ["agent-loop", "tool-contract-design", "human-in-the-loop"],
+      "questionRefs": ["agent-loop-control", "agent-stop-conditions", "human-in-the-loop"],
+      "projectRef": "task-planning-agent"
+    },
+    {
+      "week": 6,
+      "title": "MCP 工具生态",
+      "focus": "开发最小权限 MCP Server，并理解 Host 与 Client 边界。",
+      "deliverables": ["文件读取 MCP Server", "威胁模型和协议测试"],
+      "exitCriteria": ["能区分三类 MCP 原语", "路径穿越和越权测试通过"],
+      "knowledgeRefs": ["mcp-architecture", "mcp-primitives", "mcp-security"],
+      "questionRefs": ["what-is-mcp", "mcp-security"],
+      "projectRef": "mcp-file-assistant"
+    },
+    {
+      "week": 7,
+      "title": "评估与生产化",
+      "focus": "为 Agent 建立 Trace、回归门禁、部署和成本预算。",
+      "deliverables": ["Agent 评估控制台最小版本", "部署、回滚和监控清单"],
+      "exitCriteria": ["能定位具体失败步骤", "质量、P95 和成本均有基线"],
+      "knowledgeRefs": ["agent-tracing", "agent-evaluation", "cost-latency-budget"],
+      "questionRefs": ["agent-tracing", "eval-regression-gate", "latency-budgeting"],
+      "projectRef": "agent-evaluation-console"
+    },
+    {
+      "week": 8,
+      "title": "作品集与面试冲刺",
+      "focus": "把项目产出转化为简历、演示和系统设计回答。",
+      "deliverables": ["两个完整项目案例", "3 分钟讲解稿", "一轮 80 题分模块复盘"],
+      "exitCriteria": ["项目可演示且验收清单通过", "能连续回答架构、失败、测试和指标追问"],
+      "knowledgeRefs": ["planning-routing", "production-reliability"],
+      "questionRefs": ["design-support-agent", "design-production-rag", "design-coding-agent"],
+      "projectRef": "agent-evaluation-console"
+    }
+  ],
+  "assessment": [
+    { "id": "api-call", "capabilityId": "llm-api-engineering", "week": 1, "statement": "我能独立完成一次服务端模型调用，并正确管理密钥。", "actionHref": "/knowledge/responses-api-lifecycle", "actionLabel": "学习请求生命周期" },
+    { "id": "api-errors", "capabilityId": "llm-api-engineering", "week": 1, "statement": "我能区分参数错误、限流、超时和可重试错误。", "actionHref": "/interview/llm-api-retry", "actionLabel": "练习重试问题" },
+    { "id": "schema", "capabilityId": "prompt-context", "week": 2, "statement": "我能用 Schema 约束输出，并处理结构通过但业务错误的情况。", "actionHref": "/knowledge/structured-outputs", "actionLabel": "学习结构化输出" },
+    { "id": "prompt-eval", "capabilityId": "prompt-context", "week": 2, "statement": "我有固定评估样例，而不是凭感觉修改 Prompt。", "actionHref": "/projects/prompt-debugger", "actionLabel": "查看调试台项目" },
+    { "id": "rag-pipeline", "capabilityId": "rag-engineering", "week": 3, "statement": "我能独立解释并实现 RAG 的入库、检索和生成链路。", "actionHref": "/projects/rag-knowledge-base", "actionLabel": "查看 RAG 项目" },
+    { "id": "rag-eval", "capabilityId": "rag-engineering", "week": 4, "statement": "我能分别评估召回、重排、答案忠实度和引用。", "actionHref": "/knowledge/rag-evaluation", "actionLabel": "学习 RAG 评估" },
+    { "id": "agent-loop", "capabilityId": "agent-orchestration", "week": 5, "statement": "我能设计带状态、工具、预算和终止条件的 Agent Loop。", "actionHref": "/projects/task-planning-agent", "actionLabel": "查看受控 Agent" },
+    { "id": "agent-safety", "capabilityId": "agent-orchestration", "week": 5, "statement": "我能说明工具权限、人工确认和失败恢复的实现位置。", "actionHref": "/interview/agent-tool-permissions", "actionLabel": "练习工具权限" },
+    { "id": "mcp", "capabilityId": "mcp-tools", "week": 6, "statement": "我能开发一个最小权限 MCP Server，并解释三类原语。", "actionHref": "/projects/mcp-file-assistant", "actionLabel": "查看 MCP 项目" },
+    { "id": "eval", "capabilityId": "eval-observability", "week": 7, "statement": "我能用 Trace 和固定数据集定位 Agent 的具体失败步骤。", "actionHref": "/projects/agent-evaluation-console", "actionLabel": "查看评估控制台" },
+    { "id": "production", "capabilityId": "production-reliability", "week": 7, "statement": "我能给项目写出部署、监控、回滚、幂等和成本预算。", "actionHref": "/knowledge/production-reliability", "actionLabel": "学习生产可靠性" },
+    { "id": "pitch", "capabilityId": "system-design-communication", "week": 8, "statement": "我能在 3 分钟内讲清项目目标、架构、难点、测试和量化结果。", "actionHref": "/projects", "actionLabel": "完善项目案例" }
+  ],
+  "status": "published",
+  "lastReviewedAt": "2026-07-15",
+  "authors": ["Jixue Lab"],
+  "reviewers": ["Codex content review"]
+}

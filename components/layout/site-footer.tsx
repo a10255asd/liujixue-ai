@@ -13,6 +13,7 @@ export function SiteFooter() {
         </div>
         <nav className="site-footer__nav" aria-label="页脚导航">
           <Link href="/roadmap">学习路线</Link>
+          <Link href="/career">求职路径</Link>
           <Link href="/interview">面试题库</Link>
           <Link href="/projects">项目实战</Link>
           <a href={siteConfig.mainSiteUrl} target="_blank" rel="noreferrer">

@@ -45,6 +45,17 @@ test('all published records carry audit fields', () => {
   }
 })
 
+test('career guide has a complete deterministic path', () => {
+  const career = readJson('../content/career.json')
+  assert.equal(career.status, 'published')
+  assert.match(career.lastReviewedAt, /^\d{4}-\d{2}-\d{2}$/)
+  assert.ok(career.authors.length > 0 && career.reviewers.length > 0)
+  assert.equal(career.capabilities.length, 8)
+  assert.equal(career.weeks.length, 8)
+  assert.equal(career.assessment.length, 12)
+  assert.deepEqual(career.weeks.map((item) => item.week), [1, 2, 3, 4, 5, 6, 7, 8])
+})
+
 test('interview questions include answer training fields', () => {
   const questions = readJson('../content/interview-questions.json')
   assert.equal(questions.length, 80)
@@ -68,5 +79,9 @@ test('practical projects include resume value', () => {
     assert.ok(project.interviewValue)
     assert.ok(project.resumeBullet)
     assert.ok(Array.isArray(project.hardParts) && project.hardParts.length > 0)
+    assert.ok(Array.isArray(project.testStrategy) && project.testStrategy.length >= 3)
+    assert.ok(Array.isArray(project.deploymentPlan) && project.deploymentPlan.length >= 3)
+    assert.ok(Array.isArray(project.acceptanceChecklist) && project.acceptanceChecklist.length >= 3)
+    assert.ok(Array.isArray(project.pitchOutline) && project.pitchOutline.length >= 3)
   }
 })

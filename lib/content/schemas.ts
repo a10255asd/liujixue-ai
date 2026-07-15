@@ -95,11 +95,53 @@ export const practicalProjectSchema = z.object({
   architecture: nonEmptyString,
   implementationSteps: stringList.min(1),
   hardParts: stringList.min(1),
+  testStrategy: stringList.min(3),
+  deploymentPlan: stringList.min(3),
+  acceptanceChecklist: stringList.min(3),
+  pitchOutline: stringList.min(3),
   interviewValue: nonEmptyString,
   resumeBullet: nonEmptyString,
   relatedQuestions: stringList,
   demoUrl: z.string().url().optional(),
   githubUrl: z.string().url().optional()
+}).merge(contentAuditFieldsSchema)
+
+export const careerCapabilitySchema = z.object({
+  id: nonEmptyString,
+  title: nonEmptyString,
+  priority: z.enum(['基础', '核心', '加分']),
+  summary: nonEmptyString,
+  jdSignals: stringList.min(1),
+  proofPoints: stringList.min(1),
+  knowledgeRefs: stringList.min(1),
+  questionRefs: stringList.min(1),
+  projectRefs: stringList.min(1)
+})
+
+export const careerWeekSchema = z.object({
+  week: z.number().int().min(1).max(8),
+  title: nonEmptyString,
+  focus: nonEmptyString,
+  deliverables: stringList.min(1),
+  exitCriteria: stringList.min(1),
+  knowledgeRefs: stringList.min(1),
+  questionRefs: stringList.min(1),
+  projectRef: nonEmptyString
+})
+
+export const assessmentItemSchema = z.object({
+  id: nonEmptyString,
+  capabilityId: nonEmptyString,
+  week: z.number().int().min(1).max(8),
+  statement: nonEmptyString,
+  actionHref: nonEmptyString,
+  actionLabel: nonEmptyString
+})
+
+export const careerGuideSchema = z.object({
+  capabilities: z.array(careerCapabilitySchema).min(1),
+  weeks: z.array(careerWeekSchema).length(8),
+  assessment: z.array(assessmentItemSchema).min(8)
 }).merge(contentAuditFieldsSchema)
 
 export const resourceLinkSchema = z.object({
@@ -140,3 +182,7 @@ export type PracticalProject = z.infer<typeof practicalProjectSchema>
 export type ResourceLink = z.infer<typeof resourceLinkSchema>
 export type LearningJournal = z.infer<typeof learningJournalSchema>
 export type ContentAuditFields = z.infer<typeof contentAuditFieldsSchema>
+export type CareerCapability = z.infer<typeof careerCapabilitySchema>
+export type CareerWeek = z.infer<typeof careerWeekSchema>
+export type AssessmentItem = z.infer<typeof assessmentItemSchema>
+export type CareerGuide = z.infer<typeof careerGuideSchema>

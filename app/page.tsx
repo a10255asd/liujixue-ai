@@ -40,7 +40,7 @@ export default function HomePage() {
               <Link className="button button--primary" href="/roadmap">
                 开始学习路线 <ArrowRight size={17} aria-hidden="true" />
               </Link>
-              <Link className="button button--secondary" href="/interview">进入面试题库</Link>
+              <Link className="button button--secondary" href="/career">查看求职能力矩阵</Link>
             </div>
           </div>
 

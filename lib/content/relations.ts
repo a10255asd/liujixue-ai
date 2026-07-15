@@ -1,6 +1,9 @@
 import {
+  getCareerGuide,
+  getInterviewQuestionById,
   getInterviewQuestions,
   getKnowledgeBySlug,
+  getProjectBySlug,
   getProjects,
   getRoadmapStages
 } from './repository'
@@ -37,4 +40,43 @@ export function getRoadmapDependencies(slug: string): RoadmapStage[] {
 
   const dependencies = new Set(stage.prerequisites)
   return stages.filter((item) => dependencies.has(item.slug))
+}
+
+export function getCareerCapabilityEvidence(id: string) {
+  const capability = getCareerGuide().capabilities.find((item) => item.id === id)
+  if (!capability) return null
+
+  return {
+    capability,
+    knowledge: capability.knowledgeRefs.flatMap((slug) => {
+      const item = getKnowledgeBySlug(slug)
+      return item ? [item] : []
+    }),
+    questions: capability.questionRefs.flatMap((questionId) => {
+      const item = getInterviewQuestionById(questionId)
+      return item ? [item] : []
+    }),
+    projects: capability.projectRefs.flatMap((slug) => {
+      const item = getProjectBySlug(slug)
+      return item ? [item] : []
+    })
+  }
+}
+
+export function getCareerWeekEvidence(weekNumber: number) {
+  const week = getCareerGuide().weeks.find((item) => item.week === weekNumber)
+  if (!week) return null
+
+  return {
+    week,
+    knowledge: week.knowledgeRefs.flatMap((slug) => {
+      const item = getKnowledgeBySlug(slug)
+      return item ? [item] : []
+    }),
+    questions: week.questionRefs.flatMap((questionId) => {
+      const item = getInterviewQuestionById(questionId)
+      return item ? [item] : []
+    }),
+    project: getProjectBySlug(week.projectRef)
+  }
 }

@@ -6,7 +6,7 @@
 
 > 给 0 基础开发者，尤其是想转 AI Agent 工程师的人，用一条可执行路线学 AI、做项目、刷面试、准备求职。
 
-当前阶段：Batch 2 内容基线与可分享筛选已完成，尚未创建远端仓库和 Vercel 部署。
+当前阶段：Batch 4 求职强化已完成，尚未创建远端仓库和 Vercel 部署。
 
 ## 必读文档
 
@@ -47,6 +47,7 @@ npm run build
 - `/roadmap`：从 0 到 Agent 工程师学习路线。
 - `/knowledge`：AI 工程知识库。
 - `/agent`：Agent 工程专题地图。
+- `/career`：岗位能力矩阵、确定性自测和 8 周求职计划。
 - `/interview`：AI 面试题库。
 - `/projects`：求职导向的项目实战清单。
 - `/resources`：官方文档和高质量资料导航。

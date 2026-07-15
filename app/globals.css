@@ -1938,6 +1938,362 @@ strong {
   gap: 64px;
 }
 
+.project-delivery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line-strong);
+  border-left: 1px solid var(--line);
+}
+
+.project-delivery-block {
+  min-height: 270px;
+  padding: 27px;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.project-delivery-block > svg {
+  color: var(--steel);
+}
+
+.project-delivery-block h3 {
+  margin: 16px 0 18px;
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 19px;
+}
+
+.project-delivery-block ol,
+.project-delivery-block ul {
+  display: grid;
+  margin: 0;
+  padding-left: 19px;
+  color: var(--muted);
+  font-size: 13px;
+  gap: 9px;
+}
+
+.career-section {
+  padding-top: 96px;
+}
+
+.career-section:first-of-type {
+  padding-top: 0;
+}
+
+.career-matrix {
+  border-top: 1px solid var(--line-strong);
+}
+
+.capability-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.85fr 0.9fr 1fr;
+  min-height: 245px;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--line);
+  gap: 34px;
+}
+
+.capability-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.capability-row__title > span,
+.capability-row small,
+.career-week small {
+  color: var(--copper);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.capability-row__title h3 {
+  margin: 13px 0 9px;
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 25px;
+}
+
+.capability-row__title p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.capability-row ul,
+.career-week ul {
+  display: grid;
+  margin: 13px 0 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 12px;
+  list-style: none;
+  gap: 8px;
+}
+
+.capability-row li::before,
+.career-week li::before {
+  margin-right: 7px;
+  color: var(--line-strong);
+  content: "—";
+}
+
+.capability-links {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.capability-links a {
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.capability-links a:hover {
+  color: var(--copper);
+}
+
+.career-section--assessment {
+  margin-top: 96px;
+  padding: 76px 48px 48px;
+  background: #e6e9e7;
+  border-block: 1px solid var(--line);
+}
+
+.career-assessment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  align-items: start;
+  gap: 28px;
+}
+
+.assessment-list {
+  display: grid;
+  border-top: 1px solid var(--line-strong);
+}
+
+.assessment-item {
+  display: grid;
+  grid-template-columns: 26px 32px minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 67px;
+  padding: 11px 4px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  gap: 10px;
+}
+
+.assessment-item:hover strong {
+  color: var(--copper);
+}
+
+.assessment-item input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.assessment-item__check {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  color: #f8f9f7;
+  background: var(--surface-strong);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  place-items: center;
+}
+
+.assessment-item input:checked + .assessment-item__check {
+  background: var(--action);
+  border-color: var(--action);
+}
+
+.assessment-item input:focus-visible + .assessment-item__check {
+  outline: 2px solid var(--copper);
+  outline-offset: 2px;
+}
+
+.assessment-item__index {
+  color: var(--quiet);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+}
+
+.assessment-item strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.assessment-item small {
+  color: var(--quiet);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.assessment-result {
+  position: sticky;
+  top: 96px;
+  padding: 28px;
+  background: var(--surface-strong);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.assessment-score {
+  display: flex;
+  align-items: baseline;
+  margin: 6px 0 2px;
+  color: var(--steel);
+}
+
+.assessment-score strong {
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 64px;
+  line-height: 1;
+}
+
+.assessment-score span,
+.assessment-result > p:not(.eyebrow) {
+  color: var(--quiet);
+  font-size: 11px;
+}
+
+.assessment-next {
+  display: grid;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  gap: 9px;
+}
+
+.assessment-next > span {
+  color: var(--copper);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.assessment-next > strong {
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.assessment-reset {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 28px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  font-size: 11px;
+  cursor: pointer;
+  gap: 6px;
+}
+
+.assessment-reset:hover {
+  color: var(--copper);
+}
+
+.career-weeks {
+  border-top: 1px solid var(--line-strong);
+}
+
+.career-week {
+  display: grid;
+  grid-template-columns: 76px 1.15fr 1fr 1fr;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+  gap: 28px;
+}
+
+.career-week__number {
+  display: flex;
+  flex-direction: column;
+}
+
+.career-week__number span {
+  color: var(--quiet);
+  font-size: 9px;
+}
+
+.career-week__number strong {
+  color: var(--steel);
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.career-week__focus h3 {
+  margin-bottom: 7px;
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 21px;
+}
+
+.career-week__focus p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.career-week__links {
+  display: flex;
+  grid-column: 2 / -1;
+  flex-wrap: wrap;
+  gap: 9px 20px;
+}
+
+.career-week__links a {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-soft);
+  font-size: 11px;
+  gap: 6px;
+}
+
+.career-week__links a:hover {
+  color: var(--copper);
+}
+
+.career-closing {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  align-items: end;
+  margin-top: 104px;
+  padding: 48px;
+  color: #e8ebe9;
+  background: #2f3538;
+  gap: 64px;
+}
+
+.career-closing h2 {
+  margin: 0;
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 34px;
+}
+
+.career-closing > div:last-child p {
+  color: #b7bfbc;
+  font-size: 13px;
+}
+
+.career-closing .button {
+  margin-top: 14px;
+  color: #22272a;
+  background: #d8c0a7;
+  border-color: #d8c0a7;
+  box-shadow: none;
+}
+
+.career-closing .button:hover {
+  background: #e3cdb8;
+  border-color: #e3cdb8;
+}
+
 .resume-bullet {
   display: flex;
   align-items: flex-start;
@@ -2029,6 +2385,14 @@ strong {
 
   .content-grid--questions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .capability-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .capability-row__title {
+    grid-row: span 2;
   }
 
   .catalog-filter {
@@ -2172,6 +2536,37 @@ strong {
     grid-template-columns: 40px 42px 1fr 24px;
   }
 
+  .career-section--assessment {
+    margin-inline: -24px;
+    padding-inline: 24px;
+  }
+
+  .career-assessment {
+    grid-template-columns: 1fr;
+  }
+
+  .assessment-result {
+    position: static;
+  }
+
+  .career-week {
+    grid-template-columns: 64px repeat(2, minmax(0, 1fr));
+  }
+
+  .career-week__focus {
+    grid-column: 2 / -1;
+  }
+
+  .career-week__links {
+    grid-column: 2 / -1;
+  }
+
+  .career-closing {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 28px;
+  }
+
   .resource-row__for {
     display: none;
   }
@@ -2313,6 +2708,74 @@ strong {
   .project-split,
   .stage-columns {
     grid-template-columns: 1fr;
+  }
+
+  .project-delivery-grid,
+  .capability-row,
+  .career-week {
+    grid-template-columns: 1fr;
+  }
+
+  .project-delivery-block {
+    min-height: 0;
+    padding: 22px;
+  }
+
+  .career-section {
+    padding-top: 72px;
+  }
+
+  .career-section--assessment {
+    margin-inline: 0;
+    margin-top: 72px;
+    padding-inline: 0;
+    padding-block: 58px 28px;
+  }
+
+  .capability-row {
+    min-height: 0;
+    padding-block: 26px;
+    gap: 24px;
+  }
+
+  .capability-row__title {
+    grid-row: auto;
+  }
+
+  .assessment-item {
+    grid-template-columns: 26px 24px minmax(0, 1fr);
+    padding-block: 13px;
+  }
+
+  .assessment-item small {
+    grid-column: 3;
+  }
+
+  .assessment-result {
+    padding: 23px;
+  }
+
+  .career-week {
+    gap: 20px;
+  }
+
+  .career-week__focus,
+  .career-week__links {
+    grid-column: auto;
+  }
+
+  .career-week__links {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .career-closing {
+    margin-top: 76px;
+    padding: 28px 23px;
+  }
+
+  .career-closing h2 {
+    font-size: 28px;
   }
 
   .roadmap-preview__item {

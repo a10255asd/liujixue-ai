@@ -1,3 +1,4 @@
+import careerData from '@/content/career.json'
 import interviewData from '@/content/interview-questions.json'
 import journalData from '@/content/journals.json'
 import knowledgeData from '@/content/knowledge-points.json'
@@ -6,12 +7,14 @@ import resourceData from '@/content/resources.json'
 import roadmapData from '@/content/roadmap.json'
 
 import {
+  careerGuideSchema,
   interviewSchema,
   journalsSchema,
   knowledgeSchema,
   projectsSchema,
   resourcesSchema,
   roadmapSchema,
+  type CareerGuide,
   type InterviewQuestion,
   type KnowledgePoint,
   type LearningJournal,
@@ -32,6 +35,7 @@ const journals = journalsSchema
   .parse(journalData)
   .filter((item) => item.status === 'published')
   .sort((a, b) => b.date.localeCompare(a.date))
+const careerGuide = careerGuideSchema.parse(careerData)
 
 export function getRoadmapStages(): RoadmapStage[] {
   return roadmap
@@ -67,4 +71,8 @@ export function getResources(): ResourceLink[] {
 
 export function getJournals(): LearningJournal[] {
   return journals
+}
+
+export function getCareerGuide(): CareerGuide {
+  return careerGuide
 }

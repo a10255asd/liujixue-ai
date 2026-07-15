@@ -5,7 +5,7 @@ import { siteConfig } from '@/lib/site-config'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const updatedAt = new Date('2026-07-15')
-  const routes = ['', '/roadmap', '/knowledge', '/agent', '/interview', '/projects', '/resources', '/journal']
+  const routes = ['', '/roadmap', '/knowledge', '/agent', '/career', '/interview', '/projects', '/resources', '/journal']
 
   return [
     ...routes.map((path) => ({ url: `${siteConfig.url}${path}`, lastModified: updatedAt })),

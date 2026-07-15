@@ -1,4 +1,5 @@
 import {
+  getCareerGuide,
   getInterviewQuestions,
   getJournals,
   getKnowledgePoints,
@@ -34,6 +35,7 @@ const questions = getInterviewQuestions()
 const projects = getProjects()
 const resources = getResources()
 const journals = getJournals()
+const career = getCareerGuide()
 
 assertUnique(roadmap.map((item) => item.slug), '路线 slug')
 assertUnique(roadmap.map((item) => String(item.order)), '路线 order')
@@ -42,6 +44,9 @@ assertUnique(questions.map((item) => item.id), '面试题 id')
 assertUnique(projects.map((item) => item.slug), '项目 slug')
 assertUnique(resources.map((item) => item.id), '资料 id')
 assertUnique(journals.map((item) => item.slug), '日志 slug')
+assertUnique(career.capabilities.map((item) => item.id), '求职能力 id')
+assertUnique(career.weeks.map((item) => String(item.week)), '求职周次')
+assertUnique(career.assessment.map((item) => item.id), '自测 id')
 
 const roadmapIds = new Set(roadmap.map((item) => item.slug))
 const questionIds = new Set(questions.map((item) => item.id))
@@ -72,6 +77,25 @@ for (const journal of journals) {
   assertReferences(`日志 ${journal.slug}`, [journal.stage], roadmapIds, '路线')
 }
 
+const capabilityIds = new Set(career.capabilities.map((item) => item.id))
+const knowledgeIds = new Set(knowledge.map((item) => item.slug))
+
+for (const capability of career.capabilities) {
+  assertReferences(`求职能力 ${capability.id}`, capability.knowledgeRefs, knowledgeIds, '知识点')
+  assertReferences(`求职能力 ${capability.id}`, capability.questionRefs, questionIds, '面试题')
+  assertReferences(`求职能力 ${capability.id}`, capability.projectRefs, projectIds, '项目')
+}
+
+for (const week of career.weeks) {
+  assertReferences(`第 ${week.week} 周`, week.knowledgeRefs, knowledgeIds, '知识点')
+  assertReferences(`第 ${week.week} 周`, week.questionRefs, questionIds, '面试题')
+  assertReferences(`第 ${week.week} 周`, [week.projectRef], projectIds, '项目')
+}
+
+for (const item of career.assessment) {
+  assertReferences(`自测 ${item.id}`, [item.capabilityId], capabilityIds, '求职能力')
+}
+
 console.log(
-  `内容校验通过：${roadmap.length} 阶段、${knowledge.length} 知识点、${questions.length} 面试题、${projects.length} 项目、${resources.length} 资料、${journals.length} 日志`
+  `内容校验通过：${roadmap.length} 阶段、${knowledge.length} 知识点、${questions.length} 面试题、${projects.length} 项目、${resources.length} 资料、${journals.length} 日志、${career.capabilities.length} 求职能力`
 )

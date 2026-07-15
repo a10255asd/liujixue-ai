@@ -5,6 +5,7 @@ const routes = [
   '/roadmap',
   '/knowledge',
   '/agent',
+  '/career',
   '/interview',
   '/projects',
   '/resources',
@@ -44,4 +45,13 @@ test('interview filters are shareable through the URL', async ({ page }) => {
   await page.reload()
   await expect(page.getByLabel('分类')).toHaveValue('mcp')
   await expect(page.getByLabel('难度')).toHaveValue('高级')
+})
+
+test('career assessment recommends the first unfinished week', async ({ page }) => {
+  await page.goto('/career')
+  await expect(page.getByTestId('assessment-score')).toHaveText('0')
+
+  await page.getByRole('checkbox', { name: '我能独立完成一次服务端模型调用，并正确管理密钥。' }).check()
+  await expect(page.getByTestId('assessment-score')).toHaveText('8')
+  await expect(page.getByTestId('assessment-next')).toContainText('建议从第 1 周开始')
 })

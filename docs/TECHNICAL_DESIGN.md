@@ -146,6 +146,7 @@ liujixue-ai/
 │   ├── knowledge-points.json
 │   ├── interview-questions.json
 │   ├── projects.json
+│   ├── career.json
 │   ├── resources.json
 │   └── journals.json
 ├── lib/
@@ -360,15 +361,21 @@ URL：筛选状态同步到 query string，分享链接可恢复状态。
 
 ### 8.8 `/projects` 与 `/projects/[slug]`
 
-列表按难度和技术栈筛选。详情页必须包含：问题、目标用户、架构、功能、实现步骤、技术难点、测试方法、部署方式、简历表达和面试追问。
+列表按难度和技术栈筛选。详情页必须包含：问题、目标用户、架构、功能、实现步骤、技术难点、测试策略、部署步骤、验收清单、3 分钟讲解、简历表达和面试追问。
 
 项目状态后续增加：`planned | building | shipped | archived`。只有 `shipped` 项目显示 demo URL。
 
-### 8.9 `/resources`
+### 8.9 `/career`
+
+数据：`career.json` 中的 8 个能力域、8 周计划和有序自测题。关系层负责解析知识、题目和项目引用，引用不存在时内容校验失败。
+
+自测算法完全在浏览器本地执行，不保存用户数据、不调用模型：得分为已确认项占比；按顺序找到首个未确认项，并推荐其 `week` 与 `actionHref`。所有项目交付字段由 Schema 强制至少 3 项。
+
+### 8.10 `/resources`
 
 按路线阶段和来源类型组织。外链必须带 `rel="noopener noreferrer"`。每个资源显示“适合什么时候看”，避免变成链接仓库。
 
-### 8.10 `/journal`
+### 8.11 `/journal`
 
 日志按日期倒序。每条记录必须关联一个路线阶段和至少一个产出。后续可增加详情页，但 Batch 1 只做列表。
 
