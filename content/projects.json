@@ -1,62 +1,287 @@
 [
   {
     "slug": "prompt-debugger",
-    "title": "Prompt 调试器",
+    "title": "Prompt 调试与回归台",
     "level": "入门",
-    "summary": "输入系统提示词、用户问题和输出格式，观察模型输出稳定性。",
-    "targetUser": "刚开始学习 LLM API 的开发者。",
-    "stack": ["Next.js", "Vercel AI SDK", "OpenAI API"],
-    "features": ["Prompt 编辑", "参数调整", "结构化输出预览", "失败样例记录"],
-    "architecture": "前端表单提交到服务端 route handler，服务端调用模型并返回流式或 JSON 输出。",
-    "implementationSteps": ["搭页面", "接模型 API", "加结构化输出", "保存测试样例"],
-    "hardParts": ["输出格式稳定性", "错误处理", "成本控制"],
-    "interviewValue": "能证明理解 LLM API、Prompt 调试、结构化输出和工程化错误处理。",
-    "resumeBullet": "实现 Prompt 调试器，支持模型参数调整、结构化输出验证和失败样例复盘。",
-    "relatedQuestions": ["rag-vs-prompt"]
+    "summary": "把提示词、模型参数、结构化输出和失败样例放进可复现的调试流程。",
+    "targetUser": "需要稳定调用 LLM API 的开发者。",
+    "stack": [
+      "Next.js",
+      "Vercel AI SDK",
+      "OpenAI API",
+      "Zod"
+    ],
+    "features": [
+      "Prompt 版本对比",
+      "结构化输出校验",
+      "流式响应",
+      "失败样例回放"
+    ],
+    "architecture": "浏览器提交版本化测试样例，服务端统一封装模型调用、Schema 校验和调用日志，评估层比较不同提示词的通过率与成本。",
+    "implementationSteps": [
+      "定义测试样例与输出 Schema",
+      "封装模型调用与错误分类",
+      "实现版本对比",
+      "增加回归数据集与报告"
+    ],
+    "hardParts": [
+      "非确定性结果比较",
+      "Schema 失败恢复",
+      "敏感信息脱敏"
+    ],
+    "interviewValue": "能证明理解 LLM API、结构化输出、可重复评估和生产错误处理。",
+    "resumeBullet": "实现 Prompt 调试与回归平台，以结构化 Schema 和固定评估集比较版本质量、延迟与 Token 成本。",
+    "relatedQuestions": [
+      "structured-output-vs-json-mode",
+      "prompt-versioning",
+      "llm-api-retry"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "rag-knowledge-base",
-    "title": "RAG 知识库问答",
+    "title": "可评估 RAG 知识库",
     "level": "进阶",
-    "summary": "把 AI 学习资料切片入库，支持带引用来源的问答。",
-    "targetUser": "想理解 RAG 工程链路的开发者。",
-    "stack": ["Next.js", "Embedding", "Vector DB", "LLM API"],
-    "features": ["文档导入", "文本切片", "向量检索", "引用来源", "答案评估"],
-    "architecture": "文档离线入库，查询时检索相关片段并作为上下文传给模型。",
-    "implementationSteps": ["准备资料", "实现 chunk", "生成 embedding", "查询检索", "生成带引用答案"],
-    "hardParts": ["切片策略", "召回准确率", "幻觉控制", "引用可信度"],
-    "interviewValue": "能覆盖 RAG、Embedding、向量库、检索评估和私有知识问答。",
-    "resumeBullet": "实现 RAG 知识库问答系统，支持文档切片、向量检索、引用来源和答案质量复盘。",
-    "relatedQuestions": ["rag-vs-prompt"]
+    "summary": "从文档解析、混合检索、重排到引用校验，建立可测量的知识问答链路。",
+    "targetUser": "需要用私有资料构建可信问答的团队。",
+    "stack": [
+      "Next.js",
+      "PostgreSQL",
+      "pgvector",
+      "OpenAI API"
+    ],
+    "features": [
+      "文档版本管理",
+      "语义与关键词混合检索",
+      "重排",
+      "引用来源",
+      "离线评估"
+    ],
+    "architecture": "离线管道清洗、切分并索引文档；在线查询经过改写、混合召回、重排和上下文组装，再生成带引用答案并记录检索证据。",
+    "implementationSteps": [
+      "定义文档与评估集",
+      "实现解析切片和索引",
+      "实现混合检索与重排",
+      "加入引用校验和回归评估"
+    ],
+    "hardParts": [
+      "切片边界",
+      "召回与精度平衡",
+      "版本更新",
+      "答案忠实度评估"
+    ],
+    "interviewValue": "覆盖 Embedding、检索、Rerank、引用、数据更新和 RAG Eval。",
+    "resumeBullet": "实现带混合检索、重排和引用校验的 RAG 系统，并用固定问题集持续评估召回率与答案忠实度。",
+    "relatedQuestions": [
+      "rag-vs-prompt",
+      "rag-chunking",
+      "rag-evaluation"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "ai-interviewer",
-    "title": "AI 面试官",
+    "title": "可追溯 AI 模拟面试官",
     "level": "进阶",
-    "summary": "根据岗位和题库进行模拟面试、追问和反馈。",
-    "targetUser": "准备 AI Agent 工程师岗位的人。",
-    "stack": ["Next.js", "LLM API", "Interview Question Bank"],
-    "features": ["题目抽取", "连续追问", "回答评分", "改进建议"],
-    "architecture": "题库提供结构化题目，模型根据候选人回答生成追问和反馈。",
-    "implementationSteps": ["整理题库", "设计面试流程", "生成追问", "输出反馈报告"],
-    "hardParts": ["评分标准", "追问质量", "避免空泛建议"],
-    "interviewValue": "能展示 Agent 场景中的状态管理、问答流程和评估思路。",
-    "resumeBullet": "实现 AI 模拟面试系统，支持按岗位抽题、上下文追问和结构化反馈。",
-    "relatedQuestions": ["agent-vs-chatbot"]
+    "summary": "按岗位能力图谱出题、连续追问，并用证据化量表生成复盘报告。",
+    "targetUser": "准备 AI Agent 工程岗位的候选人。",
+    "stack": [
+      "Next.js",
+      "OpenAI API",
+      "PostgreSQL",
+      "Zod"
+    ],
+    "features": [
+      "岗位题目映射",
+      "连续追问",
+      "结构化评分",
+      "证据引用",
+      "复盘报告"
+    ],
+    "architecture": "题库和评分量表由确定性代码管理，模型只负责选择追问和提取证据；会话状态、评分依据和模型版本全部持久化。",
+    "implementationSteps": [
+      "定义岗位能力与量表",
+      "实现会话状态机",
+      "加入追问策略",
+      "建立人工标注对照集"
+    ],
+    "hardParts": [
+      "评分一致性",
+      "追问相关性",
+      "避免模型替代规则"
+    ],
+    "interviewValue": "展示状态机、结构化输出、评估集和人机协作边界。",
+    "resumeBullet": "实现基于岗位能力图谱的 AI 面试系统，支持连续追问、证据化评分和人工标注回归评估。",
+    "relatedQuestions": [
+      "agent-state-vs-memory",
+      "llm-as-judge",
+      "human-in-the-loop"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "task-planning-agent",
-    "title": "任务规划 Agent",
+    "title": "受控任务执行 Agent",
     "level": "高级",
-    "summary": "把模糊目标拆成可执行步骤，按权限调用工具并输出完整执行记录。",
-    "targetUser": "希望理解 Agent Loop、状态、工具权限和失败恢复的开发者。",
-    "stack": ["Python", "OpenAI Agents SDK", "MCP", "PostgreSQL"],
-    "features": ["任务拆解", "工具选择", "执行状态", "人工确认", "Trace 复盘"],
-    "architecture": "控制层维护任务状态和终止条件，模型负责决策，工具层按最小权限执行，Trace 记录每一步输入输出。",
-    "implementationSteps": ["定义任务状态", "设计工具协议", "实现循环和终止条件", "加入人工确认", "建立评估样例"],
-    "hardParts": ["终止条件", "工具失败恢复", "权限边界", "可重复评估"],
-    "interviewValue": "可系统展示 Agent Loop、状态管理、工具安全、可观测性和 Eval 能力。",
-    "resumeBullet": "实现任务规划 Agent，支持受控工具调用、执行状态持久化、人工确认和 Trace 复盘。",
-    "relatedQuestions": ["agent-vs-chatbot", "what-is-mcp"]
+    "summary": "把模糊目标拆成步骤，按权限调用工具并保留可恢复的执行记录。",
+    "targetUser": "需要自动化多步骤内部流程的团队。",
+    "stack": [
+      "Python",
+      "OpenAI Agents SDK",
+      "PostgreSQL",
+      "Redis"
+    ],
+    "features": [
+      "任务拆解",
+      "工具选择",
+      "状态持久化",
+      "人工确认",
+      "Trace 复盘"
+    ],
+    "architecture": "控制层维护任务状态、预算和终止条件，模型负责受约束决策，工具层执行最小权限动作，事件日志支持断点恢复与审计。",
+    "implementationSteps": [
+      "定义状态与工具契约",
+      "实现循环和预算",
+      "加入确认点与补偿操作",
+      "建立轨迹评估集"
+    ],
+    "hardParts": [
+      "终止条件",
+      "幂等与补偿",
+      "权限边界",
+      "长任务恢复"
+    ],
+    "interviewValue": "系统展示 Agent Loop、状态、工具安全、可观测性和 Eval。",
+    "resumeBullet": "实现受控任务 Agent，支持工具白名单、状态持久化、人工审批、失败补偿和执行轨迹评估。",
+    "relatedQuestions": [
+      "agent-vs-chatbot",
+      "agent-stop-conditions",
+      "agent-tool-permissions"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "mcp-file-assistant",
+    "title": "最小权限 MCP 文件助手",
+    "level": "进阶",
+    "summary": "通过 MCP 暴露受限文件搜索、读取和摘要能力，并完整记录访问审计。",
+    "targetUser": "需要让 AI 安全读取项目资料的开发团队。",
+    "stack": [
+      "TypeScript",
+      "MCP SDK",
+      "Node.js",
+      "SQLite"
+    ],
+    "features": [
+      "目录白名单",
+      "文件检索",
+      "资源读取",
+      "危险操作确认",
+      "审计日志"
+    ],
+    "architecture": "MCP Server 只暴露白名单根目录下的 Resources 和只读 Tools；输入路径规范化后校验边界，客户端负责用户确认与结果展示。",
+    "implementationSteps": [
+      "定义 capability 与威胁模型",
+      "实现路径沙箱",
+      "暴露 Resources 和 Tools",
+      "加入审计与协议测试"
+    ],
+    "hardParts": [
+      "目录穿越防护",
+      "能力协商",
+      "传输错误",
+      "敏感文件过滤"
+    ],
+    "interviewValue": "能具体解释 MCP 架构、能力边界、协议调试和安全设计。",
+    "resumeBullet": "实现最小权限 MCP 文件服务，支持路径沙箱、资源读取、工具调用审计和协议级自动化测试。",
+    "relatedQuestions": [
+      "what-is-mcp",
+      "mcp-primitives",
+      "mcp-security"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "agent-evaluation-console",
+    "title": "Agent 评估与追踪控制台",
+    "level": "高级",
+    "summary": "把任务成功率、工具轨迹、延迟、成本和回归结果放进同一个质量门禁。",
+    "targetUser": "需要稳定发布 Agent 的工程团队。",
+    "stack": [
+      "Python",
+      "OpenAI Agents SDK",
+      "PostgreSQL",
+      "Next.js"
+    ],
+    "features": [
+      "评估数据集",
+      "轨迹回放",
+      "规则与模型评分",
+      "版本对比",
+      "发布门禁"
+    ],
+    "architecture": "采集运行 Trace 后标准化为事件序列；离线评估执行规则评分、结果评分和轨迹评分，并按版本聚合质量、延迟与成本。",
+    "implementationSteps": [
+      "定义事件模型和指标",
+      "接入 Trace",
+      "建立黄金数据集",
+      "实现版本报告与阈值门禁"
+    ],
+    "hardParts": [
+      "非确定性评估",
+      "评分偏差",
+      "Trace 脱敏",
+      "质量成本权衡"
+    ],
+    "interviewValue": "展示对 Agent 生产可靠性、可观测性和持续交付的完整理解。",
+    "resumeBullet": "搭建 Agent 评估控制台，以黄金数据集和轨迹评分比较版本成功率、P95 延迟与单任务成本。",
+    "relatedQuestions": [
+      "agent-evaluation",
+      "agent-tracing",
+      "tool-call-evaluation"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   }
 ]

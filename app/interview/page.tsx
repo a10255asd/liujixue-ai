@@ -1,6 +1,7 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 
-import { InterviewCard } from '@/components/content/content-cards'
+import { InterviewCatalog } from '@/components/filters/catalog-filters'
 import { PageHeading } from '@/components/ui/page-heading'
 import { getInterviewQuestions } from '@/lib/content/repository'
 
@@ -22,10 +23,9 @@ export default function InterviewPage() {
         description="先识别考察点，再给出短答案、工程解释和项目证据，最后准备面试官的连续追问。"
         aside={<div className="heading-stat"><strong>{questions.length}</strong><span>题目</span><strong>{categoryCount}</strong><span>分类</span></div>}
       />
-      <div className="catalog-toolbar"><span>概念题</span><span>工程题</span><span>项目追问</span></div>
-      <div className="content-grid content-grid--questions">
-        {questions.map((item) => <InterviewCard item={item} key={item.id} />)}
-      </div>
+      <Suspense fallback={<div className="catalog-loading">正在加载题库…</div>}>
+        <InterviewCatalog items={questions} />
+      </Suspense>
     </div>
   )
 }

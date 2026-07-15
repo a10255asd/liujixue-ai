@@ -3,6 +3,14 @@ import { z } from 'zod'
 const nonEmptyString = z.string().trim().min(1)
 const stringList = z.array(nonEmptyString)
 
+export const contentAuditFieldsSchema = z.object({
+  status: z.enum(['draft', 'reviewed', 'published']),
+  lastReviewedAt: z.string().date(),
+  sourceUpdatedAt: z.string().date().optional(),
+  authors: stringList.min(1),
+  reviewers: stringList.min(1)
+})
+
 export const roadmapStageSchema = z.object({
   slug: nonEmptyString,
   title: nonEmptyString,
@@ -16,7 +24,7 @@ export const roadmapStageSchema = z.object({
   interviewFocus: stringList.min(1),
   projectRefs: stringList,
   resourceRefs: stringList
-})
+}).merge(contentAuditFieldsSchema)
 
 export const knowledgePointSchema = z.object({
   slug: nonEmptyString,
@@ -43,8 +51,8 @@ export const knowledgePointSchema = z.object({
   interviewAnswer: nonEmptyString,
   relatedQuestions: stringList,
   relatedProjects: stringList,
-  references: stringList
-})
+  references: stringList.min(1)
+}).merge(contentAuditFieldsSchema)
 
 export const interviewQuestionSchema = z.object({
   id: nonEmptyString,
@@ -73,8 +81,8 @@ export const interviewQuestionSchema = z.object({
   commonMistakes: stringList.min(1),
   followUps: stringList.min(1),
   projectConnection: nonEmptyString,
-  references: stringList
-})
+  references: stringList.min(1)
+}).merge(contentAuditFieldsSchema)
 
 export const practicalProjectSchema = z.object({
   slug: nonEmptyString,
@@ -92,7 +100,7 @@ export const practicalProjectSchema = z.object({
   relatedQuestions: stringList,
   demoUrl: z.string().url().optional(),
   githubUrl: z.string().url().optional()
-})
+}).merge(contentAuditFieldsSchema)
 
 export const resourceLinkSchema = z.object({
   id: nonEmptyString,
@@ -103,7 +111,7 @@ export const resourceLinkSchema = z.object({
   summary: nonEmptyString,
   recommendedFor: stringList.min(1),
   priority: z.union([z.literal(1), z.literal(2), z.literal(3)])
-})
+}).merge(contentAuditFieldsSchema)
 
 export const learningJournalSchema = z.object({
   slug: nonEmptyString,
@@ -116,7 +124,7 @@ export const learningJournalSchema = z.object({
   artifacts: stringList.min(1),
   interviewTakeaways: stringList,
   nextActions: stringList.min(1)
-})
+}).merge(contentAuditFieldsSchema)
 
 export const roadmapSchema = z.array(roadmapStageSchema)
 export const knowledgeSchema = z.array(knowledgePointSchema)
@@ -131,3 +139,4 @@ export type InterviewQuestion = z.infer<typeof interviewQuestionSchema>
 export type PracticalProject = z.infer<typeof practicalProjectSchema>
 export type ResourceLink = z.infer<typeof resourceLinkSchema>
 export type LearningJournal = z.infer<typeof learningJournalSchema>
+export type ContentAuditFields = z.infer<typeof contentAuditFieldsSchema>

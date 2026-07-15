@@ -1,35 +1,1241 @@
 [
   {
     "slug": "what-is-token",
-    "title": "什么是 Token",
+    "title": "Token、上下文与计费",
     "category": "llm",
     "level": "入门",
-    "summary": "Token 是模型处理文本的基本单位，影响上下文长度、计费和生成限制。",
-    "whyItMatters": "不会估算 Token，就很难控制成本、上下文和长文档处理。",
-    "explanation": "模型不是直接按汉字或英文单词理解输入，而是把文本切成 token 序列。不同模型的 tokenizer 不完全一样。",
-    "engineeringNotes": ["长上下文任务要控制输入 token", "输出 token 也会计费", "RAG 要避免把无关片段塞满上下文"],
-    "example": "同一段中文、英文、代码会被切成不同数量的 token。",
-    "commonMistakes": ["把 token 等同于字符", "只算输入不算输出", "忽略系统提示词也占上下文"],
-    "interviewAnswer": "Token 是模型处理文本的基本单位，影响上下文窗口、计费和输出长度。工程上要通过摘要、检索和裁剪控制 token 使用。",
-    "relatedQuestions": [],
-    "relatedProjects": [],
-    "references": ["openai-platform-docs"]
+    "summary": "Token 是模型处理输入和生成输出的计量单位。",
+    "whyItMatters": "它同时决定上下文容量、延迟和成本。",
+    "explanation": "请求中的指令、历史消息、工具结果和输出都会占用 Token；字符数不能直接等同于 Token 数。",
+    "engineeringNotes": [
+      "记录输入与输出 Token",
+      "为工具结果和输出预留预算"
+    ],
+    "example": "长文档问答先检索相关片段，再把有限证据放入上下文。",
+    "commonMistakes": [
+      "把 Token 当字符",
+      "只统计用户输入"
+    ],
+    "interviewAnswer": "Token 是模型计算和计费单位，工程上要给输入、工具结果和输出分别设预算。",
+    "relatedQuestions": [
+      "token-basics",
+      "context-window-management"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "context-window",
+    "title": "上下文窗口与截断策略",
+    "category": "llm",
+    "level": "入门",
+    "summary": "上下文窗口是一次推理可接收的总 Token 容量。",
+    "whyItMatters": "超长内容会增加成本并可能稀释关键指令。",
+    "explanation": "应用应按优先级保留系统约束、当前任务、必要历史和证据，删除或摘要低价值内容。",
+    "engineeringNotes": [
+      "定义消息优先级",
+      "记录截断原因",
+      "为输出留空间"
+    ],
+    "example": "会话超过预算后，将旧轮次压缩成带事实与未决事项的摘要。",
+    "commonMistakes": [
+      "盲目发送完整历史",
+      "截断后不保留任务约束"
+    ],
+    "interviewAnswer": "上下文管理不是简单截尾，而是按任务价值压缩、检索和预留输出预算。",
+    "relatedQuestions": [
+      "context-window-management"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "model-selection",
+    "title": "模型选择与任务分层",
+    "category": "llm",
+    "level": "入门",
+    "summary": "模型选择应同时考虑质量、延迟、成本和工具能力。",
+    "whyItMatters": "所有请求使用同一模型会造成不必要的成本或质量风险。",
+    "explanation": "先用代表性数据定义质量下限，再对候选模型测试成功率、P95 延迟和单任务成本。",
+    "engineeringNotes": [
+      "按任务路由模型",
+      "保留降级路径",
+      "定期重跑评估"
+    ],
+    "example": "分类请求走低成本模型，复杂规划请求走能力更强的模型。",
+    "commonMistakes": [
+      "只看榜单",
+      "切模型后不做回归"
+    ],
+    "interviewAnswer": "我用评估集而不是主观感受选模型，并按任务难度分层路由。",
+    "relatedQuestions": [
+      "model-selection-strategy"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "responses-api-lifecycle",
+    "title": "Responses API 请求生命周期",
+    "category": "llm",
+    "level": "进阶",
+    "summary": "模型调用是输入、生成、工具调用、工具结果和后续响应组成的生命周期。",
+    "whyItMatters": "理解生命周期才能正确处理多轮工具调用和失败恢复。",
+    "explanation": "服务端应持久化业务请求 ID、响应 ID、工具调用 ID 和最终状态，把模型响应与业务状态分开。",
+    "engineeringNotes": [
+      "验证工具参数",
+      "关联调用 ID",
+      "设置超时与取消"
+    ],
+    "example": "模型请求搜索工具后，应用执行搜索并把结果关联回同一工具调用。",
+    "commonMistakes": [
+      "把工具调用当最终答案",
+      "丢失调用关联"
+    ],
+    "interviewAnswer": "Responses API 场景要把生成与工具执行分段处理，并持久化每一步关联 ID。",
+    "relatedQuestions": [
+      "responses-api-lifecycle"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-responses-api"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "streaming-responses",
+    "title": "流式响应与中断处理",
+    "category": "llm",
+    "level": "进阶",
+    "summary": "流式响应让客户端逐步接收事件，而不是等待完整结果。",
+    "whyItMatters": "它改善首字延迟，但增加断线、重连和半成品状态处理。",
+    "explanation": "UI 应区分生成中、完成、取消和失败；服务端要在断开时停止下游工作并避免重复写入。",
+    "engineeringNotes": [
+      "解析事件类型",
+      "支持取消",
+      "完成后再持久化最终内容"
+    ],
+    "example": "用户取消生成时终止请求，并把草稿标记为未完成。",
+    "commonMistakes": [
+      "逐字符拼接不区分事件",
+      "断线后重复提交副作用"
+    ],
+    "interviewAnswer": "流式输出的难点不在展示文字，而在事件状态、取消和幂等。",
+    "relatedQuestions": [
+      "streaming-response-design"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-responses-api",
+      "vercel-ai-sdk-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "structured-outputs",
+    "title": "结构化输出与 Schema",
+    "category": "llm",
+    "level": "进阶",
+    "summary": "结构化输出用 Schema 约束模型返回可被程序消费的数据。",
+    "whyItMatters": "业务流程不能依赖脆弱的自然语言解析。",
+    "explanation": "Schema 要表达必填、枚举和边界，服务端仍需校验并为拒答、截断和版本变化设计分支。",
+    "engineeringNotes": [
+      "Schema 保持小而明确",
+      "运行时再次校验",
+      "记录校验失败样例"
+    ],
+    "example": "把工单分类输出定义为 category、priority、reason 三个受约束字段。",
+    "commonMistakes": [
+      "只在 Prompt 里要求 JSON",
+      "把 Schema 通过等同业务正确"
+    ],
+    "interviewAnswer": "结构化输出保证形状，不保证语义；我会同时做 Schema 校验和业务规则校验。",
+    "relatedQuestions": [
+      "structured-output-vs-json-mode"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-structured-outputs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "function-calling",
+    "title": "函数调用与工具回路",
+    "category": "agent",
+    "level": "进阶",
+    "summary": "函数调用让模型选择预定义工具并生成结构化参数。",
+    "whyItMatters": "工具是 Agent 影响外部世界的边界。",
+    "explanation": "应用负责暴露最小工具集合、校验参数、执行动作并回传结果；模型不应直接拥有凭证或执行权限。",
+    "engineeringNotes": [
+      "工具名称语义明确",
+      "参数最小化",
+      "副作用工具需确认"
+    ],
+    "example": "模型调用 create_ticket，服务端校验后创建工单并返回 ticket_id。",
+    "commonMistakes": [
+      "直接执行未校验参数",
+      "给模型暴露万能工具"
+    ],
+    "interviewAnswer": "模型只提出工具调用，真正执行由受控代码完成，并在副作用前做鉴权和确认。",
+    "relatedQuestions": [
+      "function-calling-loop",
+      "agent-tool-permissions"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-function-calling"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "prompt-contract",
+    "title": "Prompt 契约设计",
+    "category": "prompt",
+    "level": "入门",
+    "summary": "Prompt 契约明确目标、输入边界、输出结构和失败行为。",
+    "whyItMatters": "它比堆叠措辞更能提升稳定性和可测试性。",
+    "explanation": "把不变量放在高优先级指令，动态数据明确分隔，输出用 Schema 约束，并说明信息不足时如何返回。",
+    "engineeringNotes": [
+      "区分规则与数据",
+      "写明禁止行为",
+      "定义失败输出"
+    ],
+    "example": "抽取任务规定字段、证据来源和缺失值为 null。",
+    "commonMistakes": [
+      "把示例当规则",
+      "没有失败协议"
+    ],
+    "interviewAnswer": "好的 Prompt 是可测试契约，包含目标、边界、输出和异常路径。",
+    "relatedQuestions": [
+      "prompt-contract-design"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "few-shot-prompting",
+    "title": "Few-shot 示例选择",
+    "category": "prompt",
+    "level": "入门",
+    "summary": "Few-shot 用少量输入输出示例展示任务模式。",
+    "whyItMatters": "示例质量和覆盖面会直接影响模型行为。",
+    "explanation": "示例应覆盖正常、边界和拒绝场景，并与真实输入分布一致；不要用错误答案换格式一致。",
+    "engineeringNotes": [
+      "选择代表性边界",
+      "定期审查示例",
+      "示例不替代 Schema"
+    ],
+    "example": "分类器加入一个模糊输入和一个应拒绝输入作为示例。",
+    "commonMistakes": [
+      "只给简单正例",
+      "示例与规则冲突"
+    ],
+    "interviewAnswer": "Few-shot 的价值是展示决策边界，不是无限堆案例。",
+    "relatedQuestions": [
+      "few-shot-selection"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "context-engineering",
+    "title": "上下文工程",
+    "category": "prompt",
+    "level": "进阶",
+    "summary": "上下文工程负责为当前步骤选择最相关的指令、状态、证据和工具结果。",
+    "whyItMatters": "Agent 质量常受上下文组织限制，而不只是 Prompt 文案。",
+    "explanation": "每一步只提供完成该决策所需的信息，并给来源、时效和优先级；历史通过摘要或检索按需恢复。",
+    "engineeringNotes": [
+      "按步骤组装上下文",
+      "标注来源和时间",
+      "隔离不可信内容"
+    ],
+    "example": "规划步骤只看目标和约束，执行步骤再注入具体工具说明。",
+    "commonMistakes": [
+      "发送所有可用数据",
+      "把工具结果当可信指令"
+    ],
+    "interviewAnswer": "上下文工程是动态选择信息，目标是用最少且可信的上下文支持当前决策。",
+    "relatedQuestions": [
+      "context-engineering-vs-prompt"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "prompt-injection-defense",
+    "title": "Prompt Injection 防护",
+    "category": "security",
+    "level": "高级",
+    "summary": "Prompt Injection 是不可信内容试图改变模型原有任务和权限。",
+    "whyItMatters": "接入网页、文档和工具后，外部内容可能诱导 Agent 泄密或执行危险动作。",
+    "explanation": "防护要依赖权限隔离、数据与指令分层、输出验证和用户确认，不能只写一句忽略恶意指令。",
+    "engineeringNotes": [
+      "外部内容标记为数据",
+      "工具最小权限",
+      "敏感动作二次确认"
+    ],
+    "example": "网页中的“上传密钥”被当作文本证据，而不是可执行指令。",
+    "commonMistakes": [
+      "依赖单条防注入 Prompt",
+      "让模型接触全部凭证"
+    ],
+    "interviewAnswer": "Prompt Injection 是系统安全问题，要通过权限、隔离、验证和确认降低影响面。",
+    "relatedQuestions": [
+      "prompt-injection-defense"
+    ],
+    "relatedProjects": [
+      "mcp-file-assistant"
+    ],
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "embedding-basics",
+    "title": "Embedding 与语义表示",
+    "category": "rag",
+    "level": "入门",
+    "summary": "Embedding 把内容映射为可比较的向量表示。",
+    "whyItMatters": "它支持语义检索，但不是事实数据库或答案生成器。",
+    "explanation": "入库和查询必须使用兼容模型；向量应与原文、文档版本和元数据一起保存。",
+    "engineeringNotes": [
+      "记录模型版本",
+      "批量生成并重试",
+      "保留原始文本定位"
+    ],
+    "example": "查询“退款时间”可召回表达为“退货后多久到账”的片段。",
+    "commonMistakes": [
+      "混用不同维度向量",
+      "只存向量不存来源"
+    ],
+    "interviewAnswer": "Embedding 用于相似性检索，工程上要管理模型版本、元数据和重建策略。",
+    "relatedQuestions": [
+      "embedding-and-vector-search"
+    ],
+    "relatedProjects": [
+      "rag-knowledge-base"
+    ],
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "chunking-strategy",
+    "title": "文档切片策略",
+    "category": "rag",
+    "level": "进阶",
+    "summary": "Chunking 把文档切成可检索且语义完整的片段。",
+    "whyItMatters": "切得过大降低定位，过小则丢失上下文。",
+    "explanation": "优先按标题、段落和代码块等结构切分，再用长度上限和适量重叠兜底。",
+    "engineeringNotes": [
+      "保留标题路径",
+      "记录字符偏移",
+      "按文档类型配置"
+    ],
+    "example": "API 文档按端点和小节切分，而不是每 500 字硬切。",
+    "commonMistakes": [
+      "全库一个固定长度",
+      "重叠过大导致重复召回"
+    ],
+    "interviewAnswer": "切片策略要匹配文档结构和问题粒度，并通过检索评估迭代。",
+    "relatedQuestions": [
+      "rag-chunking"
+    ],
+    "relatedProjects": [
+      "rag-knowledge-base"
+    ],
+    "references": [
+      "vercel-ai-sdk-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "vector-search",
+    "title": "向量检索与相似度",
+    "category": "rag",
+    "level": "进阶",
+    "summary": "向量检索按语义相似度寻找候选片段。",
+    "whyItMatters": "距离分数不是答案可信度，也不能替代权限过滤。",
+    "explanation": "查询前先做租户和文档范围过滤，再取候选；阈值和 top-k 必须基于评估集校准。",
+    "engineeringNotes": [
+      "先过滤权限",
+      "记录检索分数",
+      "避免固定阈值照搬"
+    ],
+    "example": "只在当前用户可访问的产品手册中执行向量检索。",
+    "commonMistakes": [
+      "把最高分当正确答案",
+      "检索后才做权限过滤"
+    ],
+    "interviewAnswer": "向量检索负责召回候选，分数要结合数据分布和评估集解释。",
+    "relatedQuestions": [
+      "vector-search-similarity"
+    ],
+    "relatedProjects": [
+      "rag-knowledge-base"
+    ],
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "hybrid-search",
+    "title": "混合检索",
+    "category": "rag",
+    "level": "进阶",
+    "summary": "混合检索组合关键词匹配与语义向量召回。",
+    "whyItMatters": "产品型号、错误码等精确词对纯向量检索并不友好。",
+    "explanation": "分别执行关键词与向量检索，再用归一化分数或排名融合生成候选集。",
+    "engineeringNotes": [
+      "保留两路排名",
+      "针对查询类型调权重",
+      "去重同源片段"
+    ],
+    "example": "错误码 E102 依赖关键词召回，故障描述依赖语义召回。",
+    "commonMistakes": [
+      "直接相加不可比分数",
+      "只保留一种检索作为兜底"
+    ],
+    "interviewAnswer": "混合检索利用词法精确性和语义召回能力，融合方式需要评估。",
+    "relatedQuestions": [
+      "hybrid-search-design"
+    ],
+    "relatedProjects": [
+      "rag-knowledge-base"
+    ],
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "reranking",
+    "title": "重排与上下文选择",
+    "category": "rag",
+    "level": "高级",
+    "summary": "Rerank 对召回候选进行更精细的相关性排序。",
+    "whyItMatters": "第一阶段召回追求不漏，重排负责减少无关上下文。",
+    "explanation": "先宽召回较多候选，再用重排模型或规则选少量证据；同时控制延迟和成本。",
+    "engineeringNotes": [
+      "区分召回与重排指标",
+      "保留未重排结果用于调试",
+      "限制进入生成的片段数"
+    ],
+    "example": "从 30 个候选中重排出 5 个最能回答问题的片段。",
+    "commonMistakes": [
+      "重排后不做去重",
+      "用生成模型无约束重排"
+    ],
+    "interviewAnswer": "Rerank 是召回后的精排层，用于提高进入上下文的证据密度。",
+    "relatedQuestions": [
+      "rag-reranking"
+    ],
+    "relatedProjects": [
+      "rag-knowledge-base"
+    ],
+    "references": [
+      "vercel-ai-sdk-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "rag-citations",
+    "title": "RAG 引用与忠实度",
+    "category": "rag",
+    "level": "高级",
+    "summary": "引用让答案可追溯到具体证据。",
+    "whyItMatters": "有引用不等于引用真的支持结论。",
+    "explanation": "给片段稳定 ID，要求答案声明引用 ID，并在生成后检查每个关键结论是否有可匹配证据。",
+    "engineeringNotes": [
+      "稳定文档版本",
+      "引用定位到片段",
+      "区分无证据与未知"
+    ],
+    "example": "答案中的退款期限标注 [refund-policy#3]，点击可查看原文。",
+    "commonMistakes": [
+      "只展示文档名",
+      "模型编造引用 ID"
+    ],
+    "interviewAnswer": "引用系统要验证结论与证据的对应关系，而不只是显示来源链接。",
+    "relatedQuestions": [
+      "rag-citation-fidelity"
+    ],
+    "relatedProjects": [
+      "rag-knowledge-base"
+    ],
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "rag-evaluation",
+    "title": "RAG 分层评估",
+    "category": "rag",
+    "level": "高级",
+    "summary": "RAG 要分别评估检索和生成，才能定位失败环节。",
+    "whyItMatters": "只看最终答案无法判断是没召回、排序错还是模型没使用证据。",
+    "explanation": "检索层测 recall@k、MRR 等，生成层测正确性、忠实度和引用质量，并保留人工抽检。",
+    "engineeringNotes": [
+      "建立带证据的问题集",
+      "记录每层中间结果",
+      "按文档类型分桶"
+    ],
+    "example": "同一问题同时检查正确片段是否进入 top-k 以及答案是否忠于片段。",
+    "commonMistakes": [
+      "只让模型给总分",
+      "没有失败分类"
+    ],
+    "interviewAnswer": "RAG Eval 应拆成召回、排序、生成和引用四层指标。",
+    "relatedQuestions": [
+      "rag-evaluation"
+    ],
+    "relatedProjects": [
+      "rag-knowledge-base",
+      "agent-evaluation-console"
+    ],
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "agent-loop",
     "title": "Agent Loop",
     "category": "agent",
     "level": "进阶",
-    "summary": "Agent Loop 是模型根据目标反复计划、调用工具、观察结果并继续执行的控制流程。",
-    "whyItMatters": "Agent 是否可靠，核心取决于循环控制、终止条件、工具权限和错误处理。",
-    "explanation": "一个典型 Agent Loop 会包含目标输入、模型决策、工具调用、结果观察、状态更新和下一步判断。",
-    "engineeringNotes": ["必须设计最大步数和终止条件", "工具失败要可恢复", "危险动作需要人工确认"],
-    "example": "让 Agent 分析 GitHub issue：读取 issue、分类、查相关文件、生成修复建议。",
-    "commonMistakes": ["没有最大步数", "工具权限过大", "没有 trace，出错无法复盘"],
-    "interviewAnswer": "Agent Loop 是 Agent 多步骤执行的核心，模型不是一次性回答，而是在状态和工具结果基础上迭代决策。",
-    "relatedQuestions": ["agent-vs-chatbot"],
-    "relatedProjects": ["task-planning-agent"],
-    "references": ["openai-agents-sdk", "langgraph-docs"]
+    "summary": "Agent Loop 让模型在目标、工具结果和状态之间迭代决策。",
+    "whyItMatters": "可靠性取决于循环控制，不只取决于模型能力。",
+    "explanation": "每轮读取状态、生成受约束动作、执行工具、记录观察并检查终止条件和预算。",
+    "engineeringNotes": [
+      "最大步数",
+      "显式完成状态",
+      "失败与取消状态"
+    ],
+    "example": "Issue Agent 读取问题、搜索代码、形成建议后以 completed 状态结束。",
+    "commonMistakes": [
+      "没有终止条件",
+      "把自然语言当唯一状态"
+    ],
+    "interviewAnswer": "Agent Loop 是受控状态机，模型负责决策，应用负责执行、预算和停止。",
+    "relatedQuestions": [
+      "agent-vs-chatbot",
+      "agent-loop-control"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "tool-contract-design",
+    "title": "工具契约设计",
+    "category": "agent",
+    "level": "进阶",
+    "summary": "工具契约定义模型何时调用、需要什么参数和会产生什么结果。",
+    "whyItMatters": "模糊或万能工具会提高误用和安全风险。",
+    "explanation": "工具按单一职责设计，参数用强 Schema，返回稳定机器字段，副作用和错误明确分类。",
+    "engineeringNotes": [
+      "名称体现动作",
+      "描述调用前置条件",
+      "错误可重试性明确"
+    ],
+    "example": "search_docs 只搜索并返回片段，不同时生成答案或修改文档。",
+    "commonMistakes": [
+      "一个工具包办所有动作",
+      "错误只返回字符串"
+    ],
+    "interviewAnswer": "工具是模型与确定性系统的 API，应该像生产接口一样设计和测试。",
+    "relatedQuestions": [
+      "agent-tool-schema"
+    ],
+    "relatedProjects": [
+      "task-planning-agent",
+      "mcp-file-assistant"
+    ],
+    "references": [
+      "openai-function-calling"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "agent-state-memory",
+    "title": "Agent 状态与记忆",
+    "category": "agent",
+    "level": "进阶",
+    "summary": "状态是当前任务执行事实，记忆是跨步骤或跨会话保留的信息。",
+    "whyItMatters": "混在聊天历史里会导致不可查询、不可恢复和上下文膨胀。",
+    "explanation": "结构化状态保存目标、步骤和工具结果；长期记忆仅保存明确有价值且允许持久化的信息。",
+    "engineeringNotes": [
+      "状态独立于消息",
+      "记忆有来源与过期时间",
+      "敏感信息最小化"
+    ],
+    "example": "订单处理状态保存 order_id 和 approval_status，而不是靠模型回忆。",
+    "commonMistakes": [
+      "把完整历史当数据库",
+      "未经同意保存个人信息"
+    ],
+    "interviewAnswer": "状态服务当前流程，记忆服务未来任务；两者都应结构化、可审计。",
+    "relatedQuestions": [
+      "agent-state-vs-memory"
+    ],
+    "relatedProjects": [
+      "ai-interviewer",
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-agents-sdk",
+      "langgraph-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "planning-routing",
+    "title": "规划、路由与确定性流程",
+    "category": "agent",
+    "level": "高级",
+    "summary": "规划决定步骤，路由决定由哪个工具或子流程处理。",
+    "whyItMatters": "并非每个任务都需要开放式 Agent。",
+    "explanation": "固定业务规则用代码或工作流；只有步骤依赖未知观察时才让模型决策，并限制可选动作。",
+    "engineeringNotes": [
+      "优先确定性流程",
+      "规划结果需要校验",
+      "路由保留兜底"
+    ],
+    "example": "退款审批由规则判断额度，只有材料归类交给模型。",
+    "commonMistakes": [
+      "让模型规划所有步骤",
+      "规划后直接执行高风险动作"
+    ],
+    "interviewAnswer": "我会用确定性流程包住 Agent，把模型决策限制在真正不确定的节点。",
+    "relatedQuestions": [
+      "workflow-vs-agent",
+      "agent-planning-routing"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-agents-sdk",
+      "langgraph-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "agent-stop-conditions",
+    "title": "Agent 终止条件与预算",
+    "category": "agent",
+    "level": "高级",
+    "summary": "终止条件定义何时完成、失败、等待或取消。",
+    "whyItMatters": "没有明确停止会造成循环、成本失控和重复副作用。",
+    "explanation": "同时设置业务完成条件、最大轮次、时间、Token 与工具预算，并在耗尽时返回可恢复状态。",
+    "engineeringNotes": [
+      "完成条件可机器判断",
+      "预算写入状态",
+      "区分等待人工与失败"
+    ],
+    "example": "已生成有效工单 ID 后立即完成，不再让模型自行决定是否继续。",
+    "commonMistakes": [
+      "只设置最大步数",
+      "超时后不取消工具"
+    ],
+    "interviewAnswer": "可靠 Agent 必须有业务终止条件和资源预算，停止由控制层执行。",
+    "relatedQuestions": [
+      "agent-stop-conditions"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "human-in-the-loop",
+    "title": "Human in the Loop",
+    "category": "agent",
+    "level": "高级",
+    "summary": "人工确认把高风险或低置信动作交给用户决定。",
+    "whyItMatters": "它是责任和权限边界，不是失败后的临时弹窗。",
+    "explanation": "按动作风险、可逆性和金额定义确认策略，页面展示将执行的动作、依据和影响，并支持拒绝或修改。",
+    "engineeringNotes": [
+      "确认点在执行前",
+      "展示差异与影响",
+      "审批结果写入审计日志"
+    ],
+    "example": "发送外部邮件前展示收件人、主题和正文供确认。",
+    "commonMistakes": [
+      "所有动作都确认导致不可用",
+      "只问“是否继续”不给细节"
+    ],
+    "interviewAnswer": "HITL 应基于风险分级，并提供足够信息让用户做真实决定。",
+    "relatedQuestions": [
+      "human-in-the-loop"
+    ],
+    "relatedProjects": [
+      "ai-interviewer",
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-agents-sdk",
+      "langgraph-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "multi-agent-patterns",
+    "title": "多 Agent 与 Handoff",
+    "category": "agent",
+    "level": "高级",
+    "summary": "多 Agent 用角色分工或交接缩小单个 Agent 的上下文和工具集合。",
+    "whyItMatters": "角色越多不一定越好，协调会增加延迟和失败面。",
+    "explanation": "只有存在清晰能力边界时拆分，并定义交接输入、输出、所有权和失败返回。",
+    "engineeringNotes": [
+      "优先单 Agent 加工具",
+      "交接使用结构化载荷",
+      "限制循环交接"
+    ],
+    "example": "分诊 Agent 只判断工单类型，再把完整上下文交给对应专家 Agent。",
+    "commonMistakes": [
+      "按岗位名机械拆 Agent",
+      "多个 Agent 共享全部工具"
+    ],
+    "interviewAnswer": "多 Agent 的价值是边界清晰，不是模拟组织架构；需要衡量协调成本。",
+    "relatedQuestions": [
+      "multi-agent-handoff"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "mcp-architecture",
+    "title": "MCP Host、Client 与 Server",
+    "category": "mcp",
+    "level": "进阶",
+    "summary": "MCP 用 Host 管理用户体验，Client 维持到单个 Server 的连接，Server 暴露能力。",
+    "whyItMatters": "理解边界才能正确处理权限、生命周期和多服务连接。",
+    "explanation": "Host 决定授权与上下文聚合；每个 Client 与一个 Server 会话通信；Server 不应假设可访问其他连接。",
+    "engineeringNotes": [
+      "连接隔离",
+      "能力协商",
+      "Host 管理授权"
+    ],
+    "example": "桌面 Host 分别连接文件和数据库两个 MCP Server。",
+    "commonMistakes": [
+      "把 Client 当最终用户",
+      "让 Server 跨连接读取上下文"
+    ],
+    "interviewAnswer": "MCP 是 Host-Client-Server 架构，Host 掌握用户授权和多服务编排。",
+    "relatedQuestions": [
+      "mcp-architecture-question"
+    ],
+    "relatedProjects": [
+      "mcp-file-assistant"
+    ],
+    "references": [
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "mcp-primitives",
+    "title": "MCP Tools、Resources 与 Prompts",
+    "category": "mcp",
+    "level": "进阶",
+    "summary": "MCP 三类核心原语分别表达可执行动作、可读取上下文和可选择模板。",
+    "whyItMatters": "混用会让控制权和用户预期不清晰。",
+    "explanation": "Tools 通常由模型选择，Resources 由应用选择，Prompts 由用户显式选择；具体客户端仍应提供确认策略。",
+    "engineeringNotes": [
+      "按控制方选择原语",
+      "Schema 稳定",
+      "描述副作用"
+    ],
+    "example": "读取项目说明用 Resource，删除文件是 Tool，代码审查模板是 Prompt。",
+    "commonMistakes": [
+      "所有能力都做 Tool",
+      "Resource 暗含副作用"
+    ],
+    "interviewAnswer": "三类原语的核心区别是能力语义与控制方，不只是接口名字。",
+    "relatedQuestions": [
+      "mcp-primitives"
+    ],
+    "relatedProjects": [
+      "mcp-file-assistant"
+    ],
+    "references": [
+      "mcp-docs",
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "mcp-security",
+    "title": "MCP 权限与传输安全",
+    "category": "security",
+    "level": "高级",
+    "summary": "MCP 安全覆盖服务发现、传输、鉴权、能力授权和工具执行。",
+    "whyItMatters": "协议统一接口并不会自动让外部服务可信。",
+    "explanation": "连接前确认服务来源，按 Server 隔离凭证和权限，危险工具需确认，输入输出都要校验和审计。",
+    "engineeringNotes": [
+      "最小权限令牌",
+      "限制可访问根目录",
+      "不信任工具描述返回"
+    ],
+    "example": "文件 Server 只拿到项目目录只读权限，而不是整个用户主目录。",
+    "commonMistakes": [
+      "安装即信任",
+      "多个 Server 共用高权限 Token"
+    ],
+    "interviewAnswer": "MCP 降低接入成本，但安全仍由 Host 和 Server 的授权、隔离与审计保证。",
+    "relatedQuestions": [
+      "mcp-security"
+    ],
+    "relatedProjects": [
+      "mcp-file-assistant"
+    ],
+    "references": [
+      "mcp-docs",
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "agent-tracing",
+    "title": "Agent Trace 与可观测性",
+    "category": "eval",
+    "level": "进阶",
+    "summary": "Trace 记录一次任务中的模型生成、工具调用、交接、护栏和耗时。",
+    "whyItMatters": "没有轨迹只能看到错误结果，无法定位决策失败在哪一步。",
+    "explanation": "事件应关联同一 trace_id，记录输入摘要、输出、状态、耗时、Token 和错误，并对敏感内容脱敏。",
+    "engineeringNotes": [
+      "统一事件模型",
+      "结构化错误",
+      "线上样本可回放"
+    ],
+    "example": "工具超时可定位到具体调用和重试，而不是只看到“任务失败”。",
+    "commonMistakes": [
+      "只记录最终文本",
+      "日志包含密钥或完整隐私数据"
+    ],
+    "interviewAnswer": "Agent 可观测性要覆盖决策轨迹、工具执行、成本和错误，而不只是 HTTP 日志。",
+    "relatedQuestions": [
+      "agent-tracing"
+    ],
+    "relatedProjects": [
+      "agent-evaluation-console"
+    ],
+    "references": [
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "agent-evaluation",
+    "title": "Agent 结果与轨迹评估",
+    "category": "eval",
+    "level": "高级",
+    "summary": "Agent Eval 同时衡量最终结果和执行过程。",
+    "whyItMatters": "只看答案可能掩盖越权、绕路和不稳定工具调用。",
+    "explanation": "固定任务集应定义成功条件、允许工具、预算和关键轨迹约束，并结合规则、人工和模型评分。",
+    "engineeringNotes": [
+      "结果与过程分开",
+      "固定模型与工具版本",
+      "记录置信区间和失败类型"
+    ],
+    "example": "工单创建正确但调用了未授权客户接口，结果分通过而安全分失败。",
+    "commonMistakes": [
+      "只用主观演示",
+      "把 LLM Judge 当唯一真值"
+    ],
+    "interviewAnswer": "Agent 评估要检查任务成功、轨迹合法、成本延迟和安全边界。",
+    "relatedQuestions": [
+      "agent-evaluation",
+      "tool-call-evaluation"
+    ],
+    "relatedProjects": [
+      "agent-evaluation-console"
+    ],
+    "references": [
+      "openai-evals",
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "production-reliability",
+    "title": "重试、幂等与故障恢复",
+    "category": "deploy",
+    "level": "高级",
+    "summary": "AI 请求和工具调用都可能超时、限流或部分成功。",
+    "whyItMatters": "盲目重试会重复收费或重复执行副作用。",
+    "explanation": "只对可重试错误做指数退避；副作用操作使用幂等键和状态查询；长任务从持久化检查点恢复。",
+    "engineeringNotes": [
+      "错误分类",
+      "幂等键",
+      "退避加抖动",
+      "熔断与降级"
+    ],
+    "example": "支付工具超时后先按幂等键查询结果，而不是再次扣款。",
+    "commonMistakes": [
+      "捕获所有异常后重试",
+      "把模型请求与业务事务绑死"
+    ],
+    "interviewAnswer": "生产可靠性依赖错误分类、幂等和可恢复状态，不是简单加三次重试。",
+    "relatedQuestions": [
+      "llm-api-retry",
+      "agent-long-running-task"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "cost-latency-budget",
+    "title": "成本与延迟预算",
+    "category": "deploy",
+    "level": "进阶",
+    "summary": "每个任务都应有质量、延迟和成本预算。",
+    "whyItMatters": "没有预算的 Agent 容易因长上下文、多轮调用和并发工具失控。",
+    "explanation": "记录输入输出 Token、调用次数、缓存命中和 P95 延迟；按任务价值选择模型、上下文和最大步骤。",
+    "engineeringNotes": [
+      "按业务任务聚合成本",
+      "设置硬预算",
+      "对照质量指标优化"
+    ],
+    "example": "简单分类限制一次低成本调用，复杂研究任务允许多步但设总预算。",
+    "commonMistakes": [
+      "只优化单次 Token",
+      "降成本不看质量回归"
+    ],
+    "interviewAnswer": "成本优化要以任务成功率为约束，同时控制模型、上下文、步骤和缓存。",
+    "relatedQuestions": [
+      "llm-cost-control"
+    ],
+    "relatedProjects": [
+      "agent-evaluation-console"
+    ],
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "secrets-and-data-boundaries",
+    "title": "密钥与数据边界",
+    "category": "security",
+    "level": "入门",
+    "summary": "模型密钥和业务凭证只能保存在受控服务端。",
+    "whyItMatters": "泄漏凭证会造成费用、安全和客户数据风险。",
+    "explanation": "客户端只调用自己的后端；服务端按环境管理密钥、限制权限、脱敏日志并明确哪些数据可发送给模型。",
+    "engineeringNotes": [
+      "密钥不进前端",
+      "日志脱敏",
+      "数据分类与保留策略"
+    ],
+    "example": "浏览器请求自有 API，由服务器读取环境变量调用模型。",
+    "commonMistakes": [
+      "把密钥写进 NEXT_PUBLIC",
+      "把完整用户数据写日志"
+    ],
+    "interviewAnswer": "AI 应用首先是普通安全系统，密钥、数据最小化和审计必须先于模型能力。",
+    "relatedQuestions": [
+      "api-key-security"
+    ],
+    "relatedProjects": [
+      "prompt-debugger",
+      "mcp-file-assistant"
+    ],
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   }
 ]
-

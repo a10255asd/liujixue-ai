@@ -18,9 +18,36 @@ test('roadmap stages have executable learning outputs', () => {
   }
 })
 
+test('batch 2 reaches the reviewed content baseline', () => {
+  assert.ok(readJson('../content/knowledge-points.json').length >= 30)
+  assert.equal(readJson('../content/interview-questions.json').length, 80)
+  assert.ok(readJson('../content/projects.json').length >= 6)
+  assert.ok(readJson('../content/resources.json').length >= 12)
+})
+
+test('all published records carry audit fields', () => {
+  const files = [
+    '../content/roadmap.json',
+    '../content/knowledge-points.json',
+    '../content/interview-questions.json',
+    '../content/projects.json',
+    '../content/resources.json',
+    '../content/journals.json'
+  ]
+
+  for (const file of files) {
+    for (const item of readJson(file)) {
+      assert.equal(item.status, 'published', `${file} ${item.slug ?? item.id} 未发布`)
+      assert.match(item.lastReviewedAt, /^\d{4}-\d{2}-\d{2}$/)
+      assert.ok(Array.isArray(item.authors) && item.authors.length > 0)
+      assert.ok(Array.isArray(item.reviewers) && item.reviewers.length > 0)
+    }
+  }
+})
+
 test('interview questions include answer training fields', () => {
   const questions = readJson('../content/interview-questions.json')
-  assert.ok(questions.length >= 3)
+  assert.equal(questions.length, 80)
   for (const item of questions) {
     assert.ok(item.id)
     assert.ok(item.question)
@@ -34,7 +61,7 @@ test('interview questions include answer training fields', () => {
 
 test('practical projects include resume value', () => {
   const projects = readJson('../content/projects.json')
-  assert.ok(projects.length >= 3)
+  assert.ok(projects.length >= 6)
   for (const project of projects) {
     assert.ok(project.slug)
     assert.ok(project.title)

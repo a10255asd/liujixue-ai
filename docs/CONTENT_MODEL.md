@@ -4,6 +4,22 @@
 
 本项目第一版采用静态内容数据源。建议放在 `content/` 或 `lib/content-data.js`，后续需要搜索和编辑后台时再迁移到数据库。
 
+## 0. 公共审核字段
+
+所有内容记录都必须包含以下字段，仓储层只向页面返回 `published` 内容：
+
+```ts
+type ContentAuditFields = {
+  status: 'draft' | 'reviewed' | 'published'
+  lastReviewedAt: string
+  sourceUpdatedAt?: string
+  authors: string[]
+  reviewers: string[]
+}
+```
+
+Batch 2 已移除旧数据兼容逻辑。缺少审核字段、知识点或面试题缺少官方资料引用时，构建直接失败。
+
 ## 1. 学习路线 Roadmap
 
 ```ts
@@ -246,4 +262,3 @@ slug 使用英文小写和短横线。
 - `agent-tool-calling`
 - `mcp-server-client`
 - `rag-vs-fine-tuning`
-

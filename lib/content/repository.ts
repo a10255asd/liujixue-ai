@@ -20,13 +20,17 @@ import {
   type RoadmapStage
 } from './schemas'
 
-const roadmap = roadmapSchema.parse(roadmapData).sort((a, b) => a.order - b.order)
-const knowledge = knowledgeSchema.parse(knowledgeData)
-const questions = interviewSchema.parse(interviewData)
-const projects = projectsSchema.parse(projectData)
-const resources = resourcesSchema.parse(resourceData).sort((a, b) => a.priority - b.priority)
+const published = <T extends { status: string }>(items: T[]) =>
+  items.filter((item) => item.status === 'published')
+
+const roadmap = published(roadmapSchema.parse(roadmapData)).sort((a, b) => a.order - b.order)
+const knowledge = published(knowledgeSchema.parse(knowledgeData))
+const questions = published(interviewSchema.parse(interviewData))
+const projects = published(projectsSchema.parse(projectData))
+const resources = published(resourcesSchema.parse(resourceData)).sort((a, b) => a.priority - b.priority)
 const journals = journalsSchema
   .parse(journalData)
+  .filter((item) => item.status === 'published')
   .sort((a, b) => b.date.localeCompare(a.date))
 
 export function getRoadmapStages(): RoadmapStage[] {

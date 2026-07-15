@@ -2,12 +2,13 @@ import { ArrowRight, Layers3 } from 'lucide-react'
 import Link from 'next/link'
 
 import type { InterviewQuestion, KnowledgePoint, PracticalProject } from '@/lib/content/schemas'
+import { getCategoryLabel } from '@/lib/content/labels'
 
 export function KnowledgeCard({ item }: { item: KnowledgePoint }) {
   return (
     <article className="content-card content-card--knowledge">
       <div className="content-card__meta">
-        <span>{item.category}</span>
+        <span>{getCategoryLabel(item.category)}</span>
         <span>{item.level}</span>
       </div>
       <h3>{item.title}</h3>
@@ -23,7 +24,7 @@ export function InterviewCard({ item }: { item: InterviewQuestion }) {
   return (
     <article className="content-card content-card--question">
       <div className="content-card__meta">
-        <span>{item.category}</span>
+        <span>{getCategoryLabel(item.category)}</span>
         <span>{item.level}</span>
       </div>
       <h3>{item.question}</h3>

@@ -1,100 +1,295 @@
 [
   {
-    "slug": "prompt-context",
-    "title": "Prompt 与上下文工程",
-    "order": 3,
-    "level": "进阶",
-    "summary": "学会拆任务、组织上下文并约束输出，让模型在真实业务中稳定工作。",
-    "goals": ["理解 Prompt 与 Context Engineering 的边界", "掌握 Few-shot 和结构化约束", "能控制长任务上下文"],
-    "prerequisites": ["llm-api"],
-    "topics": ["任务拆解", "Few-shot", "上下文压缩", "输出约束", "交接文档"],
-    "outputs": ["需求转 AI 任务包模板"],
-    "interviewFocus": ["如何提升模型输出稳定性", "上下文过长时如何处理"],
-    "projectRefs": ["prompt-debugger"],
-    "resourceRefs": ["openai-platform-docs"]
-  },
-  {
     "slug": "ai-user-basics",
     "title": "AI 使用基础",
     "order": 1,
     "level": "入门",
-    "summary": "理解模型、Token、上下文和常见 AI 工具，先成为稳定的 AI 使用者。",
-    "goals": ["理解 LLM 请求的基本过程", "掌握基础 Prompt 写法", "知道 ChatGPT、Claude、Cursor、Codex 的分工"],
+    "summary": "理解模型、Token、上下文和 AI 应用边界。",
+    "goals": [
+      "掌握模型与 Token",
+      "完成AI 概念笔记",
+      "能回答：Token 与上下文如何影响工程"
+    ],
     "prerequisites": [],
-    "topics": ["模型", "Token", "上下文窗口", "系统提示词", "温度参数"],
-    "outputs": ["整理一份 AI 工具使用清单"],
-    "interviewFocus": ["什么是 Token", "上下文窗口为什么重要"],
+    "topics": [
+      "模型与 Token",
+      "上下文窗口",
+      "非确定性"
+    ],
+    "outputs": [
+      "AI 概念笔记"
+    ],
+    "interviewFocus": [
+      "Token 与上下文如何影响工程"
+    ],
     "projectRefs": [],
-    "resourceRefs": ["openai-platform-docs"]
+    "resourceRefs": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "llm-api",
     "title": "LLM API 开发",
     "order": 2,
     "level": "入门",
-    "summary": "学会把大模型作为一个可控的工程依赖调用。",
-    "goals": ["完成文本生成调用", "理解结构化输出", "理解流式响应和错误处理"],
-    "prerequisites": ["ai-user-basics"],
-    "topics": ["模型参数", "JSON 输出", "流式响应", "函数调用", "成本控制"],
-    "outputs": ["Prompt 调试器"],
-    "interviewFocus": ["如何保证 LLM 输出稳定", "如何处理 API 超时和重试"],
-    "projectRefs": ["prompt-debugger"],
-    "resourceRefs": ["openai-platform-docs", "vercel-ai-sdk-docs"]
+    "summary": "把大模型作为可观测、可校验的工程依赖调用。",
+    "goals": [
+      "掌握Responses API",
+      "完成Prompt 调试与回归台",
+      "能回答：如何保证输出结构和处理重试"
+    ],
+    "prerequisites": [
+      "ai-user-basics"
+    ],
+    "topics": [
+      "Responses API",
+      "结构化输出",
+      "工具调用",
+      "错误处理"
+    ],
+    "outputs": [
+      "Prompt 调试与回归台"
+    ],
+    "interviewFocus": [
+      "如何保证输出结构和处理重试"
+    ],
+    "projectRefs": [
+      "prompt-debugger"
+    ],
+    "resourceRefs": [
+      "openai-responses-api",
+      "openai-structured-outputs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "prompt-context",
+    "title": "Prompt 与上下文工程",
+    "order": 3,
+    "level": "进阶",
+    "summary": "用契约、上下文选择和安全边界提高稳定性。",
+    "goals": [
+      "掌握Prompt 契约",
+      "完成可测试 Prompt 契约",
+      "能回答：Prompt 和 Context Engineering 的区别"
+    ],
+    "prerequisites": [
+      "llm-api"
+    ],
+    "topics": [
+      "Prompt 契约",
+      "Few-shot",
+      "上下文压缩",
+      "Prompt Injection"
+    ],
+    "outputs": [
+      "可测试 Prompt 契约"
+    ],
+    "interviewFocus": [
+      "Prompt 和 Context Engineering 的区别"
+    ],
+    "projectRefs": [
+      "prompt-debugger"
+    ],
+    "resourceRefs": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "rag",
     "title": "RAG 知识库",
     "order": 4,
     "level": "进阶",
-    "summary": "学会把外部知识检索后提供给模型，降低幻觉并增强可追溯性。",
-    "goals": ["理解 Embedding", "理解 Chunk 和 Retriever", "能设计一个基础知识库问答流程"],
-    "prerequisites": ["llm-api"],
-    "topics": ["Embedding", "Chunking", "Vector DB", "Rerank", "引用来源", "评估"],
-    "outputs": ["AI 学习资料问答知识库"],
-    "interviewFocus": ["RAG 和普通 Prompt 的区别", "如何提升召回率和准确率"],
-    "projectRefs": ["rag-knowledge-base"],
-    "resourceRefs": ["vercel-ai-sdk-docs"]
+    "summary": "建立可检索、可引用、可评估的外部知识链路。",
+    "goals": [
+      "掌握Embedding",
+      "完成可评估 RAG 知识库",
+      "能回答：如何分层评估 RAG"
+    ],
+    "prerequisites": [
+      "llm-api"
+    ],
+    "topics": [
+      "Embedding",
+      "Chunking",
+      "混合检索",
+      "Rerank",
+      "引用",
+      "Eval"
+    ],
+    "outputs": [
+      "可评估 RAG 知识库"
+    ],
+    "interviewFocus": [
+      "如何分层评估 RAG"
+    ],
+    "projectRefs": [
+      "rag-knowledge-base"
+    ],
+    "resourceRefs": [
+      "pgvector-docs",
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "agent-engineering",
     "title": "Agent 工程",
     "order": 5,
     "level": "进阶",
-    "summary": "理解工具调用、状态、规划和循环执行，让模型完成多步骤任务。",
-    "goals": ["理解 Agent Loop", "理解工具调用", "能说明 Agent 的失败模式"],
-    "prerequisites": ["rag"],
-    "topics": ["Tool Calling", "Agent Loop", "State", "Memory", "Planning", "Guardrails"],
-    "outputs": ["多步骤资料整理 Agent"],
-    "interviewFocus": ["Agent 和普通 Chatbot 的区别", "如何避免 Agent 失控"],
-    "projectRefs": ["task-planning-agent"],
-    "resourceRefs": ["openai-agents-sdk", "langgraph-docs"]
+    "summary": "掌握状态、工具、控制循环、终止和人工确认。",
+    "goals": [
+      "掌握Agent Loop",
+      "完成受控任务执行 Agent",
+      "能回答：如何避免 Agent 失控"
+    ],
+    "prerequisites": [
+      "rag"
+    ],
+    "topics": [
+      "Agent Loop",
+      "Tools",
+      "State",
+      "Planning",
+      "HITL"
+    ],
+    "outputs": [
+      "受控任务执行 Agent"
+    ],
+    "interviewFocus": [
+      "如何避免 Agent 失控"
+    ],
+    "projectRefs": [
+      "task-planning-agent",
+      "ai-interviewer"
+    ],
+    "resourceRefs": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "mcp-ecosystem",
     "title": "MCP 与工具生态",
     "order": 6,
     "level": "高级",
-    "summary": "用标准协议把 Agent 与文件、数据库和业务工具连接起来。",
-    "goals": ["理解 MCP Client 与 Server", "区分 Tools、Resources 和 Prompts", "建立最小权限意识"],
-    "prerequisites": ["agent-engineering"],
-    "topics": ["MCP Server", "MCP Client", "Tools", "Resources", "权限控制"],
-    "outputs": ["本地文件 MCP 助手"],
-    "interviewFocus": ["MCP 解决什么问题", "如何保护 MCP 工具权限"],
-    "projectRefs": ["task-planning-agent"],
-    "resourceRefs": ["mcp-docs"]
+    "summary": "用标准协议连接受限工具和数据资源。",
+    "goals": [
+      "掌握Host/Client/Server",
+      "完成最小权限 MCP 文件助手",
+      "能回答：MCP 架构和安全边界"
+    ],
+    "prerequisites": [
+      "agent-engineering"
+    ],
+    "topics": [
+      "Host/Client/Server",
+      "Tools/Resources/Prompts",
+      "Transport",
+      "Security"
+    ],
+    "outputs": [
+      "最小权限 MCP 文件助手"
+    ],
+    "interviewFocus": [
+      "MCP 架构和安全边界"
+    ],
+    "projectRefs": [
+      "mcp-file-assistant"
+    ],
+    "resourceRefs": [
+      "mcp-docs",
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "slug": "production-career",
-    "title": "工程化与求职",
+    "title": "评估、生产与求职",
     "order": 7,
     "level": "求职",
-    "summary": "补齐评估、追踪、成本、部署和项目表达，形成可投递能力。",
-    "goals": ["能为 AI 应用设计 Eval", "理解日志、Trace 与成本控制", "完成项目和面试表达"],
-    "prerequisites": ["mcp-ecosystem"],
-    "topics": ["Eval", "Observability", "Deployment", "Cost", "Resume", "Interview"],
-    "outputs": ["可演示 Agent 项目", "项目讲解稿", "AI 面试回答集"],
-    "interviewFocus": ["如何评估 Agent 可靠性", "如何控制模型成本", "项目最难的问题是什么"],
-    "projectRefs": ["ai-interviewer", "task-planning-agent"],
-    "resourceRefs": ["openai-agents-sdk", "vercel-ai-sdk-docs"]
+    "summary": "用 Eval、Trace、部署与项目表达形成可投递能力。",
+    "goals": [
+      "掌握Eval",
+      "完成Agent 评估控制台",
+      "能回答：如何量化 Agent 可靠性"
+    ],
+    "prerequisites": [
+      "mcp-ecosystem"
+    ],
+    "topics": [
+      "Eval",
+      "Tracing",
+      "成本",
+      "稳定性",
+      "系统设计"
+    ],
+    "outputs": [
+      "Agent 评估控制台",
+      "项目讲解稿"
+    ],
+    "interviewFocus": [
+      "如何量化 Agent 可靠性"
+    ],
+    "projectRefs": [
+      "agent-evaluation-console"
+    ],
+    "resourceRefs": [
+      "openai-evals",
+      "openai-agents-tracing",
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   }
 ]

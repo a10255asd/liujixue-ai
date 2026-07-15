@@ -1,6 +1,7 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 
-import { ProjectCard } from '@/components/content/content-cards'
+import { ProjectCatalog } from '@/components/filters/catalog-filters'
 import { PageHeading } from '@/components/ui/page-heading'
 import { getProjects } from '@/lib/content/repository'
 
@@ -21,9 +22,9 @@ export default function ProjectsPage() {
         description="项目不只列功能，还需要讲清架构选择、失败处理、测试方法、部署边界和量化结果。"
         aside={<div className="heading-count"><strong>{projects.length}</strong><span>项目路径</span></div>}
       />
-      <div className="project-grid project-grid--catalog">
-        {projects.map((item) => <ProjectCard item={item} key={item.slug} />)}
-      </div>
+      <Suspense fallback={<div className="catalog-loading">正在加载项目…</div>}>
+        <ProjectCatalog items={projects} />
+      </Suspense>
     </div>
   )
 }

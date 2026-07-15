@@ -14,13 +14,21 @@
 
 后续补内容前，应重新打开并确认这些链接仍然有效。
 
-- OpenAI Platform Docs：`https://platform.openai.com/docs`
+- OpenAI API Docs：`https://developers.openai.com/api/docs`
+- OpenAI Responses API：`https://developers.openai.com/api/docs/guides/responses`
+- OpenAI Structured Outputs：`https://developers.openai.com/api/docs/guides/structured-outputs`
+- OpenAI Function Calling：`https://developers.openai.com/api/docs/guides/function-calling`
+- OpenAI Evals：`https://developers.openai.com/api/docs/guides/evals`
+- OpenAI Production Best Practices：`https://developers.openai.com/api/docs/guides/production-best-practices`
 - OpenAI Agents SDK：`https://openai.github.io/openai-agents-python/`
+- OpenAI Agents SDK Tracing：`https://openai.github.io/openai-agents-python/tracing/`
 - Model Context Protocol Docs：`https://modelcontextprotocol.io/docs`
+- Model Context Protocol Architecture：`https://modelcontextprotocol.io/docs/learn/architecture`
 - Vercel AI SDK Docs：`https://ai-sdk.dev/docs`
 - Vercel AI SDK Agents：`https://ai-sdk.dev/docs/agents/overview`
 - LangChain Docs：`https://docs.langchain.com/`
-- LangGraph Docs：`https://langchain-ai.github.io/langgraph/`
+- LangGraph Docs：`https://docs.langchain.com/oss/python/langgraph/overview`
+- pgvector：`https://github.com/pgvector/pgvector`
 
 ## 内容写作规则
 
@@ -45,4 +53,3 @@
 - 复制付费题库。
 - 伪造大厂面试题来源。
 - 不加判断地搬运网上答案。
-

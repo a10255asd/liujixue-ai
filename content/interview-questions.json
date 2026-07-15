@@ -1,48 +1,3224 @@
 [
   {
+    "id": "token-basics",
+    "question": "Token 是什么，它为什么影响成本和上下文？",
+    "category": "ai-basic",
+    "level": "初级",
+    "tags": [
+      "Token",
+      "Context"
+    ],
+    "whatItTests": [
+      "基础概念是否准确",
+      "能否联系工程约束"
+    ],
+    "shortAnswer": "Token 是模型处理文本的单位，输入、输出、历史和工具结果都会占用上下文并参与计费。",
+    "fullAnswer": "工程上应按任务记录输入与输出 Token，为输出预留空间，并通过检索、摘要和裁剪减少无关上下文。Token 数不能用字符数直接替代，应以实际 tokenizer 或 API usage 为准。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台展示单任务 Token、延迟和成本。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "context-window-management",
+    "question": "上下文窗口满了应该怎样处理？",
+    "category": "ai-basic",
+    "level": "初级",
+    "tags": [
+      "Context",
+      "Token"
+    ],
+    "whatItTests": [
+      "基础概念是否准确",
+      "能否联系工程约束"
+    ],
+    "shortAnswer": "按优先级保留系统约束、当前任务和关键证据，对旧历史做摘要或按需检索。",
+    "fullAnswer": "不能只从头或尾机械截断。先定义消息优先级和输出预算，再删除重复工具结果、压缩旧对话，把长期事实迁移到结构化状态；截断决策要可观测，避免悄悄丢失关键约束。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台实现上下文预算和截断报告。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "llm-vs-traditional-ml",
+    "question": "LLM 应用和传统机器学习系统的工程差异是什么？",
+    "category": "ai-basic",
+    "level": "中级",
+    "tags": [
+      "LLM",
+      "ML"
+    ],
+    "whatItTests": [
+      "基础概念是否准确",
+      "能否联系工程约束"
+    ],
+    "shortAnswer": "LLM 更依赖自然语言接口和上下文，输出具有非确定性，必须额外处理提示词版本、评估、护栏和成本。",
+    "fullAnswer": "传统 ML 常围绕固定特征、单一预测目标和离线指标；LLM 应用还包含上下文组装、工具调用和多轮状态。二者都需要数据、评估和监控，但 LLM 不能只靠类型检查或少量人工演示证明正确。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台说明如何给非确定性系统建立回归门禁。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "hallucination-causes",
+    "question": "模型幻觉通常来自哪些环节？",
+    "category": "ai-basic",
+    "level": "初级",
+    "tags": [
+      "Hallucination",
+      "RAG"
+    ],
+    "whatItTests": [
+      "基础概念是否准确",
+      "能否联系工程约束"
+    ],
+    "shortAnswer": "信息不足、上下文冲突、检索失败、指令不清和模型生成倾向都可能造成无依据内容。",
+    "fullAnswer": "先按链路分类：查询是否正确、证据是否召回、上下文是否包含冲突、模型是否忠于证据、输出校验是否缺失。RAG 只能补充证据，不能保证生成一定忠实，因此仍需引用校验、拒答条件和评估。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 知识库展示检索与生成分层诊断。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "temperature-and-determinism",
+    "question": "把 temperature 设为 0 就能保证结果确定吗？",
+    "category": "ai-basic",
+    "level": "初级",
+    "tags": [
+      "Temperature",
+      "Determinism"
+    ],
+    "whatItTests": [
+      "基础概念是否准确",
+      "能否联系工程约束"
+    ],
+    "shortAnswer": "不能。较低温度通常减少随机性，但模型服务、并行计算、提示词和上下文变化仍可能导致差异。",
+    "fullAnswer": "生产系统不应把稳定性寄托在单个采样参数上。应使用结构化输出、业务校验、固定评估集、模型版本记录和可重试流程；需要绝对确定的规则应交给代码执行。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台比较相同样例多次运行的通过率。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "responses-api-lifecycle",
+    "question": "如何解释一次带工具调用的 Responses API 生命周期？",
+    "category": "llm-api",
+    "level": "中级",
+    "tags": [
+      "Responses API",
+      "Tools"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "应用提交输入，模型可能返回工具调用；应用执行并回传对应工具结果，再继续请求直到得到最终响应或终止。",
+    "fullAnswer": "模型只产生调用意图和参数，应用负责参数校验、鉴权和执行。每次工具结果必须关联正确的调用 ID，控制层还要处理多工具、拒答、超时、取消和最大轮次。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 展示每轮响应、工具调用和状态变化。",
+    "references": [
+      "openai-responses-api",
+      "openai-function-calling"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "streaming-response-design",
+    "question": "流式响应比一次性响应多了哪些工程问题？",
+    "category": "llm-api",
+    "level": "中级",
+    "tags": [
+      "Streaming",
+      "SSE"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "需要处理事件解析、生成中状态、断线、取消、错误事件和最终结果持久化。",
+    "fullAnswer": "客户端不能把所有事件都当文本片段；服务端应在连接取消时终止下游调用，并区分草稿与最终结果。涉及工具或副作用时还要保证重连不会重复执行。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台实现取消按钮和未完成状态。",
+    "references": [
+      "openai-responses-api",
+      "vercel-ai-sdk-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "structured-output-vs-json-mode",
+    "question": "结构化输出和“提示模型返回 JSON”有什么区别？",
+    "category": "llm-api",
+    "level": "中级",
+    "tags": [
+      "Structured Output",
+      "JSON Schema"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "结构化输出用 Schema 约束结果形状，单纯要求 JSON 只保证或尝试得到语法格式，字段和枚举仍可能漂移。",
+    "fullAnswer": "Schema 可以约束必填字段、类型和枚举，但不保证业务语义正确。服务端仍需运行时校验、业务规则校验，并处理拒绝、截断和 Schema 版本升级。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台展示 Schema 通过率和业务校验失败。",
+    "references": [
+      "openai-structured-outputs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "function-calling-loop",
+    "question": "Function Calling 的完整闭环是什么？",
+    "category": "llm-api",
+    "level": "中级",
+    "tags": [
+      "Function Calling",
+      "Tools"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "定义工具 Schema，模型选择工具并给参数，应用校验执行，回传结果，模型再基于结果完成任务。",
+    "fullAnswer": "工具定义要单一职责且描述调用条件。应用不能直接信任参数，必须鉴权、校验和审计；副作用操作应使用幂等键并在执行前确认。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合受控任务 Agent 展示工具白名单与执行日志。",
+    "references": [
+      "openai-function-calling"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "parallel-tool-calls",
+    "question": "什么时候适合并行工具调用，风险是什么？",
+    "category": "llm-api",
+    "level": "高级",
+    "tags": [
+      "Tools",
+      "Concurrency"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "互不依赖且无冲突副作用的查询适合并行；依赖顺序或共享写入的动作不适合。",
+    "fullAnswer": "并行能降低总延迟，但会增加速率限制、结果合并、超时和部分失败处理。控制层要建立依赖图、并发上限和取消策略，不能仅因为模型一次返回多个调用就盲目并行。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 并行读取多个只读数据源。",
+    "references": [
+      "openai-function-calling"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "llm-api-retry",
+    "question": "LLM API 超时和限流应该怎样重试？",
+    "category": "llm-api",
+    "level": "中级",
+    "tags": [
+      "Retry",
+      "Rate Limit"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "仅对可重试错误使用带抖动的指数退避，并设置总时间、次数和成本上限。",
+    "fullAnswer": "请求必须能区分网络超时、限流、服务端错误、参数错误和内容拒绝。纯生成可安全重试，但带副作用的工具要靠幂等键和状态查询避免重复执行；超出预算后应降级或返回可恢复错误。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台记录错误分类与重试次数。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "rate-limit-control",
+    "question": "如何在服务端处理模型 API 限流？",
+    "category": "llm-api",
+    "level": "中级",
+    "tags": [
+      "Rate Limit",
+      "Queue"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "使用并发控制、队列、指数退避和按租户配额，优先保护核心请求。",
+    "fullAnswer": "应监控请求数和 Token 维度的限制，避免大量长请求挤占容量。可以按任务优先级排队、提前估算 Token，并在高负载时降级模型或缩短非关键输出，而不是让客户端无限重试。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台展示吞吐、429 和排队时延。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "model-selection-strategy",
+    "question": "你会如何为不同任务选择模型？",
+    "category": "llm-api",
+    "level": "中级",
+    "tags": [
+      "Model Routing",
+      "Eval"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "先定义任务质量下限，再比较候选模型的成功率、P95 延迟、成本和能力约束。",
+    "fullAnswer": "用真实任务评估集分桶测试，不只看通用榜单。简单抽取、复杂推理和工具规划可使用不同模型，并保留回退路径；每次更换模型都必须跑回归评估。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台展示按任务路由的质量成本曲线。",
+    "references": [
+      "openai-platform-docs",
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "context-window-truncation",
+    "question": "API 层如何设计上下文截断而不破坏任务？",
+    "category": "llm-api",
+    "level": "高级",
+    "tags": [
+      "Context",
+      "Truncation"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "对消息分级，固定保留高优先级指令和当前任务，按价值压缩历史与工具结果，并预留输出预算。",
+    "fullAnswer": "截断器应输出被删除或摘要的内容清单，支持针对不同任务配置。结构化业务状态不应只存在聊天历史中；必要事实应从数据库或检索层按需重建。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合面试官项目保存结构化会话状态而非完整依赖历史。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "api-key-security",
+    "question": "为什么模型 API Key 不能放在浏览器？",
+    "category": "llm-api",
+    "level": "初级",
+    "tags": [
+      "Security",
+      "API Key"
+    ],
+    "whatItTests": [
+      "是否理解 API 生命周期",
+      "是否考虑失败与成本"
+    ],
+    "shortAnswer": "浏览器代码和网络请求对用户可见，公开密钥会被盗用并绕过业务权限。",
+    "fullAnswer": "客户端应调用自己的服务端，由服务端读取环境变量并实施鉴权、限流、数据脱敏和模型策略。不同环境和服务使用独立、最小权限凭证，并建立轮换和泄漏响应。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任一项目说明服务端代理和环境密钥管理。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "instruction-precedence",
+    "question": "系统指令、应用指令和用户输入冲突时怎样处理？",
+    "category": "prompt-context",
+    "level": "中级",
+    "tags": [
+      "Instructions",
+      "Security"
+    ],
+    "whatItTests": [
+      "是否能把提示词做成可测试契约",
+      "是否理解不可信上下文边界"
+    ],
+    "shortAnswer": "应用应把不可变规则放在更高优先级指令，并把用户输入和外部内容明确视为数据。",
+    "fullAnswer": "不能只依赖模型自行识别冲突。权限和危险操作必须由代码控制，输出经过 Schema 与业务校验；外部文档中的命令不能获得与应用指令相同的信任级别。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 MCP 文件助手说明读取内容不能改变工具权限。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "prompt-contract-design",
+    "question": "什么是 Prompt 契约？",
+    "category": "prompt-context",
+    "level": "初级",
+    "tags": [
+      "Prompt",
+      "Contract"
+    ],
+    "whatItTests": [
+      "是否能把提示词做成可测试契约",
+      "是否理解不可信上下文边界"
+    ],
+    "shortAnswer": "它明确任务目标、输入边界、输出 Schema、禁止行为和信息不足时的失败方式。",
+    "fullAnswer": "可测试的 Prompt 不只是角色描述。应把稳定规则和动态数据分开，用代表性示例说明边界，并以固定评估集判断版本变化，避免凭单次感觉调词。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台展示契约、Schema 和回归样例。",
+    "references": [
+      "openai-structured-outputs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "few-shot-selection",
+    "question": "Few-shot 示例应该怎样选择？",
+    "category": "prompt-context",
+    "level": "初级",
+    "tags": [
+      "Few-shot",
+      "Prompt"
+    ],
+    "whatItTests": [
+      "是否能把提示词做成可测试契约",
+      "是否理解不可信上下文边界"
+    ],
+    "shortAnswer": "选择与真实分布一致的正常、边界、拒绝和易混淆样例，而不是只放最简单的正例。",
+    "fullAnswer": "示例要正确、短小且不与规则冲突。示例数量受上下文预算限制，任务规则仍应显式表达；数据分布变化后需要重新评估示例是否继续代表真实输入。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台建立示例版本和边界测试。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "context-engineering-vs-prompt",
+    "question": "Context Engineering 和 Prompt Engineering 有什么区别？",
+    "category": "prompt-context",
+    "level": "中级",
+    "tags": [
+      "Context",
+      "Prompt"
+    ],
+    "whatItTests": [
+      "是否能把提示词做成可测试契约",
+      "是否理解不可信上下文边界"
+    ],
+    "shortAnswer": "Prompt Engineering 关注指令表达，Context Engineering 关注每一步应该提供哪些状态、证据、历史和工具结果。",
+    "fullAnswer": "复杂 Agent 的问题常不是一句 Prompt 写得不好，而是上下文过多、过期、冲突或缺少关键状态。工程上要按步骤动态组装上下文，并标注来源、时效和可信级别。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 展示规划和执行步骤使用不同上下文。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "prompt-injection-defense",
+    "question": "如何防御 RAG 或浏览器 Agent 中的 Prompt Injection？",
+    "category": "prompt-context",
+    "level": "高级",
+    "tags": [
+      "Prompt Injection",
+      "Security"
+    ],
+    "whatItTests": [
+      "是否能把提示词做成可测试契约",
+      "是否理解不可信上下文边界"
+    ],
+    "shortAnswer": "把外部内容视为不可信数据，并通过最小权限、工具确认、输出校验和数据隔离限制影响。",
+    "fullAnswer": "单靠“忽略恶意指令”不可靠。Host 应控制可用工具和凭证，敏感动作要求用户确认，检索内容标注来源，系统还要检测异常调用并保留审计轨迹。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 MCP 文件助手的目录白名单和只读权限。",
+    "references": [
+      "openai-production-best-practices",
+      "mcp-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "untrusted-context-delimiters",
+    "question": "给外部内容加分隔符就安全了吗？",
+    "category": "prompt-context",
+    "level": "中级",
+    "tags": [
+      "Context",
+      "Security"
+    ],
+    "whatItTests": [
+      "是否能把提示词做成可测试契约",
+      "是否理解不可信上下文边界"
+    ],
+    "shortAnswer": "不安全。分隔符能帮助模型区分数据，但不能形成真正的权限边界。",
+    "fullAnswer": "安全边界应由代码、凭证和工具权限保证。分隔符可以配合来源标记、内容过滤和结构化解析提升清晰度，但不能授权模型接触不需要的数据或执行高风险动作。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目说明证据是数据而不是新指令。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "conversation-summarization",
+    "question": "长会话摘要应该保留什么？",
+    "category": "prompt-context",
+    "level": "中级",
+    "tags": [
+      "Summary",
+      "State"
+    ],
+    "whatItTests": [
+      "是否能把提示词做成可测试契约",
+      "是否理解不可信上下文边界"
+    ],
+    "shortAnswer": "保留任务目标、已确认事实、关键约束、未决事项和来源，删除寒暄与重复内容。",
+    "fullAnswer": "摘要必须区分用户原话、系统推断和工具事实，并带更新时间。高风险状态应保存在结构化字段中，不能只依赖模型生成的自然语言摘要。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 AI 面试官保存题目、回答证据和未完成追问。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "prompt-versioning",
+    "question": "如何管理 Prompt 版本并避免改坏线上效果？",
+    "category": "prompt-context",
+    "level": "中级",
+    "tags": [
+      "Prompt",
+      "Versioning",
+      "Eval"
+    ],
+    "whatItTests": [
+      "是否能把提示词做成可测试契约",
+      "是否理解不可信上下文边界"
+    ],
+    "shortAnswer": "Prompt 与模型、Schema 和评估集一起版本化，变更前后跑固定回归并灰度发布。",
+    "fullAnswer": "日志应记录实际使用的 Prompt 版本和模型配置。评估至少覆盖质量、拒答、延迟和成本；上线后监控真实失败样本，再把经过脱敏和审核的样本补入评估集。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 Prompt 调试台实现版本对比与发布门禁。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
     "id": "rag-vs-prompt",
     "question": "RAG 和普通 Prompt 有什么区别？",
     "category": "rag",
     "level": "初级",
-    "tags": ["RAG", "Prompt", "Embedding"],
-    "whatItTests": ["是否理解外部知识注入", "是否理解检索和生成的边界", "是否知道幻觉控制"],
-    "shortAnswer": "普通 Prompt 只依赖输入上下文和模型已有能力，RAG 会先从外部知识源检索相关内容，再把检索结果提供给模型生成答案。",
-    "fullAnswer": "RAG 的核心是 Retrieval Augmented Generation。它通常包含文档切分、Embedding、向量检索、可选重排和生成环节。相比普通 Prompt，RAG 更适合回答私有知识、频繁变化知识和需要引用来源的问题，但它的质量取决于切片、召回、排序和上下文组织。",
-    "bonusPoints": ["能提到 chunking、rerank、hybrid search", "能提到引用来源和评估", "能结合自己的知识库项目说明"],
-    "commonMistakes": ["把 RAG 等同于向量数据库", "认为加了 RAG 就不会幻觉", "忽略数据清洗和评估"],
-    "followUps": ["如何评估 RAG 效果？", "召回结果不准怎么办？", "什么时候不适合用 RAG？"],
-    "projectConnection": "可以结合 RAG 知识库问答项目回答：文档入库、检索、引用和答案生成是如何串起来的。",
-    "references": ["vercel-ai-sdk-docs"]
+    "tags": [
+      "RAG",
+      "Prompt"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "普通 Prompt 只使用当前输入，RAG 会先从外部知识源检索证据，再将证据提供给模型生成。",
+    "fullAnswer": "RAG 适合私有、频繁更新和需要引用的知识，但质量取决于解析、切片、召回、重排和忠实度。它不自动消除幻觉，也不是向量数据库的同义词。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目讲清离线入库与在线问答链路。",
+    "references": [
+      "pgvector-docs",
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "embedding-and-vector-search",
+    "question": "Embedding 在 RAG 中扮演什么角色？",
+    "category": "rag",
+    "level": "初级",
+    "tags": [
+      "Embedding",
+      "Vector Search"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "Embedding 把查询和片段映射到向量空间，用相似度召回语义相关候选。",
+    "fullAnswer": "向量检索只负责找候选，不判断答案真假。入库和查询需使用兼容模型，并保存原文、文档版本、权限元数据和向量模型版本，以便重建和审计。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目的索引表结构说明。",
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "rag-chunking",
+    "question": "如何选择 RAG 的 Chunk 大小和重叠？",
+    "category": "rag",
+    "level": "中级",
+    "tags": [
+      "Chunking",
+      "RAG"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "先按文档结构和问题粒度切分，再用长度上限兜底，通过检索评估调整大小与重叠。",
+    "fullAnswer": "没有通用最佳数字。FAQ、API 文档、合同和代码需要不同策略；重叠可避免跨边界信息丢失，但过大会产生重复召回、增加索引和上下文成本。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目展示不同文档类型的切片策略。",
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "chunk-overlap-tradeoff",
+    "question": "Chunk overlap 越大越好吗？",
+    "category": "rag",
+    "level": "中级",
+    "tags": [
+      "Chunking",
+      "Overlap"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "不是。重叠能保留边界上下文，但会增加重复片段、存储、检索噪声和 Token 成本。",
+    "fullAnswer": "应根据文档结构和评估结果选择重叠；更好的做法常是按标题和段落语义切分，并在检索后去重或合并相邻片段，而不是无限增加重叠。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目比较 overlap 对 recall 和重复率的影响。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "vector-database-role",
+    "question": "向量数据库在 RAG 中解决什么问题？",
+    "category": "rag",
+    "level": "初级",
+    "tags": [
+      "Vector DB",
+      "Index"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "它负责存储向量及元数据，并按相似度高效返回候选。",
+    "fullAnswer": "生产系统还需要文档版本、权限过滤、删除同步和索引重建。向量库不是完整 RAG，也不负责生成答案；小规模系统可直接使用支持向量扩展的现有数据库。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 pgvector 项目说明向量和业务元数据共存。",
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "vector-search-similarity",
+    "question": "余弦相似度高就代表答案正确吗？",
+    "category": "rag",
+    "level": "中级",
+    "tags": [
+      "Similarity",
+      "Vector Search"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "不代表。相似度只表示向量空间中的接近程度，受模型、文本长度和语料分布影响。",
+    "fullAnswer": "需要用带正确证据的问题集校准 top-k 和阈值，并配合元数据过滤、重排和生成忠实度检查。分数不能跨不同模型或索引配置直接比较。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 评估集展示相似度分布。",
+    "references": [
+      "pgvector-docs",
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "metadata-filtering",
+    "question": "为什么 RAG 要在检索前做元数据和权限过滤？",
+    "category": "rag",
+    "level": "中级",
+    "tags": [
+      "Metadata",
+      "Authorization"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "它能缩小候选范围，并确保不可访问内容不会进入模型上下文。",
+    "fullAnswer": "权限过滤必须在数据层或查询层执行，不能先召回敏感内容再让模型忽略。常见元数据包括租户、产品、语言、版本、有效时间和文档状态。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目实现租户与文档版本过滤。",
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "hybrid-search-design",
+    "question": "什么时候应该使用混合检索？",
+    "category": "rag",
+    "level": "中级",
+    "tags": [
+      "Hybrid Search",
+      "BM25"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "查询同时包含语义描述和精确词，如产品名、代码或错误码时，混合检索通常更稳。",
+    "fullAnswer": "关键词检索与向量检索分别召回，再通过排名融合或重排合并。两路分数不可直接假定同尺度，需要在真实查询集上调整权重并处理重复片段。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目对比纯向量和混合检索。",
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "rag-reranking",
+    "question": "Rerank 为什么放在召回之后？",
+    "category": "rag",
+    "level": "中级",
+    "tags": [
+      "Rerank",
+      "Retrieval"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "召回阶段追求快速且不漏，重排对较小候选集做更昂贵、更精细的相关性判断。",
+    "fullAnswer": "典型流程先从大索引取几十个候选，再重排出少量上下文。这样兼顾召回率、精度、延迟与成本；重排前后结果应保留用于诊断。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目测量 recall@k 和重排后的 MRR。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "top-k-selection",
+    "question": "RAG 的 top-k 应该怎样选择？",
+    "category": "rag",
+    "level": "中级",
+    "tags": [
+      "Top K",
+      "Retrieval"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "根据问题集评估召回率、上下文噪声、延迟和 Token 成本，而不是固定照搬一个数。",
+    "fullAnswer": "不同查询类型可以动态调整 top-k。先宽召回再重排通常比直接把大量片段塞入模型更好；还要去重相邻片段并为最终输出留预算。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目按查询类型记录最佳 k。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "query-rewriting",
+    "question": "查询改写能解决什么问题，又有什么风险？",
+    "category": "rag",
+    "level": "高级",
+    "tags": [
+      "Query Rewrite",
+      "Retrieval"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "它可消除指代、补全关键词或拆分多意图查询，提高召回。",
+    "fullAnswer": "改写也可能改变用户原意，因此应保留原查询、限制改写目标，并对专有名词和过滤条件做保护。复杂问题可生成多个子查询，再合并去重候选。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目记录原查询、改写查询和召回差异。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "rag-citation-fidelity",
+    "question": "如何验证 RAG 引用真的支持答案？",
+    "category": "rag",
+    "level": "高级",
+    "tags": [
+      "Citation",
+      "Faithfulness"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "给证据稳定 ID，要求关键结论绑定引用，并检查结论能否从对应片段推出。",
+    "fullAnswer": "只附文档链接不够。可以用规则检查引用存在性，用模型或人工判断蕴含关系，并对数值、日期等关键事实做确定性比对；无证据时应明确回答不知道。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目做引用覆盖率和错误引用抽检。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "rag-evaluation",
+    "question": "如何系统评估一个 RAG 系统？",
+    "category": "rag",
+    "level": "高级",
+    "tags": [
+      "RAG Eval",
+      "Metrics"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "把评估拆成检索、重排、生成和引用四层，并使用带正确证据的真实问题集。",
+    "fullAnswer": "检索看 recall@k、MRR 等，生成看正确性、忠实度、完整性和拒答，线上再监控无结果率、延迟和成本。模型评分可扩展规模，但必须用人工样本校准。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台展示版本对比与失败分类。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "rag-stale-data",
+    "question": "知识库文档更新后，怎样避免旧内容继续被检索？",
+    "category": "rag",
+    "level": "高级",
+    "tags": [
+      "Versioning",
+      "Index"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "给文档和片段建立版本与状态，更新时原子切换有效版本并删除或禁用旧索引。",
+    "fullAnswer": "入库流程要支持幂等、失败回滚和删除传播。查询只过滤 published 且在有效期内的片段，引用包含文档版本，便于审计答案使用了哪一版资料。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目实现文档版本和索引状态机。",
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "rag-vs-fine-tuning",
+    "question": "什么时候选 RAG，什么时候考虑微调？",
+    "category": "rag",
+    "level": "中级",
+    "tags": [
+      "RAG",
+      "Fine-tuning"
+    ],
+    "whatItTests": [
+      "是否能拆分检索与生成",
+      "是否知道如何评估质量"
+    ],
+    "shortAnswer": "需要注入可更新事实和引用时优先 RAG；需要稳定行为、风格或特定任务模式时才评估微调。",
+    "fullAnswer": "两者可组合，但解决的问题不同。微调不适合作为频繁更新知识的数据库；选择前应先建立基线和评估集，比较 Prompt、RAG 与微调的质量和维护成本。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合知识库项目说明为何选择 RAG 管理资料。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "id": "agent-vs-chatbot",
     "question": "Agent 和普通 Chatbot 有什么区别？",
     "category": "agent",
     "level": "初级",
-    "tags": ["Agent", "Tool Calling", "Planning"],
-    "whatItTests": ["是否理解 Agent 的任务执行能力", "是否知道工具调用和状态管理", "是否能说清边界"],
-    "shortAnswer": "普通 Chatbot 主要根据上下文生成回复，Agent 通常能围绕目标进行多步骤执行、调用工具、维护状态，并根据中间结果继续决策。",
-    "fullAnswer": "Agent 不是一个神秘概念，工程上可以理解为模型、工具、状态、控制循环和安全边界的组合。它会根据任务选择工具，观察结果，再决定下一步。相比 Chatbot，它更适合执行复杂任务，但也更需要权限控制、可观测性、失败处理和人工确认。",
-    "bonusPoints": ["能提到 Agent Loop", "能提到 human-in-the-loop", "能提到 trace/eval/guardrails"],
-    "commonMistakes": ["把所有 LLM 应用都叫 Agent", "忽略工具权限", "没有终止条件"],
-    "followUps": ["如何设计 Agent 的停止条件？", "工具调用失败怎么办？", "如何评估 Agent 是否可靠？"],
-    "projectConnection": "可以结合任务拆解 Agent 或 GitHub Issue 分析 Agent 回答。",
-    "references": ["openai-agents-sdk", "langgraph-docs"]
+    "tags": [
+      "Agent",
+      "Tool Calling"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "Chatbot 主要生成回复，Agent 围绕目标维护状态、调用工具，并根据结果多步决策。",
+    "fullAnswer": "工程上的 Agent 是模型、工具、状态、控制循环和安全边界的组合。并非调用一次工具就是 Agent；任务若能由确定性工作流完成，也不应为了名称强行引入开放循环。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 说明状态、工具、停止和审计。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-loop-control",
+    "question": "一个可靠 Agent Loop 至少包含什么？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "Agent Loop",
+      "Control"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "包含结构化状态、模型决策、工具执行、观察记录、终止条件、预算和错误处理。",
+    "fullAnswer": "每轮都应校验动作是否允许，并把工具结果更新到状态。控制层负责最大步数、时间和成本，模型不能自行突破权限或决定无限继续。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 展示循环伪代码和状态机。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-tool-schema",
+    "question": "Agent 工具 Schema 怎样设计更容易被正确调用？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "Tools",
+      "Schema"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "工具保持单一职责，名称和描述写清调用条件，参数使用明确类型、枚举和必填约束。",
+    "fullAnswer": "返回结果也应稳定结构化，并区分成功、可重试错误和业务拒绝。不要暴露“执行任意命令”式万能工具；工具越少、边界越清晰，模型选择越稳定。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 MCP 文件助手的 search_files 与 read_file 分离设计。",
+    "references": [
+      "openai-function-calling"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-stop-conditions",
+    "question": "如何设计 Agent 的停止条件？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "Stop Condition",
+      "Budget"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "同时设置业务完成条件、失败条件、等待人工状态和最大步数、时间、Token、工具预算。",
+    "fullAnswer": "业务完成最好能由代码判断，例如拿到有效工单 ID。预算耗尽时返回可恢复状态和已完成步骤，而不是让模型输出一句失败；控制层必须真正停止后续调用。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 展示 completed、blocked、failed、cancelled 状态。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-state-vs-memory",
+    "question": "Agent 的 state 和 memory 有什么区别？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "State",
+      "Memory"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "State 保存当前任务的结构化执行事实，memory 保存跨步骤或跨会话仍有价值的信息。",
+    "fullAnswer": "当前步骤、审批状态和工具结果属于状态；用户偏好可能是长期记忆。两者都不应只塞在对话历史里，且记忆需要来源、过期、删除和隐私策略。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 AI 面试官保存当前题目状态和可选学习偏好。",
+    "references": [
+      "openai-agents-sdk",
+      "langgraph-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-planning-routing",
+    "question": "Agent 的 planning 和 routing 分别解决什么？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "Planning",
+      "Routing"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "Planning 决定完成目标需要哪些步骤，routing 决定当前任务交给哪个工具、工作流或 Agent。",
+    "fullAnswer": "固定规则优先由代码路由；只有输入开放且路径依赖中间观察时才需要模型规划。规划结果要经过允许动作、依赖和预算校验后才能执行。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 将低风险查询路由到只读工具。",
+    "references": [
+      "openai-agents-sdk",
+      "langgraph-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "human-in-the-loop",
+    "question": "哪些 Agent 动作应该加入人工确认？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "HITL",
+      "Approval"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "高风险、不可逆、涉及资金或外部沟通，以及模型置信不足的动作应在执行前确认。",
+    "fullAnswer": "确认页面应展示具体动作、参数、依据和影响，允许修改或拒绝。确认策略按风险分级，避免所有动作都弹窗，也不能等危险操作完成后才告知用户。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 的发送邮件与修改数据审批点。",
+    "references": [
+      "openai-agents-sdk",
+      "langgraph-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-tool-failure",
+    "question": "工具调用失败时 Agent 应该怎样处理？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "Tool Error",
+      "Recovery"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "先按错误类型判断重试、换工具、补充参数、等待人工还是终止，不能把所有错误原样丢回模型。",
+    "fullAnswer": "工具返回稳定错误码、可重试标记和安全摘要。控制层限制重试次数并记录尝试，副作用工具先查询状态避免重复执行；失败后保留可恢复检查点。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 演示超时、参数错误和权限拒绝三种路径。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-tool-permissions",
+    "question": "如何限制 Agent 的工具权限？",
+    "category": "agent",
+    "level": "高级",
+    "tags": [
+      "Authorization",
+      "Tools"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "按用户、任务和步骤动态生成最小工具集合与凭证范围，并在执行层再次鉴权。",
+    "fullAnswer": "模型看到工具不等于获得权限。危险参数使用白名单，文件与数据库按租户隔离，副作用动作确认并审计；禁止把全局管理员凭证交给通用 Agent。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 MCP 文件助手只读目录和工具白名单。",
+    "references": [
+      "openai-production-best-practices",
+      "mcp-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "multi-agent-handoff",
+    "question": "什么时候值得使用多 Agent 和 handoff？",
+    "category": "agent",
+    "level": "高级",
+    "tags": [
+      "Multi-agent",
+      "Handoff"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "只有角色拥有清晰的上下文、工具或责任边界时才值得拆分。",
+    "fullAnswer": "Handoff 需要结构化交接载荷、所有权、成功条件和失败返回，防止 Agent 之间循环转交。很多场景用单 Agent 加少量工具更简单、更易评估。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合分诊 Agent 把工单交给产品或技术子流程。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "parallel-agent-work",
+    "question": "Agent 什么时候可以并行执行步骤？",
+    "category": "agent",
+    "level": "高级",
+    "tags": [
+      "Parallelism",
+      "Tools"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "步骤之间没有数据依赖、不会竞争同一资源且副作用可隔离时可以并行。",
+    "fullAnswer": "控制层应根据依赖图调度，设置并发和超时，处理部分成功，并在后续合并前验证结果。模型提出并行建议不等于系统可安全并行。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 并行读取日志与配置，汇总后再诊断。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-long-running-task",
+    "question": "长时间运行的 Agent 怎样支持断点恢复？",
+    "category": "agent",
+    "level": "高级",
+    "tags": [
+      "Checkpoint",
+      "Idempotency"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "把结构化状态、事件和已完成工具调用持久化，在可恢复检查点继续执行。",
+    "fullAnswer": "每个步骤要有稳定 ID 和幂等语义，恢复时先核对外部副作用状态。模型上下文可从状态和事件重建，不能依赖进程内聊天数组；同时需要取消和过期策略。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 的事件日志与 checkpoint。",
+    "references": [
+      "langgraph-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "browser-agent-safety",
+    "question": "浏览器 Agent 的主要风险是什么？",
+    "category": "agent",
+    "level": "高级",
+    "tags": [
+      "Browser Agent",
+      "Security"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "网页内容不可信，页面状态易变，点击和提交可能产生真实副作用。",
+    "fullAnswer": "需要域名白名单、操作级权限、页面状态验证、敏感输入隔离和提交前确认。截图或 DOM 文本中的指令只能作为数据，重要动作要根据可验证元素和预期页面进行后置检查。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合受控任务 Agent 设计只读浏览与提交审批。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "coding-agent-sandbox",
+    "question": "代码 Agent 为什么需要沙箱？",
+    "category": "agent",
+    "level": "高级",
+    "tags": [
+      "Coding Agent",
+      "Sandbox"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "代码和命令可能读取密钥、破坏文件或访问网络，沙箱用于限制文件、进程、网络和资源范围。",
+    "fullAnswer": "应使用临时工作区、命令白名单或容器、密钥隔离、时间与磁盘限制，并在应用变更前展示 diff 和测试结果。只在 Prompt 中要求“不要破坏”不是安全控制。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 的临时工作树和审核步骤。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "workflow-vs-agent",
+    "question": "什么时候应该用工作流，而不是 Agent？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "Workflow",
+      "Agent"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "步骤固定、规则清楚、需要强审计和确定性时优先工作流；路径依赖开放观察时才考虑 Agent。",
+    "fullAnswer": "可以把两者组合：工作流负责审批、状态和事务，Agent 只在分类、检索或规划等不确定节点做受约束决策。这样更容易测试和恢复。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 AI 面试官用状态机控制流程，模型只决定追问。",
+    "references": [
+      "langgraph-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-failure-modes",
+    "question": "常见 Agent 失败模式有哪些？",
+    "category": "agent",
+    "level": "中级",
+    "tags": [
+      "Failure Mode",
+      "Agent"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "包括循环不止、选错工具、参数错误、上下文污染、权限越界、部分成功和错误完成。",
+    "fullAnswer": "诊断时区分模型决策、工具执行、状态同步和控制逻辑。每类失败都应映射到 Trace 事件、可重复测试和恢复策略，而不是简单归因于“模型不够聪明”。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台按失败类型统计回归。",
+    "references": [
+      "openai-agents-tracing",
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-guardrails",
+    "question": "Guardrails 在 Agent 系统中能解决什么，不能解决什么？",
+    "category": "agent",
+    "level": "高级",
+    "tags": [
+      "Guardrails",
+      "Security"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "护栏可在输入、输出或工具调用周围检查规则，但不能替代鉴权、沙箱和事务控制。",
+    "fullAnswer": "同步护栏可在执行前阻止危险动作，并行护栏可能降低延迟但已消耗模型或工具资源。关键安全规则必须由确定性代码和执行层权限保证。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 对外发邮件做执行前护栏和确认。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-output-validation",
+    "question": "Agent 宣称任务完成时如何验证？",
+    "category": "agent",
+    "level": "高级",
+    "tags": [
+      "Validation",
+      "Completion"
+    ],
+    "whatItTests": [
+      "是否理解状态、工具与控制循环",
+      "是否考虑权限和终止条件"
+    ],
+    "shortAnswer": "用业务系统状态和确定性检查验证完成条件，而不是相信模型的自然语言声明。",
+    "fullAnswer": "例如创建工单后校验返回 ID、状态和关键字段；代码修改后运行测试并检查 diff。验证失败应更新状态并允许修复，而不是把“已完成”直接展示给用户。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 为每类任务定义 completion validator。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   },
   {
     "id": "what-is-mcp",
-    "question": "MCP 是什么，为什么它对 Agent 很重要？",
+    "question": "MCP 是什么，为什么它对 Agent 重要？",
+    "category": "mcp",
+    "level": "初级",
+    "tags": [
+      "MCP",
+      "Protocol"
+    ],
+    "whatItTests": [
+      "是否理解协议角色与原语",
+      "是否能说明安全边界"
+    ],
+    "shortAnswer": "MCP 是连接 AI 应用与外部工具、数据和提示模板的标准协议。",
+    "fullAnswer": "它定义 Host、Client、Server 和 Tools、Resources、Prompts 等原语，降低重复接入成本。但协议本身不自动解决授权和信任，Host 与 Server 仍需最小权限和审计。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 MCP 文件助手说明统一接入与权限边界。",
+    "references": [
+      "mcp-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-architecture-question",
+    "question": "MCP Host、Client、Server 分别负责什么？",
     "category": "mcp",
     "level": "中级",
-    "tags": ["MCP", "Tools", "Resources"],
-    "whatItTests": ["是否理解 AI 应用连接外部工具的协议化趋势", "是否知道 Server/Client 关系", "是否理解安全边界"],
-    "shortAnswer": "MCP 是 Model Context Protocol，用来标准化 AI 应用和外部工具、数据源之间的连接方式。",
-    "fullAnswer": "MCP 可以把文件、数据库、API、工具能力包装成统一接口，供支持 MCP 的客户端使用。对 Agent 来说，它降低了工具接入成本，也让工具权限、资源暴露和上下文提供更有结构。但实现时仍然要关注鉴权、最小权限、数据泄露和用户确认。",
-    "bonusPoints": ["能区分 Tools、Resources、Prompts", "能说出 MCP Server 和 Client", "能提到最小权限"],
-    "commonMistakes": ["把 MCP 当成模型", "认为 MCP 自动解决安全问题", "不区分工具调用和资源读取"],
-    "followUps": ["如何设计一个文件系统 MCP Server？", "MCP 工具要如何做权限控制？"],
-    "projectConnection": "可以结合 MCP 文件助手项目回答。",
-    "references": ["mcp-docs"]
+    "tags": [
+      "MCP",
+      "Architecture"
+    ],
+    "whatItTests": [
+      "是否理解协议角色与原语",
+      "是否能说明安全边界"
+    ],
+    "shortAnswer": "Host 管理用户体验与授权，Client 维持到一个 Server 的连接，Server 暴露受控能力。",
+    "fullAnswer": "Host 可同时管理多个 Client，并决定上下文如何汇总。Client 负责会话和协议消息；Server 不应假设能看到其他连接或 Host 的全部上下文。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合桌面 Host 分别连接文件与数据库 Server。",
+    "references": [
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-primitives",
+    "question": "MCP Tools、Resources、Prompts 有什么区别？",
+    "category": "mcp",
+    "level": "中级",
+    "tags": [
+      "Tools",
+      "Resources",
+      "Prompts"
+    ],
+    "whatItTests": [
+      "是否理解协议角色与原语",
+      "是否能说明安全边界"
+    ],
+    "shortAnswer": "Tools 表示可执行动作，Resources 表示可读取上下文，Prompts 表示用户可选择的模板。",
+    "fullAnswer": "它们不仅数据结构不同，也体现控制方式：工具通常由模型选择，资源由应用选择，提示模板由用户选择。副作用不应伪装成 Resource。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合文件助手把读取说明暴露为 Resource，把搜索暴露为 Tool。",
+    "references": [
+      "mcp-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-transports",
+    "question": "stdio 和 Streamable HTTP 传输如何选择？",
+    "category": "mcp",
+    "level": "中级",
+    "tags": [
+      "Transport",
+      "stdio",
+      "HTTP"
+    ],
+    "whatItTests": [
+      "是否理解协议角色与原语",
+      "是否能说明安全边界"
+    ],
+    "shortAnswer": "本地子进程和单机集成适合 stdio，远程多客户端服务更适合 Streamable HTTP。",
+    "fullAnswer": "无论传输方式，MCP 的 JSON-RPC 数据层保持一致。远程服务还需处理鉴权、TLS、连接生命周期和网络故障；stdio 则要管理进程启动、标准错误和退出。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合本地文件助手选择 stdio 并记录进程错误。",
+    "references": [
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-capability-negotiation",
+    "question": "MCP 为什么需要能力协商？",
+    "category": "mcp",
+    "level": "高级",
+    "tags": [
+      "Capabilities",
+      "Negotiation"
+    ],
+    "whatItTests": [
+      "是否理解协议角色与原语",
+      "是否能说明安全边界"
+    ],
+    "shortAnswer": "客户端和服务端在初始化时声明支持的能力，避免调用对方未实现的功能。",
+    "fullAnswer": "协议和实现会演进，不能根据服务名猜能力。连接建立后应保存协商结果，UI 和模型工具列表只暴露当前可用能力，并处理能力变化或重连。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合文件助手只在 Server 声明 Resources 后显示资源浏览。",
+    "references": [
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-security",
+    "question": "接入第三方 MCP Server 时如何做安全评审？",
+    "category": "mcp",
+    "level": "高级",
+    "tags": [
+      "MCP",
+      "Security"
+    ],
+    "whatItTests": [
+      "是否理解协议角色与原语",
+      "是否能说明安全边界"
+    ],
+    "shortAnswer": "确认来源、传输和鉴权，审查暴露能力、数据范围、副作用、日志与更新机制。",
+    "fullAnswer": "每个 Server 使用独立最小权限凭证，危险工具默认关闭或确认，输出视为不可信内容。还要防目录穿越、命令注入、Token 泄漏和供应链更新风险。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 MCP 文件助手的威胁模型和目录沙箱。",
+    "references": [
+      "mcp-docs",
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-server-design",
+    "question": "如何设计一个高质量 MCP Server？",
+    "category": "mcp",
+    "level": "高级",
+    "tags": [
+      "MCP Server",
+      "Design"
+    ],
+    "whatItTests": [
+      "是否理解协议角色与原语",
+      "是否能说明安全边界"
+    ],
+    "shortAnswer": "从明确用户任务和最小能力开始，选择正确原语，提供稳定 Schema、可理解错误和最小权限。",
+    "fullAnswer": "Server 应支持初始化与生命周期、输入校验、超时、取消和审计，并为协议行为写集成测试。工具描述要具体，但不能把安全责任交给模型。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合文件助手实现 search、read 和资源列表。",
+    "references": [
+      "mcp-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-debugging",
+    "question": "MCP 工具无法调用时怎样排查？",
+    "category": "mcp",
+    "level": "中级",
+    "tags": [
+      "MCP",
+      "Debugging"
+    ],
+    "whatItTests": [
+      "是否理解协议角色与原语",
+      "是否能说明安全边界"
+    ],
+    "shortAnswer": "按连接初始化、能力协商、工具发现、参数 Schema、执行和结果返回逐层检查。",
+    "fullAnswer": "先看 transport 与进程日志，再核对 JSON-RPC ID、方法和协议错误；确认 Host 实际暴露了工具、参数符合 Schema，最后检查权限和业务执行。不要只盯模型输出。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合文件助手保存协议日志并做最小客户端测试。",
+    "references": [
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-evaluation",
+    "question": "Agent 评估为什么要同时看结果和轨迹？",
+    "category": "eval-observability",
+    "level": "中级",
+    "tags": [
+      "Agent Eval",
+      "Trace"
+    ],
+    "whatItTests": [
+      "是否能定义可重复指标",
+      "是否能从轨迹定位失败"
+    ],
+    "shortAnswer": "正确结果可能来自越权或偶然路径，错误结果也需要从轨迹定位失败环节。",
+    "fullAnswer": "评估应覆盖任务成功、工具选择与参数、步骤数、权限、延迟和成本。对关键轨迹使用规则断言，对开放结果用人工或校准后的模型评分。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台展示结果分与轨迹分。",
+    "references": [
+      "openai-evals",
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "eval-dataset-design",
+    "question": "怎样建立有价值的 AI 评估数据集？",
+    "category": "eval-observability",
+    "level": "中级",
+    "tags": [
+      "Eval",
+      "Dataset"
+    ],
+    "whatItTests": [
+      "是否能定义可重复指标",
+      "是否能从轨迹定位失败"
+    ],
+    "shortAnswer": "从真实任务和失败样本中抽取代表性、边界、拒绝和安全案例，并保存期望结果与评分依据。",
+    "fullAnswer": "数据集按场景分桶并版本化，训练或调 Prompt 时防止只针对少量样例过拟合。线上新失败经脱敏审核后加入回归集，且保留一个不参与日常调试的盲测集。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台管理黄金集和失败集。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "eval-metric-selection",
+    "question": "AI 应用的评估指标应该怎样选？",
+    "category": "eval-observability",
+    "level": "中级",
+    "tags": [
+      "Metrics",
+      "Eval"
+    ],
+    "whatItTests": [
+      "是否能定义可重复指标",
+      "是否能从轨迹定位失败"
+    ],
+    "shortAnswer": "从业务成功条件反推指标，同时覆盖质量、拒答、安全、延迟和成本。",
+    "fullAnswer": "可确定的格式、引用、工具参数优先用规则；语义质量用人工标注或校准后的模型评分。总分不能掩盖关键安全失败，应设置分项阈值和发布门禁。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 RAG 项目设置 recall、忠实度、P95 和成本阈值。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "llm-as-judge",
+    "question": "使用 LLM as Judge 有哪些风险？",
+    "category": "eval-observability",
+    "level": "高级",
+    "tags": [
+      "LLM Judge",
+      "Bias"
+    ],
+    "whatItTests": [
+      "是否能定义可重复指标",
+      "是否能从轨迹定位失败"
+    ],
+    "shortAnswer": "评分模型可能偏好特定文风、受顺序影响、与被评模型共享偏差，且结果仍有随机性。",
+    "fullAnswer": "要用清晰 rubric、随机交换答案顺序、隐藏无关信息，并用人工标注集校准一致性。关键安全和确定性字段不能只依赖模型评分。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合 AI 面试官对比模型评分与人工评分。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-tracing",
+    "question": "Agent Trace 应记录哪些关键事件？",
+    "category": "eval-observability",
+    "level": "中级",
+    "tags": [
+      "Tracing",
+      "Observability"
+    ],
+    "whatItTests": [
+      "是否能定义可重复指标",
+      "是否能从轨迹定位失败"
+    ],
+    "shortAnswer": "记录模型生成、工具调用与结果、handoff、guardrail、状态变化、错误、Token 和耗时。",
+    "fullAnswer": "所有事件关联 trace_id 和业务任务 ID，敏感字段脱敏，工具参数按风险选择性记录。Trace 应支持从最终失败回到具体决策，并可转成离线评估输入。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台回放一条失败轨迹。",
+    "references": [
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "eval-regression-gate",
+    "question": "如何把 Eval 接入发布流程？",
+    "category": "eval-observability",
+    "level": "高级",
+    "tags": [
+      "Regression",
+      "CI"
+    ],
+    "whatItTests": [
+      "是否能定义可重复指标",
+      "是否能从轨迹定位失败"
+    ],
+    "shortAnswer": "变更模型、Prompt、工具或检索配置时运行固定评估集，并按分项阈值阻断明显回归。",
+    "fullAnswer": "报告要比较质量、失败类型、延迟和成本，保留基线版本。非确定性指标可用多次运行和置信区间，线上再通过灰度与监控验证真实分布。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台生成 CI 可读的门禁结果。",
+    "references": [
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "tool-call-evaluation",
+    "question": "怎样评估 Agent 的工具调用质量？",
+    "category": "eval-observability",
+    "level": "高级",
+    "tags": [
+      "Tool Eval",
+      "Agent"
+    ],
+    "whatItTests": [
+      "是否能定义可重复指标",
+      "是否能从轨迹定位失败"
+    ],
+    "shortAnswer": "检查是否选择正确工具、参数是否正确、调用顺序是否合理、是否越权，以及结果是否被正确使用。",
+    "fullAnswer": "对固定任务可断言工具集合和关键参数，对开放任务允许多条合法路径但限制预算和危险动作。工具失败场景也要测试恢复策略。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 的轨迹断言。",
+    "references": [
+      "openai-evals",
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "online-ai-monitoring",
+    "question": "AI 应用上线后应该监控什么？",
+    "category": "eval-observability",
+    "level": "中级",
+    "tags": [
+      "Monitoring",
+      "Production"
+    ],
+    "whatItTests": [
+      "是否能定义可重复指标",
+      "是否能从轨迹定位失败"
+    ],
+    "shortAnswer": "监控任务成功代理指标、错误类型、拒答率、工具失败、P95 延迟、Token 成本和用户反馈。",
+    "fullAnswer": "线上没有完整真值，因此要组合确定性业务结果、抽样人工复核和漂移检测。告警应能定位模型、Prompt、检索索引和工具版本，避免只有一个总成功率。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台建立线上指标看板。",
+    "references": [
+      "openai-production-best-practices",
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "llm-cost-control",
+    "question": "如何降低 LLM 应用成本而不明显伤害质量？",
+    "category": "deploy-cost",
+    "level": "中级",
+    "tags": [
+      "Cost",
+      "Routing"
+    ],
+    "whatItTests": [
+      "是否具备生产稳定性意识",
+      "是否能量化成本与延迟"
+    ],
+    "shortAnswer": "先按业务任务测量成本，再优化模型路由、上下文、输出长度、缓存和调用次数，并用评估守住质量。",
+    "fullAnswer": "不要只盯单次 Token。减少无关历史和重复工具结果，简单任务使用合适模型，批量或并行要考虑限流；每次优化都比较成功率、延迟和单任务成本。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合评估控制台展示质量成本前沿。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "prompt-caching-strategy",
+    "question": "什么内容适合缓存，缓存要注意什么？",
+    "category": "deploy-cost",
+    "level": "中级",
+    "tags": [
+      "Cache",
+      "Cost"
+    ],
+    "whatItTests": [
+      "是否具备生产稳定性意识",
+      "是否能量化成本与延迟"
+    ],
+    "shortAnswer": "稳定、重复且不含用户私密状态的前缀或结果更适合缓存。",
+    "fullAnswer": "缓存键必须包含模型、Prompt、Schema、数据版本和权限范围。对时效信息设置过期与失效策略，不能让不同租户共享敏感结果，也不能用缓存掩盖版本回归。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合知识库缓存公共文档检索结果。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "latency-budgeting",
+    "question": "如何拆解一个 Agent 的延迟？",
+    "category": "deploy-cost",
+    "level": "高级",
+    "tags": [
+      "Latency",
+      "Tracing"
+    ],
+    "whatItTests": [
+      "是否具备生产稳定性意识",
+      "是否能量化成本与延迟"
+    ],
+    "shortAnswer": "按模型首字与总时延、每次工具调用、排队、网络和重试分解关键路径。",
+    "fullAnswer": "先通过 Trace 找到瓶颈，再考虑并行无依赖查询、减少轮次、流式展示和模型分层。优化平均值不够，还要关注 P95、超时和部分失败。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 的 span 瀑布图说明。",
+    "references": [
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "production-secret-management",
+    "question": "AI 服务部署时怎样管理密钥和环境？",
+    "category": "deploy-cost",
+    "level": "初级",
+    "tags": [
+      "Secrets",
+      "Deployment"
+    ],
+    "whatItTests": [
+      "是否具备生产稳定性意识",
+      "是否能量化成本与延迟"
+    ],
+    "shortAnswer": "密钥存服务端环境或密钥管理系统，按环境和服务隔离，不写入仓库、浏览器或日志。",
+    "fullAnswer": "Preview、Production 使用独立凭证与额度，权限最小化并定期轮换。部署前检查环境变量完整性，泄漏时立即吊销、审计调用并替换。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任一项目说明 Vercel 或服务器环境配置。",
+    "references": [
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "design-support-agent",
+    "question": "请设计一个企业客服 Agent。",
+    "category": "system-design",
+    "level": "高级",
+    "tags": [
+      "System Design",
+      "Agent"
+    ],
+    "whatItTests": [
+      "是否能划清确定性系统与模型边界",
+      "是否能设计可恢复架构"
+    ],
+    "shortAnswer": "用确定性会话状态包住检索和工具调用，读操作自动执行，高风险写操作审批，并用真实工单评估。",
+    "fullAnswer": "架构包含渠道接入、身份与权限、RAG、订单工具、状态机、人工接管和 Trace。先处理高频只读场景，未知或高风险问题转人工；评估覆盖解决率、引用忠实度、越权、延迟和成本。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "可将任务 Agent 与 RAG 知识库组合成作品。",
+    "references": [
+      "openai-agents-sdk",
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "design-production-rag",
+    "question": "请设计一个多租户生产级 RAG 系统。",
+    "category": "system-design",
+    "level": "高级",
+    "tags": [
+      "System Design",
+      "RAG"
+    ],
+    "whatItTests": [
+      "是否能划清确定性系统与模型边界",
+      "是否能设计可恢复架构"
+    ],
+    "shortAnswer": "离线入库和在线检索分离，所有文档、片段和查询都带租户与版本，检索前强制权限过滤。",
+    "fullAnswer": "离线管道负责解析、切片、Embedding、版本切换与删除；在线链路做查询理解、混合召回、重排、引用生成和分层评估。还要考虑索引重建、缓存隔离、审计和数据保留。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "直接对应可评估 RAG 知识库项目。",
+    "references": [
+      "pgvector-docs",
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "design-coding-agent",
+    "question": "请设计一个可安全修改代码的 Coding Agent。",
+    "category": "system-design",
+    "level": "高级",
+    "tags": [
+      "System Design",
+      "Coding Agent"
+    ],
+    "whatItTests": [
+      "是否能划清确定性系统与模型边界",
+      "是否能设计可恢复架构"
+    ],
+    "shortAnswer": "在隔离工作树或容器中读取代码、规划修改、执行受限命令、运行测试并展示 diff，合并前必须人工确认。",
+    "fullAnswer": "权限层限制仓库、网络、命令和密钥；状态层记录计划、文件变更和测试；恢复层用 checkpoint 与幂等步骤；评估使用真实 issue、测试通过率、diff 正确性和越权检测。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "可扩展受控任务 Agent 的工具和沙箱。",
+    "references": [
+      "openai-production-best-practices",
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-idempotency-event-log",
+    "question": "为什么 Agent 系统需要幂等和事件日志？",
+    "category": "system-design",
+    "level": "高级",
+    "tags": [
+      "Idempotency",
+      "Event Log"
+    ],
+    "whatItTests": [
+      "是否能划清确定性系统与模型边界",
+      "是否能设计可恢复架构"
+    ],
+    "shortAnswer": "网络和模型步骤会重试，幂等避免重复副作用，事件日志让系统可恢复、审计和重建状态。",
+    "fullAnswer": "每个任务与工具步骤使用稳定 ID，执行前后写状态，超时后先查询外部结果。事件包含版本、输入摘要、输出和错误；当前状态可由事件投影得到，但敏感信息要脱敏和设置保留期。",
+    "bonusPoints": [
+      "主动给出可量化的验证指标",
+      "能结合失败案例说明取舍"
+    ],
+    "commonMistakes": [
+      "只背定义，不说明工程边界",
+      "只讲理想流程，不处理异常路径"
+    ],
+    "followUps": [
+      "这个方案最可能在哪一步失败？",
+      "你会用什么数据证明改动有效？"
+    ],
+    "projectConnection": "结合任务 Agent 的长任务恢复设计。",
+    "references": [
+      "openai-production-best-practices",
+      "openai-agents-tracing"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
   }
 ]
-
