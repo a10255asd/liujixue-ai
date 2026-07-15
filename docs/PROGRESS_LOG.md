@@ -1,12 +1,12 @@
 # AI 学习知识库进度日志
 
-更新时间：2026-07-15
+更新时间：2026-07-16
 
 本文档只记录已完成、验证结果、当前状态和下一步，供不同 AI agent 无缝接手。产品方向看 `PRODUCT_DESIGN.md`，技术实现看 `TECHNICAL_DESIGN.md`。
 
 ## 当前里程碑
 
-状态：Batch 5 已完成。GitHub、Vercel、`ai.liujixue.cn` 正式域名和 `liujixue-main` 显眼入口均已接通。Vercel 判定当前 DNS 配置有效并服务 READY 部署，当前 CNAME 已是推荐的专用记录。
+状态：Batch 7 阶段 1 已完成。项目内容已从“方案描述”升级为带真实成熟度和证据门禁的交付体系，首个 Prompt 回归原型已可运行；线上基础设施继续沿用已接通的 GitHub、Vercel 和 `ai.liujixue.cn`。
 
 ## 已完成
 
@@ -66,6 +66,15 @@
 - 内容校验、TypeScript、ESLint、13 项单测和生产构建通过，生成 134 个静态页面。
 - Playwright 桌面与手机共 27 项通过、1 项按设备条件跳过；1440px 和 390px 均无横向溢出，路径选择和本地进度重载恢复通过。
 
+### 2026-07-16：Batch 7 阶段 1 项目证据化
+
+- 审计全部 6 个项目：确认此前只有方案模板，没有独立运行仓库、测试或部署证据。
+- 增加 `deliveryStatus` 与 `evidence` Schema，强制区分 `blueprint`、`prototype`、`verified`；当前为 1 个原型、5 个模板、0 个已验证交付。
+- 项目目录和详情页公开当前成熟度、验证命令、产物、运行入口与代码入口；未验证项目的架构、功能、步骤和简历表达全部标为目标状态。
+- 新增 `/labs/prompt-regression`：用 4 条固定样例比较两个 Prompt 版本，分别计算 Schema 与业务通过率、P95 延迟和估算成本。
+- 固定响应夹具不发送模型请求、不需要 API Key；延迟和成本字段只用于验证评估报表流程。
+- 新增 `PROJECT_EVIDENCE_AUDIT.md`，明确每个项目缺口及 RAG 原型的下一验收门禁。
+
 ## 验证记录
 
 - `validate:content`：通过。
@@ -86,6 +95,10 @@
 - Batch 5 上线前验证：`validate:content`、12 项单测、`typecheck`、`lint`、`build`、Playwright 23 项通过/1 项跳过。
 - Vercel 生产部署验证：远端内容校验、Next.js 编译和 133 个静态页面生成通过。
 - 正式域名验证：Vercel 域名验证通过、alias 指向 READY 生产部署；权威 DNS 解析正常。
+- Batch 7 内容校验、TypeScript、ESLint 和 15 项单元测试通过。
+- Batch 7 生产构建通过，生成 135 个静态页面。
+- Batch 7 Playwright 桌面与手机共 33 项通过、1 项按设备条件跳过；项目状态、原型切换和 390px 无横向溢出均通过。
+- 真实浏览器验收：1440px 项目卡片每行底部一致；Prompt 业务通过率可从 25% 切换到 100%；390px 项目证据和实验页无溢出。
 
 ## 当前数据规模
 
@@ -103,13 +116,13 @@
 
 ## 下一步唯一主线
 
-进入项目证据审计：
+把 `rag-knowledge-base` 从 `blueprint` 提升为 `prototype`：
 
-1. 按训练路径优先级审计 `prompt-debugger`、`rag-knowledge-base`、`task-planning-agent` 和 `agent-evaluation-console`。
-2. 区分“项目模板”和“已有可运行仓库”，不得把计划中的功能写成已经交付的证据。
-3. 给每个核心项目补真实仓库、启动命令、测试输出、部署地址和验收记录；缺少实现时先做最小可运行版本。
-4. 完成一个 RAG 项目和一个 Agent 项目后，再进行真实 JD 校准和模拟面试。
-5. 不立即增加账号、数据库、模型自动评判或更多题目。
+1. 使用仓库内确定性小型文档集完成摄取、切分、检索和引用返回闭环。
+2. 建立至少 10 条检索评估样例，输出可复现的 Hit@K、MRR 或等价指标。
+3. 提供运行页面或 API、单元测试、失败样例和启动命令。
+4. 完成桌面与 390px 手机端验收后，才修改项目成熟度和证据字段。
+5. RAG 原型完成前不新增项目、题目、登录、数据库或模型自动评判。
 
 ## 不要做
 

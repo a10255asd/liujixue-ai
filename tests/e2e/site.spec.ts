@@ -9,6 +9,7 @@ const routes = [
   '/career',
   '/interview',
   '/projects',
+  '/labs/prompt-regression',
   '/resources',
   '/journal'
 ]
@@ -67,4 +68,28 @@ test('training workspace restores selected track and local progress', async ({ p
 
   await page.reload()
   await expect(page.getByTestId('track-progress')).toHaveText('50')
+})
+
+test('project catalog separates runnable evidence from blueprints', async ({ page }) => {
+  await page.goto('/projects')
+  await expect(page.locator('.delivery-badge--prototype')).toHaveCount(1)
+  await expect(page.locator('.delivery-badge--blueprint')).toHaveCount(5)
+
+  await page.goto('/projects/prompt-debugger')
+  await expect(page.getByRole('link', { name: /运行原型/ })).toBeVisible()
+  await expect(page.getByText('固定响应夹具')).toBeVisible()
+
+  await page.goto('/projects/rag-knowledge-base')
+  await expect(page.getByText('尚无可执行命令')).toBeVisible()
+  await expect(page.getByRole('link', { name: /运行原型/ })).toHaveCount(0)
+})
+
+test('prompt regression prototype compares deterministic fixture reports', async ({ page }) => {
+  await page.goto('/labs/prompt-regression')
+  await expect(page.getByTestId('business-pass-rate')).toHaveText('25%')
+  await expect(page.locator('.prompt-case')).toHaveCount(4)
+
+  await page.getByRole('tab', { name: /V2 契约化指令/ }).click()
+  await expect(page.getByTestId('business-pass-rate')).toHaveText('100%')
+  await expect(page.locator('.prompt-case .fail')).toHaveCount(0)
 })

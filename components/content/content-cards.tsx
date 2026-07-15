@@ -2,7 +2,7 @@ import { ArrowRight, Layers3 } from 'lucide-react'
 import Link from 'next/link'
 
 import type { InterviewQuestion, KnowledgePoint, PracticalProject } from '@/lib/content/schemas'
-import { getCategoryLabel } from '@/lib/content/labels'
+import { getCategoryLabel, getProjectDeliveryLabel } from '@/lib/content/labels'
 
 export function KnowledgeCard({ item }: { item: KnowledgePoint }) {
   return (
@@ -43,7 +43,10 @@ export function ProjectCard({ item }: { item: PracticalProject }) {
     <article className="project-card">
       <div className="project-card__topline">
         <span className="project-card__icon"><Layers3 size={18} aria-hidden="true" /></span>
-        <span>{item.level}</span>
+        <div className="project-card__status">
+          <span className={`delivery-badge delivery-badge--${item.deliveryStatus}`}>{getProjectDeliveryLabel(item.deliveryStatus)}</span>
+          <span>{item.level}</span>
+        </div>
       </div>
       <div>
         <h3>{item.title}</h3>
@@ -53,7 +56,7 @@ export function ProjectCard({ item }: { item: PracticalProject }) {
         {item.stack.slice(0, 4).map((stack) => <span key={stack}>{stack}</span>)}
       </div>
       <Link className="text-link" href={`/projects/${item.slug}`}>
-        查看项目拆解 <ArrowRight size={16} aria-hidden="true" />
+        {item.deliveryStatus === 'blueprint' ? '查看项目方案' : '查看运行证据'} <ArrowRight size={16} aria-hidden="true" />
       </Link>
     </article>
   )

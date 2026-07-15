@@ -24,6 +24,16 @@ export function getCategoryLabel(category: string): string {
   return categoryLabels[category] ?? category
 }
 
+const projectDeliveryLabels = {
+  blueprint: '方案模板',
+  prototype: '可运行原型',
+  verified: '已验证交付'
+} as const
+
+export function getProjectDeliveryLabel(status: keyof typeof projectDeliveryLabels): string {
+  return projectDeliveryLabels[status]
+}
+
 export function sortChinese(values: string[]): string[] {
   return [...values].sort((a, b) => a.localeCompare(b, 'zh-CN'))
 }

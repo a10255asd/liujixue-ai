@@ -3,6 +3,7 @@
     "slug": "prompt-debugger",
     "title": "Prompt 调试与回归台",
     "level": "入门",
+    "deliveryStatus": "prototype",
     "summary": "把提示词、模型参数、结构化输出和失败样例放进可复现的调试流程。",
     "targetUser": "需要稳定调用 LLM API 的开发者。",
     "stack": [
@@ -58,6 +59,14 @@
       "prompt-versioning",
       "llm-api-retry"
     ],
+    "evidence": {
+      "summary": "站内已提供基于固定响应夹具的回归评估原型，可验证 Schema、业务规则、延迟和估算成本；暂未接入真实模型密钥和在线调用。",
+      "repositoryUrl": "https://github.com/a10255asd/liujixue-ai",
+      "demoPath": "/labs/prompt-regression",
+      "verifiedAt": "2026-07-16",
+      "commands": ["npm run test:unit", "npm run build"],
+      "artifacts": ["固定夹具回归引擎与单元测试", "桌面和手机端交互验收"]
+    },
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -71,6 +80,7 @@
     "slug": "rag-knowledge-base",
     "title": "可评估 RAG 知识库",
     "level": "进阶",
+    "deliveryStatus": "blueprint",
     "summary": "从文档解析、混合检索、重排到引用校验，建立可测量的知识问答链路。",
     "targetUser": "需要用私有资料构建可信问答的团队。",
     "stack": [
@@ -128,6 +138,11 @@
       "rag-chunking",
       "rag-evaluation"
     ],
+    "evidence": {
+      "summary": "当前仅完成架构、测试、部署和验收模板，尚无对应代码仓库、可运行 Demo 或测试输出。",
+      "commands": [],
+      "artifacts": []
+    },
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -141,6 +156,7 @@
     "slug": "ai-interviewer",
     "title": "可追溯 AI 模拟面试官",
     "level": "进阶",
+    "deliveryStatus": "blueprint",
     "summary": "按岗位能力图谱出题、连续追问，并用证据化量表生成复盘报告。",
     "targetUser": "准备 AI Agent 工程岗位的候选人。",
     "stack": [
@@ -197,6 +213,11 @@
       "llm-as-judge",
       "human-in-the-loop"
     ],
+    "evidence": {
+      "summary": "当前仅完成项目方案模板，尚无对应代码仓库、可运行 Demo 或测试输出。",
+      "commands": [],
+      "artifacts": []
+    },
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -210,6 +231,7 @@
     "slug": "task-planning-agent",
     "title": "受控任务执行 Agent",
     "level": "高级",
+    "deliveryStatus": "blueprint",
     "summary": "把模糊目标拆成步骤，按权限调用工具并保留可恢复的执行记录。",
     "targetUser": "需要自动化多步骤内部流程的团队。",
     "stack": [
@@ -267,6 +289,11 @@
       "agent-stop-conditions",
       "agent-tool-permissions"
     ],
+    "evidence": {
+      "summary": "当前仅完成状态机、工具权限和验收方案，尚无对应代码仓库、可运行 Demo 或测试输出。",
+      "commands": [],
+      "artifacts": []
+    },
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -280,6 +307,7 @@
     "slug": "mcp-file-assistant",
     "title": "最小权限 MCP 文件助手",
     "level": "进阶",
+    "deliveryStatus": "blueprint",
     "summary": "通过 MCP 暴露受限文件搜索、读取和摘要能力，并完整记录访问审计。",
     "targetUser": "需要让 AI 安全读取项目资料的开发团队。",
     "stack": [
@@ -337,6 +365,11 @@
       "mcp-primitives",
       "mcp-security"
     ],
+    "evidence": {
+      "summary": "当前仅完成协议边界和安全验收模板，尚无对应代码仓库、可运行 Demo 或测试输出。",
+      "commands": [],
+      "artifacts": []
+    },
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -350,6 +383,7 @@
     "slug": "agent-evaluation-console",
     "title": "Agent 评估与追踪控制台",
     "level": "高级",
+    "deliveryStatus": "blueprint",
     "summary": "把任务成功率、工具轨迹、延迟、成本和回归结果放进同一个质量门禁。",
     "targetUser": "需要稳定发布 Agent 的工程团队。",
     "stack": [
@@ -407,6 +441,11 @@
       "agent-tracing",
       "tool-call-evaluation"
     ],
+    "evidence": {
+      "summary": "当前仅完成事件模型、评估和发布门禁方案，尚无对应代码仓库、可运行 Demo 或测试输出。",
+      "commands": [],
+      "artifacts": []
+    },
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [

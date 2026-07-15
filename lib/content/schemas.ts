@@ -88,6 +88,7 @@ export const practicalProjectSchema = z.object({
   slug: nonEmptyString,
   title: nonEmptyString,
   level: z.enum(['入门', '进阶', '高级']),
+  deliveryStatus: z.enum(['blueprint', 'prototype', 'verified']),
   summary: nonEmptyString,
   targetUser: nonEmptyString,
   stack: stringList.min(1),
@@ -102,9 +103,35 @@ export const practicalProjectSchema = z.object({
   interviewValue: nonEmptyString,
   resumeBullet: nonEmptyString,
   relatedQuestions: stringList,
+  evidence: z.object({
+    summary: nonEmptyString,
+    repositoryUrl: z.string().url().optional(),
+    demoPath: z.string().startsWith('/').optional(),
+    verifiedAt: z.string().date().optional(),
+    commands: stringList,
+    artifacts: stringList
+  }),
   demoUrl: z.string().url().optional(),
   githubUrl: z.string().url().optional()
-}).merge(contentAuditFieldsSchema)
+}).merge(contentAuditFieldsSchema).superRefine((project, context) => {
+  if (project.deliveryStatus === 'blueprint') return
+
+  if (!project.evidence.demoPath) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence', 'demoPath'], message: '可运行项目必须提供 demoPath' })
+  }
+  if (!project.evidence.verifiedAt) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence', 'verifiedAt'], message: '可运行项目必须提供 verifiedAt' })
+  }
+  if (project.evidence.commands.length < 1) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence', 'commands'], message: '可运行项目必须提供验证命令' })
+  }
+  if (project.evidence.artifacts.length < 2) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence', 'artifacts'], message: '可运行项目至少需要两项验证产物' })
+  }
+  if (project.deliveryStatus === 'verified' && !project.evidence.repositoryUrl) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence', 'repositoryUrl'], message: '已验证交付必须提供仓库地址' })
+  }
+})
 
 export const careerCapabilitySchema = z.object({
   id: nonEmptyString,

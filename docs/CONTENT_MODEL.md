@@ -166,6 +166,15 @@ type PracticalProject = {
   interviewValue: string
   resumeBullet: string
   relatedQuestions: string[]
+  deliveryStatus: 'blueprint' | 'prototype' | 'verified'
+  evidence: {
+    summary: string
+    repositoryUrl?: string
+    demoPath?: string
+    verifiedAt?: string
+    commands: string[]
+    artifacts: string[]
+  }
   demoUrl?: string
   githubUrl?: string
 }
@@ -181,6 +190,13 @@ type PracticalProject = {
 - 如何测试、部署和验收。
 - 如何在 3 分钟内讲清目标、架构、难点、测试和结果。
 - 面试官会怎么追问。
+
+交付状态不是内容发布状态：`status: published` 只表示这条内容可展示，`deliveryStatus` 才表示项目实现成熟度。
+
+- `blueprint`：只有方案和交付模板，不得出现运行入口或已通过测试的暗示。
+- `prototype`：必须提供站内 Demo、验证日期、至少一条验证命令和两项产物证据。
+- `verified`：在原型证据上增加真实代码仓库和完整验收记录。
+- 未达到 `verified` 时，`resumeBullet` 只能作为完成后的目标表达。
 
 ## 5. 求职路径 CareerGuide
 

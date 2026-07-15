@@ -52,6 +52,7 @@ npm run build
 - `/career`：岗位能力矩阵、确定性自测和 8 周求职计划。
 - `/interview`：AI 面试题库。
 - `/projects`：求职导向的项目实战清单。
+- `/labs/prompt-regression`：固定夹具驱动的 Prompt 回归原型，比较 Schema、业务规则、延迟和成本。
 - `/resources`：官方文档和高质量资料导航。
 - `/journal`：学习日志。
 

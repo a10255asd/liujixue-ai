@@ -90,7 +90,7 @@ test('interview questions include answer training fields', () => {
   }
 })
 
-test('practical projects include resume value', () => {
+test('practical projects include resume value and honest delivery evidence', () => {
   const projects = readJson('../content/projects.json')
   assert.ok(projects.length >= 6)
   for (const project of projects) {
@@ -103,5 +103,21 @@ test('practical projects include resume value', () => {
     assert.ok(Array.isArray(project.deploymentPlan) && project.deploymentPlan.length >= 3)
     assert.ok(Array.isArray(project.acceptanceChecklist) && project.acceptanceChecklist.length >= 3)
     assert.ok(Array.isArray(project.pitchOutline) && project.pitchOutline.length >= 3)
+    assert.ok(['blueprint', 'prototype', 'verified'].includes(project.deliveryStatus))
+    assert.ok(project.evidence?.summary)
+
+    if (project.deliveryStatus === 'blueprint') {
+      assert.equal(project.evidence.commands.length, 0)
+      assert.equal(project.evidence.artifacts.length, 0)
+    } else {
+      assert.match(project.evidence.demoPath, /^\//)
+      assert.match(project.evidence.verifiedAt, /^\d{4}-\d{2}-\d{2}$/)
+      assert.ok(project.evidence.commands.length > 0)
+      assert.ok(project.evidence.artifacts.length >= 2)
+    }
   }
+
+  assert.equal(projects.filter((project) => project.deliveryStatus === 'prototype').length, 1)
+  assert.equal(projects.filter((project) => project.deliveryStatus === 'verified').length, 0)
+  assert.equal(projects.find((project) => project.slug === 'prompt-debugger')?.evidence.demoPath, '/labs/prompt-regression')
 })
