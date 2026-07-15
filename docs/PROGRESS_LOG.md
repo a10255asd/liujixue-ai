@@ -6,7 +6,7 @@
 
 ## 当前里程碑
 
-状态：Batch 4 已完成。Batch 3 详情页已在 Batch 1 提前完成；下一主线是 Batch 5 上线与主站接入，但必须等用户明确要求部署。
+状态：Batch 5 已完成 Vercel 生产部署；`ai.liujixue.cn` 已挂到 Vercel 项目，但阿里云 DNS 尚未配置 `ai` CNAME，正式域名仍不可访问。主站入口改动已在 `liujixue-main` 本地验证通过，待 DNS 生效后再发布。
 
 ## 已完成
 
@@ -47,6 +47,17 @@
 - 首页、主导航、页脚和 sitemap 增加求职入口。
 - 修复 390px 下自测区横向溢出，项目交付区在手机端按单列呈现。
 
+### 2026-07-15：Batch 5 生产部署准备
+
+- 用户明确要求继续部署后，使用 Vercel CLI 发布生产部署。
+- Vercel 项目 `liujixue-ai` 已部署 READY，部署 ID：`dpl_518Cn5TQ7VRphxzxhgu3WDxENH9x`。
+- 生产部署生成 133 个静态页面。
+- Vercel 已给生产部署添加 alias：`https://ai.liujixue.cn`。
+- `vercel domains verify ai.liujixue.cn` 返回 `invalid-configuration`，当前 DNS 无 `ai` 记录。
+- Vercel 推荐阿里云 DNS 记录：`CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
+- 本机没有阿里云 DNS CLI 或凭据，暂不能自动完成 DNS 配置。
+- 为避免主站出现死链，`liujixue-main` 的 AI 学习库入口暂未提交/部署。
+
 ## 验证记录
 
 - `validate:content`：通过。
@@ -64,6 +75,9 @@
 - Batch 4 Playwright：桌面与手机共 23 项通过、1 项按项目配置跳过。
 - Batch 4 生产构建：通过，133 个静态页面生成成功。
 - 生产构建冒烟：`/career` 在 1440px 下输出 8 个能力域和 8 周计划，无横向溢出。
+- Batch 5 上线前验证：`validate:content`、12 项单测、`typecheck`、`lint`、`build`、Playwright 23 项通过/1 项跳过。
+- Vercel 生产部署验证：远端内容校验、Next.js 编译和 133 个静态页面生成通过。
+- 正式域名验证：`https://ai.liujixue.cn` 当前 DNS `ENOTFOUND`，等待阿里云 DNS 增加 CNAME。
 
 ## 当前数据规模
 
@@ -79,12 +93,12 @@
 
 ## 下一步唯一主线
 
-准备 Batch 5 上线与主站接入：
+完成 Batch 5 的 DNS 收尾与主站接入：
 
-1. 只有用户明确要求部署后，才创建 GitHub 仓库和 Vercel 项目。
-2. 上线前再跑完整内容校验、单测、类型、Lint、构建和 E2E。
-3. 部署 `ai.liujixue.cn`，验证 canonical、robots、sitemap 和移动端。
-4. 在 `liujixue-main` 的 header、首页站点矩阵和 sitemap 增加 AI 学习库入口。
+1. 在阿里云 DNS 为 `liujixue.cn` 增加 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
+2. 运行 `vercel domains verify ai.liujixue.cn`，确认配置通过。
+3. 验证 `https://ai.liujixue.cn` 首页、核心路由、canonical、robots 和 sitemap。
+4. DNS 生效后，在 `liujixue-main` 提交并部署已验证的 AI 学习库入口。
 5. 上线后先观察内容使用与求职训练效果，不立即增加账号、数据库和模型调用。
 
 ## 不要做

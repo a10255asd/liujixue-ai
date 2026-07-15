@@ -14,9 +14,9 @@
 
 ## 当前阶段
 
-当前已完成 Batch 4：设计与技术骨架、全部核心页面和详情页、33 个知识点、80 道面试题、6 个项目、14 个官方资料入口，以及 8 个求职能力域、12 项自测和 8 周计划。
+当前已完成 Batch 5 的 Vercel 生产部署准备：设计与技术骨架、全部核心页面和详情页、33 个知识点、80 道面试题、6 个项目、14 个官方资料入口，以及 8 个求职能力域、12 项自测和 8 周计划均已上线到 Vercel 项目。
 
-不要直接部署，不要创建 Vercel 项目，除非用户明确说开始部署。
+用户已在 2026-07-15 明确要求继续部署；Vercel 生产部署已 READY，但正式域名仍被阿里云 DNS 阻塞。
 
 ## 必读顺序
 
@@ -31,12 +31,12 @@
 
 ## 下一步推荐
 
-下一批是 `docs/IMPLEMENTATION_PLAN.md` 的 Batch 5，但只有用户明确要求上线后才执行：
+下一批是完成 Batch 5 的 DNS 收尾与主站接入：
 
-1. 先阅读 `docs/PROGRESS_LOG.md` 的“下一步唯一主线”。
-2. 本地完整回归后创建 GitHub 仓库和 Vercel 项目。
-3. 配置 `ai.liujixue.cn` 并验证 SEO 基础文件。
-4. 修改 `liujixue-main`，增加主导航、首页站点矩阵和 sitemap 入口。
+1. 在阿里云 DNS 为 `liujixue.cn` 增加 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
+2. 运行 `vercel domains verify ai.liujixue.cn`，确认 Vercel 域名配置通过。
+3. 验证 `https://ai.liujixue.cn` 的首页、canonical、robots、sitemap 和核心页面。
+4. 确认正式域名可访问后，再提交并部署 `liujixue-main` 的 AI 学习库入口。
 5. 不增加登录、收藏、模型调用或数据库。
 
 ## 内容边界
@@ -91,7 +91,7 @@ npm run build
 
 ## 与其他项目关系
 
-- `liujixue-main`：主站，后续要增加 `ai.liujixue.cn` 入口。
+- `liujixue-main`：主站，已有待提交的 `ai.liujixue.cn` 入口改动；正式域名未解析前不要发布，避免线上死链。
 - `liujixue-xuan`：玄学工具子站，不要混入 AI 学习内容。
 - `liujixue-api`：后端服务，第一版 AI 学习库暂不接入。
 - `NotionNext`：博客，不作为本项目内容源。
@@ -116,4 +116,8 @@ npm run build
 - 6 个项目增加测试策略、部署步骤、验收清单和 3 分钟讲解模板。
 - `/career` 桌面和 390px 手机端完成真实浏览器验收，自测递进与项目交付布局正常。
 - Batch 4 最终验证：12 项单测通过，Playwright 23 项通过、1 项跳过，生产构建生成 133 个静态页面。
-- 尚未创建远端仓库，尚未部署。
+- GitHub 远端仓库已存在：`https://github.com/a10255asd/liujixue-ai.git`。
+- Vercel 项目已存在并完成生产部署：`liujixue-ai`，部署 `dpl_518Cn5TQ7VRphxzxhgu3WDxENH9x` READY。
+- Vercel 已将 `https://ai.liujixue.cn` 作为 alias 挂到生产部署，但 DNS 当前 `ENOTFOUND`。
+- Vercel 验证提示当前 nameserver 为 `dns11.hichina.com` / `dns12.hichina.com`，推荐 DNS 记录为 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
+- 本机没有阿里云 DNS CLI 或凭据，尚不能自动补 DNS 记录。

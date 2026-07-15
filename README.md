@@ -6,7 +6,7 @@
 
 > 给 0 基础开发者，尤其是想转 AI Agent 工程师的人，用一条可执行路线学 AI、做项目、刷面试、准备求职。
 
-当前阶段：Batch 4 求职强化已完成，尚未创建远端仓库和 Vercel 部署。
+当前阶段：Batch 5 已完成 Vercel 生产部署，`ai.liujixue.cn` 已挂到 Vercel 项目；阿里云 DNS 仍需补 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.` 后才能通过正式域名访问。
 
 ## 必读文档
 
@@ -24,6 +24,7 @@
 - React Server Components
 - 静态 JSON 内容数据源 + 构建期 Schema 校验
 - Vercel 部署
+- 阿里云 DNS 记录配置
 - 第一版不做登录、不做数据库、不做 AI 生成内容
 
 ## 本地命令
