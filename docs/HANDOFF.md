@@ -36,7 +36,7 @@
 1. 在阿里云 DNS 为 `liujixue.cn` 增加 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
 2. 运行 `vercel domains verify ai.liujixue.cn`，确认 Vercel 域名配置通过。
 3. 验证 `https://ai.liujixue.cn` 的首页、canonical、robots、sitemap 和核心页面。
-4. 确认正式域名可访问后，再提交并部署 `liujixue-main` 的 AI 学习库入口。
+4. DNS 生效后，把 `liujixue-main` 的 `siteProfile.ai` 从临时 Vercel alias 切回 `https://ai.liujixue.cn` 并部署。
 5. 不增加登录、收藏、模型调用或数据库。
 
 ## 内容边界
@@ -91,7 +91,7 @@ npm run build
 
 ## 与其他项目关系
 
-- `liujixue-main`：主站，已有待提交的 `ai.liujixue.cn` 入口改动；正式域名未解析前不要发布，避免线上死链。
+- `liujixue-main`：主站，已提交 AI 学习库入口；正式域名未解析前入口临时指向 `https://liujixue-ai.vercel.app`。
 - `liujixue-xuan`：玄学工具子站，不要混入 AI 学习内容。
 - `liujixue-api`：后端服务，第一版 AI 学习库暂不接入。
 - `NotionNext`：博客，不作为本项目内容源。

@@ -6,7 +6,7 @@
 
 ## 当前里程碑
 
-状态：Batch 5 已完成 Vercel 生产部署；`ai.liujixue.cn` 已挂到 Vercel 项目，但阿里云 DNS 尚未配置 `ai` CNAME，正式域名仍不可访问。主站入口改动已在 `liujixue-main` 本地验证通过，待 DNS 生效后再发布。
+状态：Batch 5 已完成 Vercel 生产部署；`ai.liujixue.cn` 已挂到 Vercel 项目，但阿里云 DNS 尚未配置 `ai` CNAME，正式域名仍不可访问。主站入口已在 `liujixue-main` 提交，正式域名生效前临时指向 Vercel alias。
 
 ## 已完成
 
@@ -56,7 +56,7 @@
 - `vercel domains verify ai.liujixue.cn` 返回 `invalid-configuration`，当前 DNS 无 `ai` 记录。
 - Vercel 推荐阿里云 DNS 记录：`CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
 - 本机没有阿里云 DNS CLI 或凭据，暂不能自动完成 DNS 配置。
-- 为避免主站出现死链，`liujixue-main` 的 AI 学习库入口暂未提交/部署。
+- `liujixue-main` 已提交 `b7ea626 feat: connect ai learning subsite`，入口临时指向 `https://liujixue-ai.vercel.app`，并保留 `ai.liujixue.cn` DNS 待接入记录。
 
 ## 验证记录
 
@@ -98,7 +98,7 @@
 1. 在阿里云 DNS 为 `liujixue.cn` 增加 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
 2. 运行 `vercel domains verify ai.liujixue.cn`，确认配置通过。
 3. 验证 `https://ai.liujixue.cn` 首页、核心路由、canonical、robots 和 sitemap。
-4. DNS 生效后，在 `liujixue-main` 提交并部署已验证的 AI 学习库入口。
+4. DNS 生效后，把 `liujixue-main` 的 `siteProfile.ai` 从临时 Vercel alias 切回 `https://ai.liujixue.cn` 并部署。
 5. 上线后先观察内容使用与求职训练效果，不立即增加账号、数据库和模型调用。
 
 ## 不要做
