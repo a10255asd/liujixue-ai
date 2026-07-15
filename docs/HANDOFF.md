@@ -14,9 +14,9 @@
 
 ## 当前阶段
 
-当前已完成 Batch 5 的 Vercel 生产部署准备：设计与技术骨架、全部核心页面和详情页、33 个知识点、80 道面试题、6 个项目、14 个官方资料入口，以及 8 个求职能力域、12 项自测和 8 周计划均已上线到 Vercel 项目。
+当前已完成 Batch 5：设计与技术骨架、全部核心页面和详情页、33 个知识点、80 道面试题、6 个项目、14 个官方资料入口，以及 8 个求职能力域、12 项自测和 8 周计划均已通过正式域名上线。
 
-用户已在 2026-07-15 明确要求继续部署；Vercel 生产部署已 READY，但正式域名仍被阿里云 DNS 阻塞。
+GitHub 仓库、Vercel 自动部署、`https://ai.liujixue.cn` 和主站显眼入口均已接通。Vercel 域名验证返回 `ok: true`，当前 CNAME 已是推荐记录。
 
 ## 必读顺序
 
@@ -31,13 +31,13 @@
 
 ## 下一步推荐
 
-下一批是完成 Batch 5 的 DNS 收尾与主站接入：
+下一批进入内容质量与真实求职使用验证：
 
-1. 在阿里云 DNS 为 `liujixue.cn` 增加 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
-2. 运行 `vercel domains verify ai.liujixue.cn`，确认 Vercel 域名配置通过。
-3. 验证 `https://ai.liujixue.cn` 的首页、canonical、robots、sitemap 和核心页面。
-4. DNS 生效后，把 `liujixue-main` 的 `siteProfile.ai` 从临时 Vercel alias 切回 `https://ai.liujixue.cn` 并部署。
-5. 不增加登录、收藏、模型调用或数据库。
+1. 以真实 Agent 工程师 JD 校准 8 个能力域和项目证据，不继续堆内容数量。
+2. 选择 3 条核心学习路径，逐条完成知识、练习、项目和面试表达闭环。
+3. 用 6 个项目的验收清单做一次真实交付审计，优先修复不能运行或无法讲清的项目。
+4. 观察站点使用后再决定是否需要搜索或学习进度；不立即增加登录、收藏、模型调用或数据库。
+5. DNS 维护项：当前记录已正确；若个别本地网络仍超时，先检查 DNS 缓存或本地解析器是否仍返回旧部署别名。
 
 ## 内容边界
 
@@ -91,7 +91,7 @@ npm run build
 
 ## 与其他项目关系
 
-- `liujixue-main`：主站，已提交 AI 学习库入口；正式域名未解析前入口临时指向 `https://liujixue-ai.vercel.app`。
+- `liujixue-main`：主站，首页、桌面导航、手机菜单、页脚和域名矩阵均直达 `https://ai.liujixue.cn`；`/ai` 保留为站内子站说明页。
 - `liujixue-xuan`：玄学工具子站，不要混入 AI 学习内容。
 - `liujixue-api`：后端服务，第一版 AI 学习库暂不接入。
 - `NotionNext`：博客，不作为本项目内容源。
@@ -117,7 +117,7 @@ npm run build
 - `/career` 桌面和 390px 手机端完成真实浏览器验收，自测递进与项目交付布局正常。
 - Batch 4 最终验证：12 项单测通过，Playwright 23 项通过、1 项跳过，生产构建生成 133 个静态页面。
 - GitHub 远端仓库已存在：`https://github.com/a10255asd/liujixue-ai.git`。
-- Vercel 项目已存在并完成生产部署：`liujixue-ai`，部署 `dpl_518Cn5TQ7VRphxzxhgu3WDxENH9x` READY。
-- Vercel 已将 `https://ai.liujixue.cn` 作为 alias 挂到生产部署，但 DNS 当前 `ENOTFOUND`。
-- Vercel 验证提示当前 nameserver 为 `dns11.hichina.com` / `dns12.hichina.com`，推荐 DNS 记录为 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
-- 本机没有阿里云 DNS CLI 或凭据，尚不能自动补 DNS 记录。
+- Vercel 项目已存在并完成生产部署：`liujixue-ai`，当前正式域名解析到 READY 部署 `dpl_HhXbBZd4vPHgazxqvjyKgzDBhDm8`。
+- Vercel 已将 `https://ai.liujixue.cn` 作为 alias 挂到生产部署并验证通过，`vercel domains verify ai.liujixue.cn` 返回 `ok: true`。
+- Vercel 当前记录：`CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`；公网解析返回 Vercel 推荐 A 值，个别本地解析器可能短时间缓存旧部署别名。
+- 主站已切换到正式 AI 域名；DNS 不再阻塞上线，只需观察个别本地解析缓存是否刷新。

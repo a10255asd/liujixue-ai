@@ -1,12 +1,12 @@
 # 刘鸡血 AI 学习知识库
 
-`liujixue-ai` 是计划部署到 `ai.liujixue.cn` 的第三个子站。
+`liujixue-ai` 是部署在 `ai.liujixue.cn` 的第三个子站。
 
 定位：
 
 > 给 0 基础开发者，尤其是想转 AI Agent 工程师的人，用一条可执行路线学 AI、做项目、刷面试、准备求职。
 
-当前阶段：Batch 5 已完成 Vercel 生产部署，`ai.liujixue.cn` 已挂到 Vercel 项目；阿里云 DNS 仍需补 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.` 后才能通过正式域名访问。
+当前阶段：Batch 5 已完成，GitHub、Vercel、正式域名和主站入口均已接通。`ai.liujixue.cn` 已被 Vercel 验证并指向 READY 的生产部署，当前 CNAME 是 Vercel 推荐的专用记录。
 
 ## 必读文档
 

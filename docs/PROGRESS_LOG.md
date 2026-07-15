@@ -6,7 +6,7 @@
 
 ## 当前里程碑
 
-状态：Batch 5 已完成 Vercel 生产部署；`ai.liujixue.cn` 已挂到 Vercel 项目，但阿里云 DNS 尚未配置 `ai` CNAME，正式域名仍不可访问。主站入口已在 `liujixue-main` 提交，正式域名生效前临时指向 Vercel alias。
+状态：Batch 5 已完成。GitHub、Vercel、`ai.liujixue.cn` 正式域名和 `liujixue-main` 显眼入口均已接通。Vercel 判定当前 DNS 配置有效并服务 READY 部署，当前 CNAME 已是推荐的专用记录。
 
 ## 已完成
 
@@ -47,16 +47,15 @@
 - 首页、主导航、页脚和 sitemap 增加求职入口。
 - 修复 390px 下自测区横向溢出，项目交付区在手机端按单列呈现。
 
-### 2026-07-15：Batch 5 生产部署准备
+### 2026-07-15：Batch 5 生产部署和主站接入
 
 - 用户明确要求继续部署后，使用 Vercel CLI 发布生产部署。
-- Vercel 项目 `liujixue-ai` 已部署 READY，部署 ID：`dpl_518Cn5TQ7VRphxzxhgu3WDxENH9x`。
+- Vercel 项目 `liujixue-ai` 已部署 READY，正式域名当前指向部署 ID：`dpl_HhXbBZd4vPHgazxqvjyKgzDBhDm8`。
 - 生产部署生成 133 个静态页面。
 - Vercel 已给生产部署添加 alias：`https://ai.liujixue.cn`。
-- `vercel domains verify ai.liujixue.cn` 返回 `invalid-configuration`，当前 DNS 无 `ai` 记录。
-- Vercel 推荐阿里云 DNS 记录：`CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
-- 本机没有阿里云 DNS CLI 或凭据，暂不能自动完成 DNS 配置。
-- `liujixue-main` 已提交 `b7ea626 feat: connect ai learning subsite`，入口临时指向 `https://liujixue-ai.vercel.app`，并保留 `ai.liujixue.cn` DNS 待接入记录。
+- `vercel domains verify ai.liujixue.cn` 返回 `ok: true`；当前 CNAME 为 `a44989d4bdff19e0.vercel-dns-017.com.`。
+- 公共 DNS 解析返回 Vercel 推荐记录；个别本地解析器若仍返回旧部署别名，应先等缓存刷新或排查本地 DNS。
+- `liujixue-main` 已切换到正式域名入口并完成测试、提交和生产部署。
 
 ## 验证记录
 
@@ -77,7 +76,7 @@
 - 生产构建冒烟：`/career` 在 1440px 下输出 8 个能力域和 8 周计划，无横向溢出。
 - Batch 5 上线前验证：`validate:content`、12 项单测、`typecheck`、`lint`、`build`、Playwright 23 项通过/1 项跳过。
 - Vercel 生产部署验证：远端内容校验、Next.js 编译和 133 个静态页面生成通过。
-- 正式域名验证：`https://ai.liujixue.cn` 当前 DNS `ENOTFOUND`，等待阿里云 DNS 增加 CNAME。
+- 正式域名验证：Vercel 域名验证通过、alias 指向 READY 生产部署；权威 DNS 解析正常。
 
 ## 当前数据规模
 
@@ -93,13 +92,13 @@
 
 ## 下一步唯一主线
 
-完成 Batch 5 的 DNS 收尾与主站接入：
+进入内容质量与真实求职使用验证：
 
-1. 在阿里云 DNS 为 `liujixue.cn` 增加 `CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`。
-2. 运行 `vercel domains verify ai.liujixue.cn`，确认配置通过。
-3. 验证 `https://ai.liujixue.cn` 首页、核心路由、canonical、robots 和 sitemap。
-4. DNS 生效后，把 `liujixue-main` 的 `siteProfile.ai` 从临时 Vercel alias 切回 `https://ai.liujixue.cn` 并部署。
-5. 上线后先观察内容使用与求职训练效果，不立即增加账号、数据库和模型调用。
+1. 以真实 Agent 工程师 JD 校准能力域、项目证据和面试表达，不继续堆内容数量。
+2. 选择 3 条核心学习路径，补齐学习任务、可运行项目、验收证据和面试讲解闭环。
+3. 对 6 个项目执行一次交付审计，优先修复不能运行、不能测试或不能部署的项目。
+4. 上线后先观察真实使用，不立即增加账号、数据库和模型调用。
+5. 维护项：若个别网络访问超时，先检查 DNS 缓存和本地解析器；不要因为旧缓存回滚应用入口。
 
 ## 不要做
 

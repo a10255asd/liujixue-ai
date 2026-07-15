@@ -12,11 +12,12 @@
 - 创建 Next.js 项目基础配置文件。
 - 添加少量内容种子文件，方便后续页面开发。
 
-尚未完成：
+已完成 Batch 5：
 
-- 未创建 GitHub 仓库。
-- 未接 Vercel。
-- 未配置 `ai.liujixue.cn` 域名。
+- GitHub 仓库 `a10255asd/liujixue-ai` 已创建并接入自动部署。
+- Vercel 项目 `liujixue-ai` 已发布生产版本。
+- `ai.liujixue.cn` 已解析、验证并指向 READY 的生产部署。
+- `liujixue-main` 已加入正式 AI 子站入口。
 
 已完成 Batch 1：
 
@@ -166,6 +167,8 @@ npm run build
 - 面试题能连接到项目回答。
 
 ## Batch 5：部署和主站接入
+
+状态：已完成（2026-07-15）。
 
 目标：
 
