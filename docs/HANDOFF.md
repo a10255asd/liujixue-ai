@@ -117,7 +117,7 @@ npm run build
 - `/career` 桌面和 390px 手机端完成真实浏览器验收，自测递进与项目交付布局正常。
 - Batch 4 最终验证：12 项单测通过，Playwright 23 项通过、1 项跳过，生产构建生成 133 个静态页面。
 - GitHub 远端仓库已存在：`https://github.com/a10255asd/liujixue-ai.git`。
-- Vercel 项目已存在并完成生产部署：`liujixue-ai`，当前正式域名解析到 READY 部署 `dpl_HhXbBZd4vPHgazxqvjyKgzDBhDm8`。
+- Vercel 项目已存在并完成生产部署：`liujixue-ai`，正式域名 alias 指向最新的 READY 生产部署；用 `vercel inspect ai.liujixue.cn` 获取当前部署 ID，不在文档中写死易过期编号。
 - Vercel 已将 `https://ai.liujixue.cn` 作为 alias 挂到生产部署并验证通过，`vercel domains verify ai.liujixue.cn` 返回 `ok: true`。
 - Vercel 当前记录：`CNAME ai -> a44989d4bdff19e0.vercel-dns-017.com.`；公网解析返回 Vercel 推荐 A 值，个别本地解析器可能短时间缓存旧部署别名。
 - 主站已切换到正式 AI 域名；DNS 不再阻塞上线，只需观察个别本地解析缓存是否刷新。

@@ -50,7 +50,7 @@
 ### 2026-07-15：Batch 5 生产部署和主站接入
 
 - 用户明确要求继续部署后，使用 Vercel CLI 发布生产部署。
-- Vercel 项目 `liujixue-ai` 已部署 READY，正式域名当前指向部署 ID：`dpl_HhXbBZd4vPHgazxqvjyKgzDBhDm8`。
+- Vercel 项目 `liujixue-ai` 已部署 READY，正式域名 alias 指向最新生产部署；当前部署 ID 以 `vercel inspect ai.liujixue.cn` 为准。
 - 生产部署生成 133 个静态页面。
 - Vercel 已给生产部署添加 alias：`https://ai.liujixue.cn`。
 - `vercel domains verify ai.liujixue.cn` 返回 `ok: true`；当前 CNAME 为 `a44989d4bdff19e0.vercel-dns-017.com.`。
