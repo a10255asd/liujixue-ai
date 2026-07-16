@@ -393,11 +393,15 @@ URL：筛选状态同步到 query string，分享链接可恢复状态。
 
 ### 8.12 `/labs/controlled-agent`
 
-确定性受控 Agent 原型。核心状态机位于 `lib/labs/controlled-agent.ts`，页面位于 `components/labs/controlled-agent-lab.tsx`。
+受控 Agent 的 `verified` 候选工作台。服务端运行时位于 `lib/agent-runtime/`，入口为 `POST /api/agent/run`；安全回归状态机仍位于 `lib/labs/controlled-agent.ts`。
+
+服务端运行时固定最多 4 个工具步，当前开放 `search_knowledge` 与 `inspect_project_evidence` 两个真实只读工具。参数均使用严格 Schema，权限固定为 `knowledge:read` 与 `projects:read`，工具输出来自当前已发布内容，不从浏览器伪造。
+
+规划器实现两种适配：生产默认使用 `deterministic-server-planner-v1`，保证公开演示不消耗模型额度；只有服务端同时配置 `AGENT_RUNTIME_MODE=openai` 与 `OPENAI_API_KEY` 时才使用 OpenAI Responses API，模型由 `OPENAI_AGENT_MODEL` 配置。上线真实模型前必须补登录或限流，不能让公开匿名请求无限消耗额度。
 
 控制器显式维护 `planned | running | waiting_approval | completed | failed | budget_exceeded | rejected` 状态。工具契约声明权限、风险、重试上限和幂等能力；权限守卫先于工具执行，高风险动作先于副作用进入审批状态。
 
-原型固定覆盖正常完成、临时故障恢复、越权拦截、步数预算终止和人工审批五类轨迹。时间与工具结果均为确定性夹具，只验证控制流、事件契约和失败边界，不宣称具备模型规划、持久化恢复或真实工具执行能力。
+安全回归固定覆盖正常完成、临时故障恢复、越权拦截、步数预算终止和人工审批五类轨迹；另有 20 条任务契约验证确定性规划器的工具选择。当前运行状态只随响应返回，尚无持久化恢复、真实模型生产实测、Token 成本基线或独立部署，因此项目状态保持 `prototype`。
 
 ### 8.13 `/labs/agent-evaluation`
 

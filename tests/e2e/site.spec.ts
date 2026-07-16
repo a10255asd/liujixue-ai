@@ -130,6 +130,14 @@ test('RAG prototype returns stable citations and rejects unsupported questions',
 
 test('controlled Agent prototype enforces budget and human approval gates', async ({ page }) => {
   await page.goto('/labs/controlled-agent')
+  await expect(page.getByTestId('runtime-mode')).toContainText('服务端安全模式')
+  await page.getByRole('button', { name: '开始受控运行' }).click()
+  await expect(page.getByTestId('runtime-status')).toContainText('运行完成')
+  await expect(page.getByTestId('runtime-provider')).toContainText('SERVER FIXTURE')
+  await expect(page.getByTestId('runtime-observation')).toHaveCount(2)
+  await expect(page.getByTestId('runtime-summary')).toContainText('受控任务执行 Agent')
+  await expect(page.getByTestId('runtime-summary')).toContainText('prototype')
+
   await expect(page.getByTestId('agent-state')).toContainText('已完成')
 
   await page.getByRole('tab', { name: /步数预算终止/ }).click()

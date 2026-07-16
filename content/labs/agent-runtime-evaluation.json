@@ -1,0 +1,22 @@
+[
+  { "id": "knowledge-rag-eval", "goal": "查找 RAG 检索评测和引用相关知识", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-agent-stop", "goal": "解释 Agent 停止条件应该怎么设计", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-mcp-permission", "goal": "查找 MCP 工具权限边界知识", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-structured-output", "goal": "结构化输出失败时怎么验证和重试", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-context", "goal": "查找上下文窗口与成本控制资料", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-observability", "goal": "学习 Agent Trace 和可观测性设计", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-tool-calling", "goal": "工具调用和普通 JSON 输出有什么区别", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-hybrid-search", "goal": "解释混合检索为什么需要离线评测", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-idempotency", "goal": "怎么设计 Agent 工具调用的幂等重试", "expectedTools": ["search_knowledge"] },
+  { "id": "knowledge-interview", "goal": "查找 Agent 工程面试中的系统设计知识", "expectedTools": ["search_knowledge"] },
+  { "id": "project-agent", "goal": "检查 task-planning-agent 项目证据", "expectedTools": ["inspect_project_evidence"] },
+  { "id": "project-rag", "goal": "检查 rag-knowledge-base 项目成熟度", "expectedTools": ["inspect_project_evidence"] },
+  { "id": "project-prompt", "goal": "检查 prompt-debugger 项目验收", "expectedTools": ["inspect_project_evidence"] },
+  { "id": "project-eval", "goal": "读取 agent-evaluation-console 项目证据", "expectedTools": ["inspect_project_evidence"] },
+  { "id": "project-mcp", "goal": "检查 mcp-file-assistant 项目成熟度", "expectedTools": ["inspect_project_evidence"] },
+  { "id": "combined-agent", "goal": "先查找 Agent 工具权限知识，再检查 task-planning-agent 项目证据", "expectedTools": ["search_knowledge", "inspect_project_evidence"] },
+  { "id": "combined-rag", "goal": "检索 RAG 评测资料并检查 rag-knowledge-base 项目成熟度", "expectedTools": ["search_knowledge", "inspect_project_evidence"] },
+  { "id": "combined-prompt", "goal": "查找 Prompt 回归知识，再检查 prompt-debugger 项目证据", "expectedTools": ["search_knowledge", "inspect_project_evidence"] },
+  { "id": "combined-eval", "goal": "解释 Agent 发布门禁并检查 agent-evaluation-console 项目验收", "expectedTools": ["search_knowledge", "inspect_project_evidence"] },
+  { "id": "combined-mcp", "goal": "学习 MCP 权限边界并检查 mcp-file-assistant 项目证据", "expectedTools": ["search_knowledge", "inspect_project_evidence"] }
+]

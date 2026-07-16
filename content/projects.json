@@ -300,18 +300,20 @@
       "agent-tool-permissions"
     ],
     "evidence": {
-      "summary": "站内已提供确定性受控 Agent 原型，覆盖正常完成、临时故障恢复、越权拦截、步数预算终止和高风险人工审批五类轨迹；暂未接入模型、数据库和真实外部工具。",
+      "summary": "站内已提供服务端 Agent 运行 API，能够通过严格工具 Schema 和权限守卫读取真实知识库与项目证据；同时保留五类确定性安全轨迹和 20 条规划契约评测。OpenAI Responses 适配器已实现但尚未配置生产密钥，运行状态也尚未持久化，因此仍为 prototype。",
       "repositoryUrl": "https://github.com/a10255asd/liujixue-ai",
       "demoPath": "/labs/controlled-agent",
       "verifiedAt": "2026-07-16",
       "commands": [
         "npm run test:unit",
-        "npm run build"
+        "npm run build",
+        "npm run test:e2e"
       ],
       "artifacts": [
-        "显式状态机与工具权限守卫",
-        "幂等重试、步数预算和审批双分支测试",
-        "五类确定性轨迹回放与双端验收"
+        "POST /api/agent/run 服务端运行契约与最多四步工具预算",
+        "真实知识检索和项目证据读取两个只读工具",
+        "OpenAI Responses 严格函数调用适配器与显式生产开关",
+        "20 条规划契约评测和五类安全轨迹回放"
       ]
     },
     "status": "published",

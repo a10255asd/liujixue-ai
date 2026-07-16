@@ -3,8 +3,9 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 import { ControlledAgentLab } from '@/components/labs/controlled-agent-lab'
+import { ServerAgentRuntimeLab } from '@/components/labs/server-agent-runtime-lab'
 import { PageHeading } from '@/components/ui/page-heading'
-import { agentScenarios } from '@/lib/labs/controlled-agent'
+import { evaluateRuntimePlanner } from '@/lib/agent-runtime/evaluation'
 
 export const metadata: Metadata = {
   title: '受控任务执行 Agent 原型',
@@ -13,15 +14,18 @@ export const metadata: Metadata = {
 }
 
 export default function ControlledAgentLabPage() {
+  const runtimeEvaluation = evaluateRuntimePlanner()
+
   return (
     <div className="page-shell page-view agent-lab-page">
       <Link className="back-link" href="/projects/task-planning-agent"><ArrowLeft size={16} /> 返回项目证据页</Link>
       <PageHeading
-        eyebrow="CONTROLLED AGENT PROTOTYPE"
-        title="每一步，都在控制边界内"
-        description="把计划、工具调用、观察、重试、审批和终止写成显式状态机。五类固定轨迹让越权、重复副作用和无限循环都能被自动验证。"
-        aside={<div className="heading-stat"><strong>{agentScenarios.length}</strong><span>固定执行场景</span><strong>100%</strong><span>预算门禁通过</span></div>}
+        eyebrow="CONTROLLED AGENT · VERIFIED CANDIDATE"
+        title="从控制流原型，走向真实工具运行"
+        description="服务端运行时已经能够规划并读取真实知识与项目证据；下方五类固定轨迹继续承担权限、预算、重试和审批的安全回归基线。"
+        aside={<div className="heading-stat"><strong>2</strong><span>真实只读工具</span><strong>{runtimeEvaluation.caseCount}</strong><span>契约评测</span></div>}
       />
+      <ServerAgentRuntimeLab evaluationCases={runtimeEvaluation.caseCount} evaluationPassRate={runtimeEvaluation.passRate} />
       <ControlledAgentLab />
     </div>
   )
