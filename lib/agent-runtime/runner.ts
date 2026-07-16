@@ -2,13 +2,15 @@ import { randomUUID } from 'node:crypto'
 
 import type {
   RuntimeCheckpoint,
+  RuntimeApprovalDecision,
+  RuntimePendingApproval,
   RuntimePlanner,
   RuntimeRunResult,
   RuntimeTraceEvent,
   RuntimeToolObservation,
   RuntimeUsage
 } from './contracts'
-import { executeRuntimeTool } from './tools'
+import { executeRuntimeTool, getRuntimeToolContract, type SavedLearningNote } from './tools'
 
 const MAX_TOOL_STEPS = 4
 const MAX_PLANNER_TURNS = 5
@@ -20,6 +22,14 @@ export async function runServerAgent(input: {
   maxSteps?: number
   runId?: string
   resumeFrom?: RuntimeCheckpoint
+  actorId?: string
+  approvalDecision?: RuntimeApprovalDecision
+  saveLearningNote?: (input: {
+    actorId: string
+    idempotencyKey: string
+    title: string
+    content: string
+  }) => Promise<SavedLearningNote>
   onCheckpoint?: (checkpoint: RuntimeCheckpoint) => Promise<void>
 }): Promise<RuntimeRunResult> {
   const startedAt = Date.now()
@@ -37,10 +47,15 @@ export async function runServerAgent(input: {
     trace.push({ ...event, sequence: trace.length + 1, elapsedMs: elapsedOffset + Date.now() - startedAt })
   }
 
-  const checkpoint = async (status: RuntimeCheckpoint['status'], nextTurnIndex: number, summary?: string) => {
+  const checkpoint = async (
+    status: RuntimeCheckpoint['status'],
+    nextTurnIndex: number,
+    summary?: string,
+    pendingApproval?: RuntimePendingApproval
+  ) => {
     if (!input.onCheckpoint) return
     await input.onCheckpoint({
-      version: 1,
+      version: 2,
       runId,
       goal: input.goal,
       mode: input.planner.mode,
@@ -53,6 +68,7 @@ export async function runServerAgent(input: {
       trace: [...trace],
       usage: { ...usage },
       requestIds: [...requestIds],
+      pendingApproval,
       summary,
       updatedAt: new Date().toISOString()
     })
@@ -64,8 +80,62 @@ export async function runServerAgent(input: {
     push({ type: 'run_started', title: '服务端运行已创建', detail: `规划器 ${input.planner.model}，最多 ${maxSteps} 个工具步。` })
   }
   try {
-    await checkpoint('running', input.resumeFrom?.nextTurnIndex ?? 0)
-    for (let turnIndex = input.resumeFrom?.nextTurnIndex ?? 0; turnIndex < MAX_PLANNER_TURNS; turnIndex += 1) {
+    let firstTurnIndex = input.resumeFrom?.nextTurnIndex ?? 0
+    const pendingApproval = input.resumeFrom?.pendingApproval
+
+    if (pendingApproval) {
+      if (!input.approvalDecision) {
+        return {
+          runId, mode: input.planner.mode, model: input.planner.model, status: 'waiting_approval',
+          goal: input.goal, summary: '等待用户确认写入学习笔记。', stepsUsed: observations.length, maxSteps,
+          observations, trace, usage, requestIds, pendingApproval, persistence: 'response-only'
+        }
+      }
+      if (input.approvalDecision === 'reject') {
+        const summary = '用户已拒绝写入，运行安全结束。'
+        push({ type: 'approval_resolved', title: '写入审批已拒绝', detail: summary, tool: pendingApproval.call.name, callId: pendingApproval.call.callId })
+        await checkpoint('rejected', firstTurnIndex, summary)
+        return {
+          runId, mode: input.planner.mode, model: input.planner.model, status: 'rejected',
+          goal: input.goal, summary, stepsUsed: observations.length, maxSteps, observations, trace, usage,
+          requestIds, persistence: 'response-only'
+        }
+      }
+
+      push({
+        type: 'approval_resolved',
+        title: '写入审批已通过',
+        detail: '仅执行本次已展示的学习笔记写入。',
+        tool: pendingApproval.call.name,
+        callId: pendingApproval.call.callId
+      })
+      const approvedObservation = await executeRuntimeTool({
+        ...pendingApproval.call,
+        permissions,
+        actorId: input.actorId,
+        idempotencyKey: `${runId}:${pendingApproval.call.callId}`,
+        saveLearningNote: input.saveLearningNote
+      })
+      observations.push(approvedObservation)
+      push({
+        type: 'tool_result',
+        title: approvedObservation.ok ? '学习笔记写入成功' : '学习笔记写入失败',
+        detail: approvedObservation.ok ? '写入结果已通过幂等键确认。' : approvedObservation.error ?? '工具失败。',
+        tool: pendingApproval.call.name,
+        callId: pendingApproval.call.callId
+      })
+      history.push({
+        type: 'function_call_output',
+        call_id: pendingApproval.call.callId,
+        output: JSON.stringify(approvedObservation.ok ? approvedObservation.output : { error: approvedObservation.error })
+      })
+      firstTurnIndex += 1
+      await checkpoint('running', firstTurnIndex)
+    } else {
+      await checkpoint('running', firstTurnIndex)
+    }
+
+    for (let turnIndex = firstTurnIndex; turnIndex < MAX_PLANNER_TURNS; turnIndex += 1) {
       const turn = await input.planner.next({ goal: input.goal, history, observations })
       usage.inputTokens += turn.usage.inputTokens
       usage.outputTokens += turn.usage.outputTokens
@@ -102,8 +172,45 @@ export async function runServerAgent(input: {
           }
         }
 
-        push({ type: 'tool_guard', title: '权限与参数守卫', detail: `准备执行只读工具 ${call.name}。`, tool: call.name, callId: call.callId })
-        const observation = await executeRuntimeTool({ ...call, permissions })
+        const contract = getRuntimeToolContract(call.name)
+        push({
+          type: 'tool_guard',
+          title: '权限与参数守卫',
+          detail: `准备校验 ${contract.risk === 'write' ? '写入' : '只读'}工具 ${call.name}。`,
+          tool: call.name,
+          callId: call.callId
+        })
+
+        if (contract.risk === 'write' && permissions.includes(contract.permission)) {
+          const approval: RuntimePendingApproval = {
+            call,
+            title: '保存学习笔记',
+            detail: `将“${String(call.arguments.title ?? '本次学习结果')}”写入当前会话的隔离笔记仓储。`,
+            permission: contract.permission,
+            risk: 'write'
+          }
+          push({
+            type: 'approval_requested',
+            title: '等待写入审批',
+            detail: approval.detail,
+            tool: call.name,
+            callId: call.callId
+          })
+          await checkpoint('waiting_approval', turnIndex, '等待用户确认写入学习笔记。', approval)
+          return {
+            runId, mode: input.planner.mode, model: input.planner.model, status: 'waiting_approval',
+            goal: input.goal, summary: '等待用户确认写入学习笔记。', stepsUsed: observations.length, maxSteps,
+            observations, trace, usage, requestIds, pendingApproval: approval, persistence: 'response-only'
+          }
+        }
+
+        const observation = await executeRuntimeTool({
+          ...call,
+          permissions,
+          actorId: input.actorId,
+          idempotencyKey: `${runId}:${call.callId}`,
+          saveLearningNote: input.saveLearningNote
+        })
         observations.push(observation)
         push({
           type: 'tool_result',

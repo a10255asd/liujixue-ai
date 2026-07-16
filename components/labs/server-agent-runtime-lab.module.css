@@ -1,0 +1,121 @@
+.approval {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--action) 34%, var(--line));
+  background: color-mix(in srgb, var(--action) 7%, var(--surface));
+}
+
+.approvalIcon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: var(--action);
+  border: 1px solid color-mix(in srgb, var(--action) 26%, var(--line));
+  background: var(--surface);
+}
+
+.approvalCopy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.approvalCopy span {
+  color: var(--action);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.approvalCopy strong {
+  font-size: 0.96rem;
+}
+
+.approvalCopy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.approvalCopy code {
+  width: max-content;
+  max-width: 100%;
+  color: var(--muted);
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.approvalActions {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.approvalActions button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.approvalActions button:last-child {
+  border-color: var(--ink);
+  color: var(--surface);
+  background: var(--ink);
+}
+
+.approvalActions button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.noteResult {
+  display: grid;
+  gap: 7px;
+}
+
+.noteResult span {
+  width: max-content;
+  padding: 3px 7px;
+  color: var(--action);
+  border: 1px solid color-mix(in srgb, var(--action) 25%, var(--line));
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.noteResult p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.noteResult small {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 720px) {
+  .approval {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .approvalActions {
+    grid-column: auto;
+    grid-template-columns: auto auto;
+  }
+}

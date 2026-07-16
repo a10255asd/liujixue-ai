@@ -4,16 +4,24 @@ import test from 'node:test'
 import { evaluateRuntimePlanner } from '../lib/agent-runtime/evaluation'
 import { createFixturePlanner, createOpenAiPlanner } from '../lib/agent-runtime/planners'
 import { runServerAgent } from '../lib/agent-runtime/runner'
-import { executeRuntimeTool, runtimeToolDefinitions } from '../lib/agent-runtime/tools'
+import { executeRuntimeTool, getRuntimeToolContracts, runtimeToolDefinitions } from '../lib/agent-runtime/tools'
 
-test('runtime exposes two strict read-only tool schemas', () => {
-  assert.equal(runtimeToolDefinitions.length, 2)
+test('runtime exposes three strict tool schemas with one approval-gated write', () => {
+  assert.equal(runtimeToolDefinitions.length, 3)
   for (const tool of runtimeToolDefinitions) {
     assert.equal(tool.type, 'function')
     assert.equal(tool.strict, true)
     assert.equal(tool.parameters.additionalProperties, false)
     assert.deepEqual(Object.keys(tool.parameters.properties).sort(), [...tool.parameters.required].sort())
   }
+  const contracts = getRuntimeToolContracts()
+  assert.equal(contracts.filter((tool) => tool.risk === 'read').length, 2)
+  assert.deepEqual(contracts.find((tool) => tool.risk === 'write'), {
+    name: 'save_learning_note',
+    label: '保存学习笔记',
+    permission: 'notes:write',
+    risk: 'write'
+  })
 })
 
 test('knowledge tool reads published content and enforces permissions', async () => {

@@ -3,6 +3,7 @@ import test from 'node:test'
 
 import { runRuntimeBaseline } from '../lib/agent-runtime/baseline'
 import type { RuntimeCheckpoint } from '../lib/agent-runtime/contracts'
+import { resolveRuntimeIdentity } from '../lib/agent-runtime/identity'
 import { createFixturePlanner } from '../lib/agent-runtime/planners'
 import { createRuntimeRateLimiter } from '../lib/agent-runtime/rate-limit'
 import { createRedisRestClient, resolveRedisRestConfig } from '../lib/agent-runtime/redis-rest'
@@ -64,8 +65,8 @@ test('development runtime store can replay a completed run', async () => {
   const store = createRuntimeStore({ redis: null, allowMemory: true })
   const result = await runServerAgent({ goal: '检查 task-planning-agent 项目证据', planner: createFixturePlanner() })
   const persisted = { ...result, persistence: store.persistence, replayUrl: `/api/agent/run?id=${result.runId}` }
-  assert.equal(await store.save(persisted), true)
-  const restored = await store.get(result.runId)
+  assert.equal(await store.save('actor-a', persisted), true)
+  const restored = await store.get('actor-a', result.runId)
   assert.equal(store.mode, 'memory')
   assert.equal(restored?.run.runId, result.runId)
   assert.equal(restored?.run.persistence, 'ephemeral-memory')
@@ -108,13 +109,13 @@ test('runtime store persists versioned checkpoints', async () => {
     planner: createFixturePlanner(),
     async onCheckpoint(checkpoint) {
       latest = checkpoint
-      await store.saveCheckpoint(checkpoint)
+      await store.saveCheckpoint('actor-a', checkpoint)
     }
   })
   assert.ok(latest)
   const checkpoint = latest as RuntimeCheckpoint
-  const restored = await store.getCheckpoint(checkpoint.runId)
-  assert.equal(restored?.version, 1)
+  const restored = await store.getCheckpoint('actor-a', checkpoint.runId)
+  assert.equal(restored?.version, 2)
   assert.equal(restored?.status, 'completed')
   assert.equal(restored?.nextTurnIndex, 2)
 })
@@ -137,5 +138,125 @@ test('production store stays disabled without Redis credentials', async () => {
   const store = createRuntimeStore({ redis: null, allowMemory: false })
   assert.equal(store.mode, 'disabled')
   assert.equal(store.persistence, 'response-only')
-  assert.equal(await store.get('unknown'), null)
+  assert.equal(await store.get('actor-a', 'unknown'), null)
+})
+
+test('signed runtime identity rejects tampering and rotates to a new actor', () => {
+  const env = { NODE_ENV: 'production', AGENT_SESSION_SECRET: 'a'.repeat(32) } as unknown as NodeJS.ProcessEnv
+  const first = resolveRuntimeIdentity(new Request('https://example.com/api/agent/run'), {
+    env,
+    createId: () => '11111111-1111-4111-8111-111111111111'
+  })
+  assert.equal(first.configured, true)
+  assert.ok(first.setCookie)
+  const cookie = first.setCookie?.split(';')[0]
+  const restored = resolveRuntimeIdentity(new Request('https://example.com/api/agent/run', { headers: { cookie: cookie ?? '' } }), { env })
+  assert.equal(restored.actorId, first.actorId)
+  assert.equal(restored.setCookie, undefined)
+
+  const tampered = resolveRuntimeIdentity(new Request('https://example.com/api/agent/run', {
+    headers: { cookie: `${cookie}broken` }
+  }), {
+    env,
+    createId: () => '22222222-2222-4222-8222-222222222222'
+  })
+  assert.equal(tampered.actorId, '22222222-2222-4222-8222-222222222222')
+  assert.ok(tampered.setCookie)
+})
+
+test('runtime storage isolates replay and checkpoints by signed actor scope', async () => {
+  const store = createRuntimeStore({ redis: null, allowMemory: true })
+  let latestCheckpoint: RuntimeCheckpoint | null = null
+  const result = await runServerAgent({
+    goal: '检查 task-planning-agent 项目证据',
+    planner: createFixturePlanner(),
+    async onCheckpoint(checkpoint) {
+      latestCheckpoint = checkpoint
+      await store.saveCheckpoint('actor-a', checkpoint)
+    }
+  })
+  await store.save('actor-a', result)
+  assert.equal((await store.get('actor-a', result.runId))?.run.runId, result.runId)
+  assert.equal(await store.get('actor-b', result.runId), null)
+  assert.ok(latestCheckpoint)
+  assert.equal((await store.getCheckpoint('actor-a', result.runId))?.runId, result.runId)
+  assert.equal(await store.getCheckpoint('actor-b', result.runId), null)
+})
+
+test('write tool waits for approval and an approved retry is idempotent', async () => {
+  const actorId = 'actor-write'
+  const store = createRuntimeStore({ redis: null, allowMemory: true })
+  let waitingCheckpoint: RuntimeCheckpoint | null = null
+  const waiting = await runServerAgent({
+    goal: '查找 Agent 工具权限知识，并保存成学习笔记',
+    planner: createFixturePlanner(),
+    actorId,
+    permissions: ['knowledge:read', 'projects:read', 'notes:write'],
+    saveLearningNote: (note) => store.saveLearningNote(note),
+    async onCheckpoint(checkpoint) {
+      await store.saveCheckpoint(actorId, checkpoint)
+      if (checkpoint.status === 'waiting_approval') waitingCheckpoint = checkpoint
+    }
+  })
+  assert.equal(waiting.status, 'waiting_approval')
+  assert.equal(waiting.observations.some((item) => item.name === 'save_learning_note'), false)
+  assert.ok(waitingCheckpoint)
+
+  const approved = await runServerAgent({
+    goal: waiting.goal,
+    planner: createFixturePlanner(),
+    actorId,
+    permissions: ['knowledge:read', 'projects:read', 'notes:write'],
+    resumeFrom: waitingCheckpoint as unknown as RuntimeCheckpoint,
+    approvalDecision: 'approve',
+    saveLearningNote: (note) => store.saveLearningNote(note)
+  })
+  assert.equal(approved.status, 'completed')
+  const saved = approved.observations.find((item) => item.name === 'save_learning_note')
+  assert.equal(saved?.ok, true)
+  assert.equal((saved?.output as { created: boolean }).created, true)
+
+  const args = waiting.pendingApproval?.call.arguments as { title: string; content: string }
+  const duplicate = await store.saveLearningNote({
+    actorId,
+    idempotencyKey: `${waiting.runId}:${waiting.pendingApproval?.call.callId}`,
+    ...args
+  })
+  assert.equal(duplicate.created, false)
+  assert.equal(duplicate.id, (saved?.output as { id: string }).id)
+})
+
+test('rejected write approval produces no write observation', async () => {
+  const waiting = await runServerAgent({
+    goal: '查找 Agent 工具权限知识，并保存成学习笔记',
+    planner: createFixturePlanner(),
+    actorId: 'actor-reject',
+    permissions: ['knowledge:read', 'projects:read', 'notes:write']
+  })
+  const rejected = await runServerAgent({
+    goal: waiting.goal,
+    planner: createFixturePlanner(),
+    actorId: 'actor-reject',
+    permissions: ['knowledge:read', 'projects:read', 'notes:write'],
+    resumeFrom: {
+      version: 2,
+      runId: waiting.runId,
+      goal: waiting.goal,
+      mode: waiting.mode,
+      model: waiting.model,
+      status: 'waiting_approval',
+      nextTurnIndex: 1,
+      maxSteps: waiting.maxSteps,
+      history: [{ role: 'user', content: waiting.goal }],
+      observations: waiting.observations,
+      trace: waiting.trace,
+      usage: waiting.usage,
+      requestIds: waiting.requestIds,
+      pendingApproval: waiting.pendingApproval,
+      updatedAt: new Date().toISOString()
+    },
+    approvalDecision: 'reject'
+  })
+  assert.equal(rejected.status, 'rejected')
+  assert.equal(rejected.observations.some((item) => item.name === 'save_learning_note'), false)
 })

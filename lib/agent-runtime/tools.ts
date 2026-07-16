@@ -13,16 +13,38 @@ const inspectProjectInputSchema = z.object({
   slug: z.string().trim().min(2).max(80)
 }).strict()
 
+const saveLearningNoteInputSchema = z.object({
+  title: z.string().trim().min(2).max(80),
+  content: z.string().trim().min(10).max(1200)
+}).strict()
+
+export type SavedLearningNote = {
+  id: string
+  title: string
+  content: string
+  createdAt: string
+  idempotencyKey: string
+  created: boolean
+}
+
 const toolContracts = {
   search_knowledge: {
     label: '检索 AI 工程知识库',
     permission: 'knowledge:read',
-    inputSchema: searchKnowledgeInputSchema
+    inputSchema: searchKnowledgeInputSchema,
+    risk: 'read'
   },
   inspect_project_evidence: {
     label: '读取项目交付证据',
     permission: 'projects:read',
-    inputSchema: inspectProjectInputSchema
+    inputSchema: inspectProjectInputSchema,
+    risk: 'read'
+  },
+  save_learning_note: {
+    label: '保存学习笔记',
+    permission: 'notes:write',
+    inputSchema: saveLearningNoteInputSchema,
+    risk: 'write'
   }
 } as const
 
@@ -52,6 +74,21 @@ export const runtimeToolDefinitions = [
         slug: { type: 'string', description: '项目 slug，例如 task-planning-agent。' }
       },
       required: ['slug'],
+      additionalProperties: false
+    },
+    strict: true
+  },
+  {
+    type: 'function',
+    name: 'save_learning_note',
+    description: '仅在用户明确要求保存时，将本次学习结果写入其隔离的学习笔记。该工具有副作用，执行前必须获得用户审批。',
+    parameters: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: '简短、具体的笔记标题。' },
+        content: { type: 'string', description: '基于已获得证据整理的笔记正文，不包含虚构信息。' }
+      },
+      required: ['title', 'content'],
       additionalProperties: false
     },
     strict: true
@@ -95,8 +132,12 @@ export function getRuntimeToolContracts() {
     name: runtimeToolNameSchema.parse(name),
     label: contract.label,
     permission: contract.permission,
-    risk: 'read' as const
+    risk: contract.risk
   }))
+}
+
+export function getRuntimeToolContract(name: RuntimeToolName) {
+  return toolContracts[name]
 }
 
 export async function executeRuntimeTool(input: {
@@ -104,13 +145,22 @@ export async function executeRuntimeTool(input: {
   name: RuntimeToolName
   arguments: Record<string, unknown>
   permissions: string[]
+  actorId?: string
+  idempotencyKey?: string
+  saveLearningNote?: (input: {
+    actorId: string
+    idempotencyKey: string
+    title: string
+    content: string
+  }) => Promise<SavedLearningNote>
 }): Promise<RuntimeToolObservation> {
   const startedAt = Date.now()
   const contract = toolContracts[input.name]
+  const call = { callId: input.callId, name: input.name, arguments: input.arguments }
 
   if (!input.permissions.includes(contract.permission)) {
     return {
-      ...input,
+      ...call,
       ok: false,
       permission: contract.permission,
       durationMs: Date.now() - startedAt,
@@ -124,7 +174,7 @@ export async function executeRuntimeTool(input: {
       const args = searchKnowledgeInputSchema.parse(input.arguments)
       const items = searchKnowledge(args.query, args.limit)
       return {
-        ...input,
+        ...call,
         ok: true,
         permission: contract.permission,
         durationMs: Date.now() - startedAt,
@@ -132,28 +182,46 @@ export async function executeRuntimeTool(input: {
       }
     }
 
-    const args = inspectProjectInputSchema.parse(input.arguments)
-    const project = getProjectBySlug(args.slug)
-    if (!project) throw new Error(`未找到项目：${args.slug}`)
+    if (input.name === 'inspect_project_evidence') {
+      const args = inspectProjectInputSchema.parse(input.arguments)
+      const project = getProjectBySlug(args.slug)
+      if (!project) throw new Error(`未找到项目：${args.slug}`)
+      return {
+        ...call,
+        ok: true,
+        permission: contract.permission,
+        durationMs: Date.now() - startedAt,
+        output: {
+          slug: project.slug,
+          title: project.title,
+          deliveryStatus: project.deliveryStatus,
+          evidenceSummary: project.evidence.summary,
+          commands: project.evidence.commands,
+          artifacts: project.evidence.artifacts,
+          demoPath: project.evidence.demoPath ?? null,
+          href: `/projects/${project.slug}`
+        }
+      }
+    }
+
+    const args = saveLearningNoteInputSchema.parse(input.arguments)
+    if (!input.actorId || !input.idempotencyKey || !input.saveLearningNote) throw new Error('学习笔记写入仓储尚未配置')
+    const note = await input.saveLearningNote({
+      actorId: input.actorId,
+      idempotencyKey: input.idempotencyKey,
+      title: args.title,
+      content: args.content
+    })
     return {
-      ...input,
+      ...call,
       ok: true,
       permission: contract.permission,
       durationMs: Date.now() - startedAt,
-      output: {
-        slug: project.slug,
-        title: project.title,
-        deliveryStatus: project.deliveryStatus,
-        evidenceSummary: project.evidence.summary,
-        commands: project.evidence.commands,
-        artifacts: project.evidence.artifacts,
-        demoPath: project.evidence.demoPath ?? null,
-        href: `/projects/${project.slug}`
-      }
+      output: note
     }
   } catch (error) {
     return {
-      ...input,
+      ...call,
       ok: false,
       permission: contract.permission,
       durationMs: Date.now() - startedAt,

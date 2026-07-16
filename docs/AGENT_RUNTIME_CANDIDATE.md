@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-阶段 6.2B-1 已完成，但项目仍为 `prototype`：
+阶段 6.2B-2A 已完成，但项目仍为 `prototype`：
 
 - 新增 `POST /api/agent/run` 服务端运行入口。
 - 新增 `search_knowledge` 与 `inspect_project_evidence` 两个真实只读工具。
@@ -19,20 +19,26 @@
 - 每个工具结果后保存版本化检查点，支持通过 `resumeRunId` 从下一规划轮次继续。
 - 客户端预生成 `runId` 并保留失败任务，恢复时先读取已完成结果，再尝试继续检查点。
 - 新增 20 条真实模型基线命令，采集精确工具序列、完成率、延迟、Token 和 request id。
+- 新增服务端 HMAC 签名会话；生产缺少 `AGENT_SESSION_SECRET` 时自动关闭身份相关能力。
+- 运行、检查点和学习笔记均按 actor 哈希隔离，跨会话 `runId` 无法回放。
+- `RuntimeCheckpoint v2` 支持 `waiting_approval`，写入前暂停并展示精确副作用。
+- 新增 `save_learning_note` 写工具；只有 `notes:write` 权限且用户逐次批准后才执行。
+- 学习笔记以 `runId + callId` 作为幂等键，重复审批或网络重试不会重复创建。
 - 原五类权限、预算、重试、审批和副作用轨迹继续作为安全回归基线。
 - 1440px 与 390px 已完成真实浏览器验收，服务端运行返回 2 个工具结果和 8 条事件。
 
-未完成：Vercel Redis 实例配置、真实模型生产实测、跨实例恢复冒烟、身份隔离、受审批写工具和成本基线。因此不得改为 `verified`。
+未完成：Vercel Redis 实例配置、生产签名身份冒烟、真实模型生产实测、跨实例恢复冒烟和成本基线。因此不得改为 `verified`。
 
 ## 目录边界
 
 ```text
 app/api/agent/run/route.ts              HTTP 输入校验、规划器选择、无缓存响应
 components/labs/server-agent-runtime-lab.tsx
-                                        浏览器任务输入、工具证据和轨迹展示
+                                        浏览器任务输入、审批、工具证据和轨迹展示
 content/labs/agent-runtime-evaluation.json
                                         20 条规划契约夹具
 lib/agent-runtime/contracts.ts          API、规划器、工具和轨迹类型
+lib/agent-runtime/identity.ts           HMAC 签名会话与 Cookie 校验
 lib/agent-runtime/tools.ts              严格工具 Schema、权限守卫、真实读取
 lib/agent-runtime/planners.ts           确定性规划器与 Responses 适配器
 lib/agent-runtime/runner.ts             最多四步的服务端编排循环
@@ -58,7 +64,7 @@ AGENT_RUNTIME_MODE 未设置
 OPENAI_API_KEY 未设置
 ```
 
-此时 API 使用 `deterministic-server-planner-v1`，但两个工具会真实读取当前内容仓储。
+此时 API 使用 `deterministic-server-planner-v1`；两个只读工具会读取当前内容仓储，写工具仅在签名身份和运行仓储同时可用时开放。
 
 Responses 模式的服务端变量：
 
@@ -87,7 +93,15 @@ OPENAI_AGENT_MODEL=gpt-5.6-luna
 - 输入：项目 `slug`
 - 输出：真实 `deliveryStatus`、证据摘要、验证命令、产物与入口
 
-两个 Schema 都要求 `additionalProperties: false` 且所有字段必填。不要把用户已经知道的权限或身份字段交给模型填写。
+三个 Schema 都要求 `additionalProperties: false` 且所有字段必填。不要把用户已经知道的权限或身份字段交给模型填写。
+
+### `save_learning_note`
+
+- 权限：`notes:write`
+- 风险：写入，必须逐次人工审批
+- 输入：标题与正文；actor 与幂等键由服务端注入，模型不能填写
+- 存储：当前 actor 隔离命名空间，幂等键固定为 `runId + callId`
+- 生产门禁：同时具备签名身份与 Redis 才开放
 
 ## API 契约
 
@@ -110,7 +124,7 @@ OPENAI_AGENT_MODEL=gpt-5.6-luna
 - `usage`
 - `persistence`、`replayUrl` 与 `rateLimit`
 
-Redis 已配置时返回 `persistence: redis-24h` 和回放地址；生产未配置 Redis 时必须返回 `response-only`。客户端可携带预生成的 `runId` 创建任务，失败后用 `{ "resumeRunId": "..." }` 从最后一个已确认工具结果继续。
+Redis 已配置时返回 `persistence: redis-24h` 和回放地址；生产未配置 Redis 时必须返回 `response-only`。客户端可携带预生成的 `runId` 创建任务，失败后用 `{ "resumeRunId": "..." }` 从最后一个已确认工具结果继续。等待写入时返回 `202 + waiting_approval`，同一签名会话再提交 `{ "approvalRunId": "...", "decision": "approve|reject" }`。
 
 ## 验证记录
 
@@ -127,24 +141,24 @@ npm run test:e2e
 
 - 内容校验通过。
 - TypeScript 与 ESLint 通过。
-- 40 项单元测试通过，其中 5 项覆盖新运行时。
+- 54 项单元测试通过，覆盖运行时、身份、隔离、恢复、审批与幂等写入。
 - 生产构建通过，存在动态路由 `ƒ /api/agent/run`。
 - Playwright 49 项通过、1 项按设备条件跳过。
 - 真实浏览器 1440px 与 390px 均无横向溢出。
 
-## 阶段 6.2B-1 验证
+## 阶段 6.2B-2A 验证
 
 - TypeScript 检查通过。
-- 50 项单元测试通过，新增覆盖中断恢复不重复工具、版本化检查点、request id 采集和 20 条基线报告。
+- 54 项单元测试通过，新增覆盖签名篡改、跨租户回放、审批前零副作用、批准幂等和拒绝终止。
+- 桌面与移动浏览器均通过完整写入审批流程；本地 HTTP 与生产 HTTPS 使用匹配协议的 Cookie 安全属性。
 - `npm run eval:agent:live` 在缺少模型密钥时按预期失败，不生成伪造报告。
 - 运维与环境变量说明见 `docs/AGENT_RUNTIME_OPERATIONS.md`。
 
 ## 下一步唯一主线
 
-阶段 6.2B-2 按以下顺序执行：
+阶段 6.2B-2B 按以下顺序执行：
 
 1. 在 Vercel Marketplace 配置 Upstash Redis，完成生产限流和 24 小时回放冒烟。
 2. 配置生产模型密钥，把 20 条夹具升级为真实模型基线；采集成功率、工具选择、延迟、Token、成本和 request id。
 3. 在生产 Redis 上验证跨实例中断续跑和轨迹重放。
-4. 增加身份隔离和一个受审批保护的写工具，验证幂等键、副作用确认和失败补偿。
-5. 完成监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。
+4. 完成监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。

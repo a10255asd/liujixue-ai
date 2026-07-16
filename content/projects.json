@@ -300,7 +300,7 @@
       "agent-tool-permissions"
     ],
     "evidence": {
-      "summary": "站内已提供服务端 Agent 运行 API，能够通过严格工具 Schema 和权限守卫读取真实知识库与项目证据；同时具备限流、可选 Redis 仓储、逐工具检查点、resumeRunId 恢复、五类安全轨迹和 20 条真实模型基线命令。生产尚未配置 Redis 与模型密钥，缺少跨实例恢复和真实报告，因此仍为 prototype。",
+      "summary": "站内已提供服务端 Agent 运行 API，能够通过严格工具 Schema 和权限守卫读取真实证据，并具备签名会话隔离、Checkpoint v2、断点恢复和受审批的幂等学习笔记写入；同时保留五类安全轨迹与 20 条真实模型基线命令。生产尚未配置签名密钥、Redis 与模型密钥，缺少跨实例恢复和真实报告，因此仍为 prototype。",
       "repositoryUrl": "https://github.com/a10255asd/liujixue-ai",
       "demoPath": "/labs/controlled-agent",
       "verifiedAt": "2026-07-16",

@@ -4,12 +4,13 @@ export const runtimeGoalSchema = z.object({
   goal: z.string().trim().min(8, '任务目标至少需要 8 个字符').max(500, '任务目标不能超过 500 个字符')
 })
 
-export const runtimeToolNameSchema = z.enum(['search_knowledge', 'inspect_project_evidence'])
+export const runtimeToolNameSchema = z.enum(['search_knowledge', 'inspect_project_evidence', 'save_learning_note'])
 
 export type RuntimeToolName = z.infer<typeof runtimeToolNameSchema>
 export type RuntimeMode = 'fixture' | 'openai'
 export type RuntimePersistence = 'response-only' | 'ephemeral-memory' | 'redis-24h'
-export type RuntimeRunStatus = 'completed' | 'failed' | 'budget_exceeded'
+export type RuntimeRunStatus = 'waiting_approval' | 'completed' | 'failed' | 'budget_exceeded' | 'rejected'
+export type RuntimeApprovalDecision = 'approve' | 'reject'
 
 export type RuntimeToolCall = {
   callId: string
@@ -25,10 +26,18 @@ export type RuntimeToolObservation = RuntimeToolCall & {
   error?: string
 }
 
+export type RuntimePendingApproval = {
+  call: RuntimeToolCall
+  title: string
+  detail: string
+  permission: string
+  risk: 'write'
+}
+
 export type RuntimeTraceEvent = {
   sequence: number
   elapsedMs: number
-  type: 'run_started' | 'run_resumed' | 'planner_response' | 'tool_guard' | 'tool_result' | 'run_completed' | 'run_failed'
+  type: 'run_started' | 'run_resumed' | 'planner_response' | 'tool_guard' | 'approval_requested' | 'approval_resolved' | 'tool_result' | 'run_completed' | 'run_failed'
   title: string
   detail: string
   tool?: RuntimeToolName
@@ -54,6 +63,7 @@ export type RuntimeRunResult = {
   trace: RuntimeTraceEvent[]
   usage: RuntimeUsage
   requestIds: string[]
+  pendingApproval?: RuntimePendingApproval
   persistence: RuntimePersistence
   replayUrl?: string
   rateLimit?: {
@@ -65,7 +75,7 @@ export type RuntimeRunResult = {
 }
 
 export type RuntimeCheckpoint = {
-  version: 1
+  version: 2
   runId: string
   goal: string
   mode: RuntimeMode
@@ -78,6 +88,7 @@ export type RuntimeCheckpoint = {
   trace: RuntimeTraceEvent[]
   usage: RuntimeUsage
   requestIds: string[]
+  pendingApproval?: RuntimePendingApproval
   summary?: string
   updatedAt: string
 }

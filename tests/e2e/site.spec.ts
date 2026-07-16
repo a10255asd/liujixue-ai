@@ -139,6 +139,16 @@ test('controlled Agent prototype enforces budget and human approval gates', asyn
   await expect(page.getByTestId('runtime-summary')).toContainText('prototype')
   await expect(page.getByTestId('runtime-persistence')).toContainText(/临时回放|本次响应|Redis/)
 
+  await page.getByRole('button', { name: '查找 Agent 工具权限知识，并保存成学习笔记' }).click()
+  await page.getByRole('button', { name: '开始受控运行' }).click()
+  await expect(page.getByTestId('runtime-status')).toContainText('等待审批')
+  await expect(page.getByTestId('runtime-approval')).toContainText('notes:write')
+  await expect(page.getByTestId('runtime-observation')).toHaveCount(1)
+  await page.getByRole('button', { name: '批准写入' }).click()
+  await expect(page.getByTestId('runtime-status')).toContainText('运行完成')
+  await expect(page.getByTestId('runtime-observation')).toHaveCount(2)
+  await expect(page.getByTestId('runtime-summary')).toContainText('已保存学习笔记')
+
   await expect(page.getByTestId('agent-state')).toContainText('已完成')
 
   await page.getByRole('tab', { name: /步数预算终止/ }).click()

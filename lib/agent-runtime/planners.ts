@@ -22,6 +22,7 @@ export function planFixtureTools(goal: string): RuntimeToolCall[] {
   const projectSlug = projectSlugFor(goal)
   const needsProject = Boolean(projectSlug) || /(项目证据|项目成熟度|项目验收)/.test(goal)
   const needsKnowledge = /(查找|检索|知识|解释|学习|面试|什么|怎么|资料|原理|对比)/.test(goal)
+  const needsNote = /(保存|写入|记录).{0,8}(笔记|学习结果)|笔记.{0,8}(保存|写入|记录)/.test(goal)
   const calls: RuntimeToolCall[] = []
 
   if (needsKnowledge || !needsProject) {
@@ -34,6 +35,13 @@ export function planFixtureTools(goal: string): RuntimeToolCall[] {
       arguments: { slug: projectSlug ?? 'task-planning-agent' }
     })
   }
+  if (needsNote) {
+    calls.push({
+      callId: 'fixture-note-1',
+      name: 'save_learning_note',
+      arguments: { title: 'Agent 工程学习笔记', content: `任务：${goal}\n已完成受控证据检索，详细结果保留在本次运行轨迹中。` }
+    })
+  }
   return calls
 }
 
@@ -44,6 +52,10 @@ function fixtureSummary(context: PlannerContext) {
     if (item.name === 'search_knowledge') {
       const output = item.output as { count?: number; items?: Array<{ title: string }> }
       return `知识库检索返回 ${output.count ?? 0} 条结果${output.items?.length ? `：${output.items.map((entry) => entry.title).join('、')}` : ''}`
+    }
+    if (item.name === 'save_learning_note') {
+      const output = item.output as { title?: string; created?: boolean }
+      return `${output.created === false ? '已确认' : '已保存'}学习笔记「${output.title ?? '未命名笔记'}」`
     }
     const output = item.output as { title?: string; deliveryStatus?: string }
     return `项目「${output.title ?? '未知项目'}」当前成熟度为 ${output.deliveryStatus ?? 'unknown'}`
@@ -79,7 +91,7 @@ const openAiResponseSchema = z.object({
 const functionCallSchema = z.object({
   type: z.literal('function_call'),
   call_id: z.string(),
-  name: z.enum(['search_knowledge', 'inspect_project_evidence']),
+  name: z.enum(['search_knowledge', 'inspect_project_evidence', 'save_learning_note']),
   arguments: z.string()
 })
 
@@ -109,7 +121,7 @@ export function createOpenAiPlanner(options: { apiKey: string; model?: string; f
         },
         body: JSON.stringify({
           model,
-          instructions: '你是受控 AI 工程学习助手。只使用提供的只读工具收集证据；不要虚构工具、项目状态或外部事实。获得证据后用中文简洁总结，并明确证据路径。',
+          instructions: '你是受控 AI 工程学习助手。先使用只读工具收集证据，不要虚构工具、项目状态或外部事实。只有用户明确要求保存时才可调用 save_learning_note；写入会由服务端暂停并等待用户审批。获得证据后用中文简洁总结，并明确证据路径。',
           input: context.history,
           tools: runtimeToolDefinitions,
           tool_choice: 'auto',

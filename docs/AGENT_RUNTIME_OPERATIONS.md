@@ -12,6 +12,7 @@
 - 使用进程内固定窗口限流，每实例每个来源标识 12 次/分钟。
 - 运行结果只随当前响应返回，不提供生产回放。
 - 不调用付费模型，不保存用户任务。
+- 未配置签名会话，生产只开放只读夹具，不开放学习笔记写入。
 
 进程内限流只能作为公开夹具模式的基础保护，不能作为真实模型模式的生产限流。
 
@@ -26,17 +27,25 @@ UPSTASH_REDIS_REST_TOKEN
 
 运行时也兼容旧变量名 `KV_REST_API_URL` 与 `KV_REST_API_TOKEN`。标准写 Token 只能放在服务端环境，不能使用 `NEXT_PUBLIC_` 前缀，也不能写入仓库。
 
+同时生成至少 32 字节的随机签名密钥并仅配置在服务端：
+
+```text
+AGENT_SESSION_SECRET=<至少 32 字节随机值>
+```
+
 配置后重新部署。预期变化：
 
 - 限流模式从 `memory` 变为 `redis`。
 - 完成的运行记录保存 24 小时。
 - 可通过 `GET /api/agent/run?id=<runId>` 回放单条运行。
-- 每个工具结果后保存 `agent:checkpoint:<runId>`；客户端可通过 `resumeRunId` 从下一轮继续。
-- 不提供运行列表接口，`runId` 视为临时访问凭据。
+- 每个工具结果后按 actor 隔离保存检查点；客户端可通过 `resumeRunId` 从下一轮继续。
+- 回放、续跑和审批都必须携带同一个 HttpOnly 签名会话 Cookie。
+- `save_learning_note` 写入前返回 `waiting_approval`，批准后按幂等键提交一次。
+- 不提供运行列表接口，`runId` 不能替代签名会话授权。
 
 ## 真实模型配置
 
-只有 Redis 限流已生效后才允许配置：
+只有 Redis 限流和签名身份都已生效后才允许配置：
 
 ```text
 AGENT_RUNTIME_MODE=openai
@@ -57,8 +66,9 @@ npm run eval:agent:live
 ## 冒烟检查
 
 ```bash
-curl -sS https://ai.liujixue.cn/api/agent/run
-curl -i -X POST https://ai.liujixue.cn/api/agent/run \
+COOKIE_JAR="$(mktemp)"
+curl -sS -c "$COOKIE_JAR" https://ai.liujixue.cn/api/agent/run
+curl -i -b "$COOKIE_JAR" -c "$COOKIE_JAR" -X POST https://ai.liujixue.cn/api/agent/run \
   -H 'content-type: application/json' \
   -d '{"goal":"检查 task-planning-agent 项目证据"}'
 ```
@@ -66,18 +76,22 @@ curl -i -X POST https://ai.liujixue.cn/api/agent/run \
 检查：
 
 - HTTP 为 `200`。
+- 能力响应在三项生产变量齐全时包含 `identityMode: signed-session`、`storageMode: redis` 与 `writeToolsEnabled: true`。
 - 响应包含 `runId`、`status`、`rateLimit` 和 `persistence`。
 - 响应头包含 `X-RateLimit-Limit`、`X-RateLimit-Remaining` 和 `X-RateLimit-Reset`。
 - Redis 已配置时，`persistence` 为 `redis-24h`，随后用回放接口读取同一个 `runId`。
 - 模拟中断后使用 `POST { "resumeRunId": "<runId>" }`，确认轨迹包含 `run_resumed` 且已成功工具没有重复执行。
+- 请求“保存成学习笔记”，确认先返回 HTTP `202` 与 `waiting_approval`；批准前没有 `save_learning_note` 观察结果，批准后只有一条且 `created: true`。
+- 换一个空 Cookie Jar 回放原 `runId`，必须返回 `404`，不得泄露其他会话记录。
 - Redis 未配置时，生产 `persistence` 必须为 `response-only`。
 
 ## 数据边界
 
 - 运行记录包含任务目标、工具参数、工具结果和轨迹，保存期固定为 24 小时。
 - 不应提交个人身份信息、客户秘密或生产凭据。
-- 当前没有账号隔离；随机 `runId` 是临时访问凭据，不是完整授权模型。
-- 上线真实客户任务前必须增加身份认证与租户隔离。
+- 当前是匿名签名会话隔离，不是实名账号系统；清除 Cookie 后无法找回原会话记录。
+- Redis key 只保存 actor 哈希，不保存原始会话 Token；Cookie 使用 HttpOnly、SameSite=Lax，HTTPS 下使用 Secure。
+- 上线真实客户任务前仍需接入正式登录、租户成员关系和数据删除流程。
 
 ## 回滚
 
