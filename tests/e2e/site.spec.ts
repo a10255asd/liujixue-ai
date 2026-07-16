@@ -12,6 +12,7 @@ const routes = [
   '/labs/prompt-regression',
   '/labs/rag-retrieval',
   '/labs/controlled-agent',
+  '/labs/agent-evaluation',
   '/resources',
   '/journal'
 ]
@@ -74,14 +75,14 @@ test('training workspace restores selected track and local progress', async ({ p
 
 test('project catalog separates runnable evidence from blueprints', async ({ page }) => {
   await page.goto('/projects')
-  await expect(page.locator('.delivery-badge--prototype')).toHaveCount(3)
-  await expect(page.locator('.delivery-badge--blueprint')).toHaveCount(3)
+  await expect(page.locator('.delivery-badge--prototype')).toHaveCount(4)
+  await expect(page.locator('.delivery-badge--blueprint')).toHaveCount(2)
 
   await page.goto('/projects/prompt-debugger')
   await expect(page.getByRole('link', { name: /运行原型/ })).toBeVisible()
   await expect(page.getByText('固定响应夹具')).toBeVisible()
 
-  await page.goto('/projects/agent-evaluation-console')
+  await page.goto('/projects/mcp-file-assistant')
   await expect(page.getByText('尚无可执行命令')).toBeVisible()
   await expect(page.getByRole('link', { name: /运行原型/ })).toHaveCount(0)
 })
@@ -127,4 +128,16 @@ test('controlled Agent prototype enforces budget and human approval gates', asyn
   await page.getByRole('button', { name: '批准一次执行' }).click()
   await expect(page.getByTestId('agent-state')).toContainText('已完成')
   await expect(page.getByTestId('agent-side-effects')).toHaveText('1')
+})
+
+test('Agent evaluation gate blocks regressions and passes the controlled version', async ({ page }) => {
+  await page.goto('/labs/agent-evaluation')
+  await expect(page.getByTestId('eval-release-status')).toContainText('阻止发布')
+  await expect(page.getByTestId('eval-overall-score')).toHaveText('56/100')
+  await expect(page.getByTestId('eval-regression-row')).toHaveCount(4)
+
+  await page.getByRole('tab', { name: /V2 受控状态机/ }).click()
+  await expect(page.getByTestId('eval-release-status')).toContainText('允许进入发布流程')
+  await expect(page.getByTestId('eval-overall-score')).toHaveText('100/100')
+  await expect(page.getByTestId('eval-regression-row')).toHaveCount(0)
 })

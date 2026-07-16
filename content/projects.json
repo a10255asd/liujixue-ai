@@ -403,14 +403,14 @@
     "slug": "agent-evaluation-console",
     "title": "Agent 评估与追踪控制台",
     "level": "高级",
-    "deliveryStatus": "blueprint",
-    "summary": "把任务成功率、工具轨迹、延迟、成本和回归结果放进同一个质量门禁。",
+    "deliveryStatus": "prototype",
+    "summary": "用固定执行轨迹比较两个 Agent 控制策略，并让权限、预算和副作用失败直接阻断发布。",
     "targetUser": "需要稳定发布 Agent 的工程团队。",
     "stack": [
-      "Python",
-      "OpenAI Agents SDK",
-      "PostgreSQL",
-      "Next.js"
+      "Next.js",
+      "TypeScript",
+      "Zod",
+      "Node Test"
     ],
     "features": [
       "评估数据集",
@@ -419,7 +419,7 @@
       "版本对比",
       "发布门禁"
     ],
-    "architecture": "采集运行 Trace 后标准化为事件序列；离线评估执行规则评分、结果评分和轨迹评分，并按版本聚合质量、延迟与成本。",
+    "architecture": "复用受控 Agent 的五类确定性事件轨迹，按结果、轨迹、权限、预算和副作用生成样本级评分；版本报告聚合回归位置与关键违规，再由独立门禁决定能否发布。",
     "implementationSteps": [
       "定义事件模型和指标",
       "接入 Trace",
@@ -462,9 +462,19 @@
       "tool-call-evaluation"
     ],
     "evidence": {
-      "summary": "当前仅完成事件模型、评估和发布门禁方案，尚无对应代码仓库、可运行 Demo 或测试输出。",
-      "commands": [],
-      "artifacts": []
+      "summary": "站内已提供可运行评测控制台：两套策略复用五类固定 Agent 轨迹，逐样本计算五维评分并定位首个回归事件；发布门禁同时检查综合分、单样本分和关键安全违规。当前使用确定性夹具，不代表真实模型延迟、成本或线上稳定性。",
+      "repositoryUrl": "https://github.com/a10255asd/liujixue-ai",
+      "demoPath": "/labs/agent-evaluation",
+      "verifiedAt": "2026-07-16",
+      "commands": [
+        "npm run test:unit",
+        "npm run build"
+      ],
+      "artifacts": [
+        "五维轨迹评分与样本级回归定位",
+        "双版本对比和关键安全发布门禁",
+        "桌面端与手机端评测矩阵"
+      ]
     },
     "status": "published",
     "lastReviewedAt": "2026-07-15",

@@ -202,6 +202,8 @@ type PracticalProject = {
 
 受控 Agent 原型的数据直接定义在类型安全的状态机模块中。场景 ID、终态、工具权限、预算和事件序号是后续评估控制台的稳定输入契约；修改轨迹语义时必须同步单元测试和项目证据。
 
+Agent 评测报告复用同一组场景 ID，固定使用 `result | trace | permission | budget | sideEffect` 五个维度。策略版本只能改变执行事实和判定结果，不能改变样本目标；权限、预算和副作用属于关键维度，任何违规都必须独立进入发布门禁，不能被综合平均分抵消。
+
 ## 5. 求职路径 CareerGuide
 
 `content/career.json` 是一个带公共审核字段的单例对象：

@@ -55,6 +55,7 @@ npm run build
 - `/labs/prompt-regression`：固定夹具驱动的 Prompt 回归原型，比较 Schema、业务规则、延迟和成本。
 - `/labs/rag-retrieval`：确定性 RAG 原型，覆盖版本化文档、混合检索、稳定引用、离线评估和未知问题拒答。
 - `/labs/controlled-agent`：受控 Agent 状态机原型，覆盖权限、预算、幂等重试、人工审批和轨迹回放。
+- `/labs/agent-evaluation`：Agent 评测与发布门禁原型，比较双版本五维轨迹评分并定位样本级回归。
 - `/resources`：官方文档和高质量资料导航。
 - `/journal`：学习日志。
 
