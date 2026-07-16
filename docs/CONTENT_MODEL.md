@@ -204,6 +204,8 @@ type PracticalProject = {
 
 Agent 评测报告复用同一组场景 ID，固定使用 `result | trace | permission | budget | sideEffect` 五个维度。策略版本只能改变执行事实和判定结果，不能改变样本目标；权限、预算和副作用属于关键维度，任何违规都必须独立进入发布门禁，不能被综合平均分抵消。
 
+岗位校准不新增项目成熟度。它只将现有项目证据映射到真实 JD 信号：`blueprint = 15`、`prototype = 65`、`verified = 100`；同能力的附加项目仅贡献自身权重的 10%。分数达到 85 为证据充分，50 至 84 为部分证据，其余为缺口。该规则衡量仓库内可展示证据，不衡量人的真实水平。
+
 ## 5. 求职路径 CareerGuide
 
 `content/career.json` 是一个带公共审核字段的单例对象：
@@ -277,6 +279,32 @@ type TrainingTrack = ContentAuditFields & {
 ```
 
 约束：路径 slug 和 order 唯一；同一路径内任务 ID 唯一；每个任务必须同时引用真实知识点、面试题和项目；验收清单至少 4 项。浏览器进度只记录任务复选状态，不代表项目已经验收通过。
+
+## 5B. 岗位样本 CareerJdSample
+
+`content/career-jd-samples.json` 保存可追溯的岗位快照：
+
+```ts
+type CareerJdSample = {
+  id: string
+  company: string
+  role: string
+  location: string
+  sourceUrl: string
+  accessedAt: string
+  sourceType: '官方招聘页' | '公司 ATS'
+  summary: string
+  signals: Array<{
+    capabilityId: string
+    weight: 1 | 2 | 3
+    requirement: string
+  }>
+}
+```
+
+约束：样本 ID 唯一、来源必须为 HTTPS、访问日期必须可解析、每个能力引用必须存在。招聘原文可能变化，站内只保存概括和来源，不把历史快照当成招聘方当前承诺。
+
+模拟面试问题不单独存数据：服务端按 JD 权重、证据分和能力顺序，从现有面试题关系中确定性选出 5 道不重复题。客户端每题只记录四个自评锚点，刷新后不保留，也不上传回答。
 
 ## 6. 资料 ResourceLink
 

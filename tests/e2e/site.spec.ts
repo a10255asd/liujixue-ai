@@ -7,6 +7,7 @@ const routes = [
   '/knowledge',
   '/agent',
   '/career',
+  '/career/calibration',
   '/interview',
   '/projects',
   '/labs/prompt-regression',
@@ -59,6 +60,20 @@ test('career assessment recommends the first unfinished week', async ({ page }) 
   await page.getByRole('checkbox', { name: '我能独立完成一次服务端模型调用，并正确管理密钥。' }).check()
   await expect(page.getByTestId('assessment-score')).toHaveText('8')
   await expect(page.getByTestId('assessment-next')).toContainText('建议从第 1 周开始')
+})
+
+test('career calibration maps real JD evidence and scores a fixed interview', async ({ page }) => {
+  await page.goto('/career/calibration')
+  await expect(page.getByTestId('jd-coverage-score')).toHaveText('70/100')
+  await expect(page.getByTestId('mock-interview-score')).toHaveText('0%')
+
+  await page.getByTestId('jd-source-select').selectOption('planera-senior-agent-engineer')
+  await expect(page.getByTestId('jd-coverage-score')).toHaveText('64/100')
+  await expect(page.locator('.jd-source-brief h3')).toHaveText('Planera · Senior AI Agent Engineer')
+
+  await page.locator('.mock-question input[type="checkbox"]').first().check()
+  await expect(page.getByTestId('mock-interview-score')).toHaveText('5%')
+  await expect(page.getByTestId('mock-weakest')).not.toContainText('完成本轮后生成')
 })
 
 test('training workspace restores selected track and local progress', async ({ page }) => {

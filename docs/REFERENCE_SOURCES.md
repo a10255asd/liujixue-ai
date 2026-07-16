@@ -1,6 +1,6 @@
 # 参考资料和内容来源原则
 
-更新时间：2026-07-15
+更新时间：2026-07-16
 
 ## 来源优先级
 
@@ -53,3 +53,16 @@
 - 复制付费题库。
 - 伪造大厂面试题来源。
 - 不加判断地搬运网上答案。
+
+## 岗位校准来源
+
+`content/career-jd-samples.json` 保存 2026-07-16 访问的岗位快照。岗位可能下线或修改，因此页面必须同时展示公司、岗位、来源链接和访问日期；`summary` 与 `signals.requirement` 只能做中文概括，不复制整段招聘文案。
+
+- OpenAI, Applied AI Engineer, Codex Core Agent：`https://openai.com/careers/applied-ai-engineer-codex-core-agent-san-francisco/`
+- Planera, Senior AI Agent Engineer：`https://jobs.ashbyhq.com/planera/d68c8a09-a11d-409e-85ca-5d434caf3fc8`
+- BIO, AI Engineer：`https://jobs.ashbyhq.com/bio/80145424-4809-46b2-99b9-8aae501be616`
+- Taxbit, Agentic AI Engineer：`https://job-boards.greenhouse.io/taxbit/jobs/6111068004`
+- Culture Amp, Senior Applied AI Engineer：`https://job-boards.greenhouse.io/cultureamp/jobs/7573350`
+- Cadence, Applied AI Engineer：`https://job-boards.greenhouse.io/solutions/jobs/4680768006`
+
+岗位信号权重只用于本站证据校准：`3` 表示岗位核心要求，`2` 表示重要要求，`1` 表示补充要求。它不是招聘方给出的权重，也不代表录用概率。

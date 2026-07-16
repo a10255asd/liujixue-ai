@@ -6,7 +6,7 @@
 
 > 给 0 基础开发者，尤其是想转 AI Agent 工程师的人，用一条可执行路线学 AI、做项目、刷面试、准备求职。
 
-当前阶段：Batch 5 已完成，GitHub、Vercel、正式域名和主站入口均已接通。`ai.liujixue.cn` 已被 Vercel 验证并指向 READY 的生产部署，当前 CNAME 是 Vercel 推荐的专用记录。
+当前阶段：Batch 7 阶段 5 已完成。4 个项目原型、真实 JD 岗位校准与固定模拟面试闭环均可运行；GitHub、Vercel、正式域名和主站入口已接通。
 
 ## 必读文档
 
@@ -50,6 +50,7 @@ npm run build
 - `/knowledge`：AI 工程知识库。
 - `/agent`：Agent 工程专题地图。
 - `/career`：岗位能力矩阵、确定性自测和 8 周求职计划。
+- `/career/calibration`：6 个真实 Agent Engineer JD 的证据覆盖分析和固定 5 题模拟面试。
 - `/interview`：AI 面试题库。
 - `/projects`：求职导向的项目实战清单。
 - `/labs/prompt-regression`：固定夹具驱动的 Prompt 回归原型，比较 Schema、业务规则、延迟和成本。

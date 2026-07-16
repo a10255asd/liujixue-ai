@@ -1,0 +1,113 @@
+[
+  {
+    "id": "openai-codex-core-agent",
+    "company": "OpenAI",
+    "role": "Applied AI Engineer, Codex Core Agent",
+    "location": "San Francisco / New York / Seattle / London",
+    "sourceUrl": "https://openai.com/careers/applied-ai-engineer-codex-core-agent-san-francisco/",
+    "accessedAt": "2026-07-16",
+    "sourceType": "官方招聘页",
+    "summary": "强调长任务 Agent 行为、真实任务评测、工具策略、上下文构造和生产可靠性。",
+    "signals": [
+      { "capabilityId": "agent-orchestration", "weight": 3, "requirement": "设计并迭代长任务 Agent 的执行行为与工具策略。" },
+      { "capabilityId": "eval-observability", "weight": 3, "requirement": "运行评测并定位回归、失败模式和边界情况。" },
+      { "capabilityId": "production-reliability", "weight": 3, "requirement": "分析生产失败，持续改善可靠性、延迟与成本边界。" },
+      { "capabilityId": "prompt-context", "weight": 2, "requirement": "通过提示词、上下文构造和模型实验改善行为。" },
+      { "capabilityId": "system-design-communication", "weight": 2, "requirement": "把模型能力转化为可衡量的用户结果并与产品协作。" },
+      { "capabilityId": "llm-api-engineering", "weight": 1, "requirement": "具备 LLM 产品工程和现代 ML 工具经验。" }
+    ]
+  },
+  {
+    "id": "planera-senior-agent-engineer",
+    "company": "Planera",
+    "role": "Senior AI Agent Engineer",
+    "location": "United States · Remote",
+    "sourceUrl": "https://jobs.ashbyhq.com/planera/d68c8a09-a11d-409e-85ca-5d434caf3fc8",
+    "accessedAt": "2026-07-16",
+    "sourceType": "公司 ATS",
+    "summary": "端到端负责 Agent 后端、工具和界面，要求真实评测、可观测性、MCP 与云部署经验。",
+    "signals": [
+      { "capabilityId": "agent-orchestration", "weight": 3, "requirement": "实现 Tool Calling、Agent Loop 与 LangGraph/LangChain 编排。" },
+      { "capabilityId": "eval-observability", "weight": 3, "requirement": "建立数据集、评测器、Trace 和版本回归流程。" },
+      { "capabilityId": "production-reliability", "weight": 3, "requirement": "具备生产服务、Docker、云平台和 CI/CD 经验。" },
+      { "capabilityId": "llm-api-engineering", "weight": 2, "requirement": "集成多模型提供商并支持 REST、SSE 与流式接口。" },
+      { "capabilityId": "mcp-tools", "weight": 2, "requirement": "理解 MCP 或同类工具与函数调用集成。" },
+      { "capabilityId": "prompt-context", "weight": 2, "requirement": "能从 Trace 调试提示词和大上下文行为。" },
+      { "capabilityId": "rag-engineering", "weight": 1, "requirement": "熟悉 RAG、Embedding 和向量存储。" },
+      { "capabilityId": "system-design-communication", "weight": 2, "requirement": "端到端拥有功能并清晰沟通工程取舍。" }
+    ]
+  },
+  {
+    "id": "bio-ai-engineer",
+    "company": "BIO",
+    "role": "AI Engineer",
+    "location": "Remote",
+    "sourceUrl": "https://jobs.ashbyhq.com/bio/80145424-4809-46b2-99b9-8aae501be616",
+    "accessedAt": "2026-07-16",
+    "sourceType": "公司 ATS",
+    "summary": "要求把 LLM 与 Agent 原型转化为安全、可扩展、可观测的生产系统。",
+    "signals": [
+      { "capabilityId": "agent-orchestration", "weight": 3, "requirement": "交付具备工具调用和编排框架的 Agent 系统。" },
+      { "capabilityId": "eval-observability", "weight": 3, "requirement": "具备评测、可观测性与生产遥测实践。" },
+      { "capabilityId": "production-reliability", "weight": 3, "requirement": "掌握云基础设施、容器、CI/CD、安全隔离和审计。" },
+      { "capabilityId": "rag-engineering", "weight": 2, "requirement": "实现 RAG、向量检索与可追溯知识系统。" },
+      { "capabilityId": "mcp-tools", "weight": 2, "requirement": "熟悉 MCP、函数调用或工具接入框架。" },
+      { "capabilityId": "llm-api-engineering", "weight": 2, "requirement": "使用 Python 或 TypeScript 构建可扩展 AI 服务。" },
+      { "capabilityId": "system-design-communication", "weight": 2, "requirement": "以证据为先，把研究原型推进为稳定平台能力。" }
+    ]
+  },
+  {
+    "id": "taxbit-agentic-ai-engineer",
+    "company": "Taxbit",
+    "role": "Agentic AI Engineer",
+    "location": "Seattle · Hybrid",
+    "sourceUrl": "https://job-boards.greenhouse.io/taxbit/jobs/6111068004",
+    "accessedAt": "2026-07-16",
+    "sourceType": "公司 ATS",
+    "summary": "面向合规场景构建多 Agent、RAG、记忆、HITL、评测与生产监控全生命周期。",
+    "signals": [
+      { "capabilityId": "agent-orchestration", "weight": 3, "requirement": "设计多 Agent、工具调用、记忆与人工介入流程。" },
+      { "capabilityId": "production-reliability", "weight": 3, "requirement": "负责部署、监控、IAM 和高可信生产运行。" },
+      { "capabilityId": "eval-observability", "weight": 3, "requirement": "评估 LLM Pipeline 并持续监控真实用户行为。" },
+      { "capabilityId": "rag-engineering", "weight": 2, "requirement": "理解 RAG 与复杂数据上的可信回答。" },
+      { "capabilityId": "llm-api-engineering", "weight": 2, "requirement": "使用 Python 或 TypeScript 跨栈交付 AI 功能。" },
+      { "capabilityId": "system-design-communication", "weight": 2, "requirement": "能向技术和非技术角色解释复杂 AI 系统。" }
+    ]
+  },
+  {
+    "id": "cultureamp-senior-applied-ai",
+    "company": "Culture Amp",
+    "role": "Senior Applied AI Engineer",
+    "location": "Melbourne · Hybrid",
+    "sourceUrl": "https://job-boards.greenhouse.io/cultureamp/jobs/7573350",
+    "accessedAt": "2026-07-16",
+    "sourceType": "公司 ATS",
+    "summary": "强调生产级多 Agent、记忆与上下文图、混合检索、规模化评测和安全护栏。",
+    "signals": [
+      { "capabilityId": "agent-orchestration", "weight": 3, "requirement": "设计可扩展的有状态、多轮和多 Agent 系统。" },
+      { "capabilityId": "rag-engineering", "weight": 3, "requirement": "实现混合检索、知识图谱与跨会话记忆。" },
+      { "capabilityId": "eval-observability", "weight": 3, "requirement": "建设评测数据集、Trace、阈值和人工标注闭环。" },
+      { "capabilityId": "production-reliability", "weight": 3, "requirement": "监控生产护栏、安全和真实数据管道。" },
+      { "capabilityId": "prompt-context", "weight": 2, "requirement": "持续诊断 Prompt 与系统级行为变化。" },
+      { "capabilityId": "system-design-communication", "weight": 2, "requirement": "从用户需求反推系统设计并完成技术交接。" }
+    ]
+  },
+  {
+    "id": "cadence-applied-ai-engineer",
+    "company": "Cadence",
+    "role": "Applied AI Engineer",
+    "location": "Remote",
+    "sourceUrl": "https://job-boards.greenhouse.io/solutions/jobs/4680768006",
+    "accessedAt": "2026-07-16",
+    "sourceType": "公司 ATS",
+    "summary": "在高可靠临床场景中交付检索、推理、工具、评测、安全和人工升级完整链路。",
+    "signals": [
+      { "capabilityId": "agent-orchestration", "weight": 3, "requirement": "实现规划、记忆、工具、错误恢复和人工升级。" },
+      { "capabilityId": "rag-engineering", "weight": 3, "requirement": "优化真实知识库上的 Embedding、检索和 Grounding。" },
+      { "capabilityId": "eval-observability", "weight": 3, "requirement": "建立离线基准、安全测试、回归集与 CI 门禁。" },
+      { "capabilityId": "production-reliability", "weight": 3, "requirement": "负责 LLM 工作流的可靠性、可观测性和成本效率。" },
+      { "capabilityId": "llm-api-engineering", "weight": 2, "requirement": "掌握 LLM API、结构化输出和函数调用。" },
+      { "capabilityId": "system-design-communication", "weight": 2, "requirement": "将领域需求转化为可交付的 AI 系统设计。" }
+    ]
+  }
+]

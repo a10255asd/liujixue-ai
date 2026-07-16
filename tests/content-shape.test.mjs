@@ -67,6 +67,7 @@ test('training tracks define three evidence-driven delivery loops', () => {
 
 test('career guide has a complete deterministic path', () => {
   const career = readJson('../content/career.json')
+  const jdSamples = readJson('../content/career-jd-samples.json')
   assert.equal(career.status, 'published')
   assert.match(career.lastReviewedAt, /^\d{4}-\d{2}-\d{2}$/)
   assert.ok(career.authors.length > 0 && career.reviewers.length > 0)
@@ -74,6 +75,9 @@ test('career guide has a complete deterministic path', () => {
   assert.equal(career.weeks.length, 8)
   assert.equal(career.assessment.length, 12)
   assert.deepEqual(career.weeks.map((item) => item.week), [1, 2, 3, 4, 5, 6, 7, 8])
+  assert.equal(jdSamples.length, 6)
+  assert.ok(jdSamples.every((item) => item.signals.length >= 4))
+  assert.ok(jdSamples.every((item) => item.sourceUrl.startsWith('https://')))
 })
 
 test('interview questions include answer training fields', () => {

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { ArrowRight, BriefcaseBusiness, CalendarRange, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, BriefcaseBusiness, CalendarRange, CheckCircle2, ScanSearch } from 'lucide-react'
 import Link from 'next/link'
 
 import { CareerAssessment } from '@/components/career/career-assessment'
@@ -34,6 +34,12 @@ export default function CareerPage() {
         description="不按岗位关键词背术语。每项能力都连接知识、面试题、项目产出和验收标准，最后形成可以演示和被追问的作品集。"
         aside={<div className="heading-stat"><strong>{capabilities.length}</strong><span>能力域</span><strong>{weeks.length}</strong><span>执行周</span></div>}
       />
+
+      <section className="career-calibration-entry">
+        <ScanSearch size={22} />
+        <div><span>REAL JD CALIBRATION</span><h2>用真实岗位要求检查作品集证据</h2><p>选择公开 Agent 工程师 JD，查看 8 个能力域的覆盖与缺口，并开始一轮固定五题模拟面试。</p></div>
+        <Link href="/career/calibration">进入岗位校准 <ArrowRight size={15} /></Link>
+      </section>
 
       <section className="career-section" id="matrix">
         <SectionHeading index="01" title="岗位能力矩阵" description="从招聘描述里识别信号，再准备能被验证的项目证据。" />

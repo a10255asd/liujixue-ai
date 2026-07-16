@@ -1,5 +1,6 @@
 import {
   getCareerGuide,
+  getCareerJdSamples,
   getInterviewQuestions,
   getJournals,
   getKnowledgePoints,
@@ -37,6 +38,7 @@ const projects = getProjects()
 const resources = getResources()
 const journals = getJournals()
 const career = getCareerGuide()
+const careerJdSamples = getCareerJdSamples()
 const trainingTracks = getTrainingTracks()
 
 assertUnique(roadmap.map((item) => item.slug), '路线 slug')
@@ -49,6 +51,7 @@ assertUnique(journals.map((item) => item.slug), '日志 slug')
 assertUnique(career.capabilities.map((item) => item.id), '求职能力 id')
 assertUnique(career.weeks.map((item) => String(item.week)), '求职周次')
 assertUnique(career.assessment.map((item) => item.id), '自测 id')
+assertUnique(careerJdSamples.map((item) => item.id), '岗位样本 id')
 assertUnique(trainingTracks.map((item) => item.slug), '训练路径 slug')
 assertUnique(trainingTracks.map((item) => String(item.order)), '训练路径 order')
 
@@ -100,6 +103,10 @@ for (const item of career.assessment) {
   assertReferences(`自测 ${item.id}`, [item.capabilityId], capabilityIds, '求职能力')
 }
 
+for (const sample of careerJdSamples) {
+  assertReferences(`岗位样本 ${sample.id}`, sample.signals.map((signal) => signal.capabilityId), capabilityIds, '求职能力')
+}
+
 for (const track of trainingTracks) {
   assertUnique(track.tasks.map((task) => task.id), `训练路径 ${track.slug} 任务 id`)
   for (const task of track.tasks) {
@@ -110,5 +117,5 @@ for (const track of trainingTracks) {
 }
 
 console.log(
-  `内容校验通过：${roadmap.length} 阶段、${trainingTracks.length} 训练路径、${knowledge.length} 知识点、${questions.length} 面试题、${projects.length} 项目、${resources.length} 资料、${journals.length} 日志、${career.capabilities.length} 求职能力`
+  `内容校验通过：${roadmap.length} 阶段、${trainingTracks.length} 训练路径、${knowledge.length} 知识点、${questions.length} 面试题、${projects.length} 项目、${resources.length} 资料、${journals.length} 日志、${career.capabilities.length} 求职能力、${careerJdSamples.length} 岗位样本`
 )

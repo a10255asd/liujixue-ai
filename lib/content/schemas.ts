@@ -171,6 +171,26 @@ export const careerGuideSchema = z.object({
   assessment: z.array(assessmentItemSchema).min(8)
 }).merge(contentAuditFieldsSchema)
 
+export const careerJdSignalSchema = z.object({
+  capabilityId: nonEmptyString,
+  weight: z.number().int().min(1).max(3),
+  requirement: nonEmptyString
+})
+
+export const careerJdSampleSchema = z.object({
+  id: nonEmptyString,
+  company: nonEmptyString,
+  role: nonEmptyString,
+  location: nonEmptyString,
+  sourceUrl: z.string().url(),
+  accessedAt: z.string().date(),
+  sourceType: z.enum(['官方招聘页', '公司 ATS']),
+  summary: nonEmptyString,
+  signals: z.array(careerJdSignalSchema).min(4)
+})
+
+export const careerJdSamplesSchema = z.array(careerJdSampleSchema).min(4)
+
 export const trainingTaskSchema = z.object({
   id: nonEmptyString,
   title: nonEmptyString,
@@ -240,5 +260,6 @@ export type CareerCapability = z.infer<typeof careerCapabilitySchema>
 export type CareerWeek = z.infer<typeof careerWeekSchema>
 export type AssessmentItem = z.infer<typeof assessmentItemSchema>
 export type CareerGuide = z.infer<typeof careerGuideSchema>
+export type CareerJdSample = z.infer<typeof careerJdSampleSchema>
 export type TrainingTask = z.infer<typeof trainingTaskSchema>
 export type TrainingTrack = z.infer<typeof trainingTrackSchema>

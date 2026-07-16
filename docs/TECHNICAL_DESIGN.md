@@ -252,6 +252,7 @@ getProjectBySlug(slug: string): PracticalProject | null
 getResources(): ResourceLink[]
 getJournals(): LearningJournal[]
 getTrainingTracks(): TrainingTrack[]
+getCareerJdSamples(): CareerJdSample[]
 ```
 
 关系查询放入 `lib/content/relations.ts`：
@@ -412,11 +413,19 @@ URL：筛选状态同步到 query string，分享链接可恢复状态。
 
 自测算法完全在浏览器本地执行，不保存用户数据、不调用模型：得分为已确认项占比；按顺序找到首个未确认项，并推荐其 `week` 与 `actionHref`。所有项目交付字段由 Schema 强制至少 3 项。
 
-### 8.15 `/resources`
+### 8.15 `/career/calibration`
+
+数据：`career-jd-samples.json` 中带来源和访问日期的真实岗位快照、`career.json` 中的 8 个能力域，以及 `projects.json` 中的成熟度证据。服务端由 `lib/labs/career-calibration.ts` 生成岗位报告和固定 5 题会话，客户端只负责岗位切换和量表勾选。
+
+证据分数使用公开且可复算的成熟度权重：`blueprint = 0.15`、`prototype = 0.65`、`verified = 1`；同能力多个项目只给第一项完整权重，其余各按 10% 计入并封顶 100。岗位覆盖率是各能力证据分按 JD 信号权重的加权平均，不表示技能真实性或录用概率。
+
+每个岗位固定生成 5 道不重复题目，优先高权重且证据较弱的能力。每题使用“概念准确、工程取舍、项目证据、失败与验证”四项自评锚点；每项 1 分，总分仅用于定位准备缺口，不调用模型、不保存答案、不判断语言表现和面试结果。
+
+### 8.16 `/resources`
 
 按路线阶段和来源类型组织。外链必须带 `rel="noopener noreferrer"`。每个资源显示“适合什么时候看”，避免变成链接仓库。
 
-### 8.16 `/journal`
+### 8.17 `/journal`
 
 日志按日期倒序。每条记录必须关联一个路线阶段和至少一个产出。后续可增加详情页，但 Batch 1 只做列表。
 

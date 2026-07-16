@@ -1,4 +1,5 @@
 import careerData from '@/content/career.json'
+import careerJdSamplesData from '@/content/career-jd-samples.json'
 import interviewData from '@/content/interview-questions.json'
 import journalData from '@/content/journals.json'
 import knowledgeData from '@/content/knowledge-points.json'
@@ -9,6 +10,7 @@ import trainingTracksData from '@/content/training-tracks.json'
 
 import {
   careerGuideSchema,
+  careerJdSamplesSchema,
   interviewSchema,
   journalsSchema,
   knowledgeSchema,
@@ -17,6 +19,7 @@ import {
   roadmapSchema,
   trainingTracksSchema,
   type CareerGuide,
+  type CareerJdSample,
   type InterviewQuestion,
   type KnowledgePoint,
   type LearningJournal,
@@ -39,6 +42,7 @@ const journals = journalsSchema
   .filter((item) => item.status === 'published')
   .sort((a, b) => b.date.localeCompare(a.date))
 const careerGuide = careerGuideSchema.parse(careerData)
+const careerJdSamples = careerJdSamplesSchema.parse(careerJdSamplesData)
 const trainingTracks = published(trainingTracksSchema.parse(trainingTracksData)).sort((a, b) => a.order - b.order)
 
 export function getRoadmapStages(): RoadmapStage[] {
@@ -79,6 +83,10 @@ export function getJournals(): LearningJournal[] {
 
 export function getCareerGuide(): CareerGuide {
   return careerGuide
+}
+
+export function getCareerJdSamples(): CareerJdSample[] {
+  return careerJdSamples
 }
 
 export function getTrainingTracks(): TrainingTrack[] {
