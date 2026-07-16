@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { evaluateRuntimePlanner } from '../lib/agent-runtime/evaluation'
-import { createFixturePlanner } from '../lib/agent-runtime/planners'
+import { createFixturePlanner, createOpenAiPlanner } from '../lib/agent-runtime/planners'
 import { runServerAgent } from '../lib/agent-runtime/runner'
 import { executeRuntimeTool, runtimeToolDefinitions } from '../lib/agent-runtime/tools'
 
@@ -61,4 +61,20 @@ test('twenty runtime contract cases are deterministic and passing', () => {
   assert.equal(evaluation.caseCount, 20)
   assert.equal(evaluation.passedCount, 20)
   assert.equal(evaluation.passRate, 1)
+})
+
+test('OpenAI planner captures usage and request ids for production evidence', async () => {
+  const planner = createOpenAiPlanner({
+    apiKey: 'test-key',
+    model: 'test-model',
+    fetchImpl: async () => new Response(JSON.stringify({
+      output: [{ type: 'message', content: [{ type: 'output_text', text: '已完成证据总结。' }] }],
+      output_text: '已完成证据总结。',
+      usage: { input_tokens: 12, output_tokens: 8, total_tokens: 20 }
+    }), { status: 200, headers: { 'x-request-id': 'req_test_123' } })
+  })
+  const turn = await planner.next({ goal: '检查 Agent 证据', history: [], observations: [] })
+  assert.equal(turn.requestId, 'req_test_123')
+  assert.equal(turn.usage.totalTokens, 20)
+  assert.equal(turn.finalText, '已完成证据总结。')
 })

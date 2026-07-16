@@ -401,9 +401,11 @@ URL：筛选状态同步到 query string，分享链接可恢复状态。
 
 运行入口已增加固定窗口限流。配置 Upstash/Vercel Redis 时使用原子 `EVAL` 计数，并将完成运行保存 24 小时；`GET /api/agent/run?id=<runId>` 只允许按随机 id 回放单条记录，不提供列表。未配置 Redis 时，夹具模式使用进程内基础限流，生产不保存；真实模型模式则直接返回 `503`。
 
+客户端在创建运行前生成 UUID 并随 `runId` 发送。运行器每轮只允许一个工具调用，在工具结果确认后保存 `RuntimeCheckpoint v1`；`POST { resumeRunId }` 使用原 run id、历史、观察、Trace、Token 和下一轮序号恢复，避免重复执行已完成工具。20 条基线评测统一输出精确工具序列、完成率、P95 延迟、Token 和 OpenAI request id。
+
 控制器显式维护 `planned | running | waiting_approval | completed | failed | budget_exceeded | rejected` 状态。工具契约声明权限、风险、重试上限和幂等能力；权限守卫先于工具执行，高风险动作先于副作用进入审批状态。
 
-安全回归固定覆盖正常完成、临时故障恢复、越权拦截、步数预算终止和人工审批五类轨迹；另有 20 条任务契约验证确定性规划器的工具选择。当前只保存已完成运行，尚无逐步骤中断恢复、身份隔离、真实模型生产实测或 Token 成本基线，因此项目状态保持 `prototype`。
+安全回归固定覆盖正常完成、临时故障恢复、越权拦截、步数预算终止和人工审批五类轨迹；另有 20 条任务契约与统一基线报告。当前缺少生产 Redis 跨实例恢复、身份隔离、真实模型报告和 Token 成本基线，因此项目状态保持 `prototype`。
 
 ### 8.13 `/labs/agent-evaluation`
 

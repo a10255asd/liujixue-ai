@@ -9,6 +9,7 @@ export const runtimeToolNameSchema = z.enum(['search_knowledge', 'inspect_projec
 export type RuntimeToolName = z.infer<typeof runtimeToolNameSchema>
 export type RuntimeMode = 'fixture' | 'openai'
 export type RuntimePersistence = 'response-only' | 'ephemeral-memory' | 'redis-24h'
+export type RuntimeRunStatus = 'completed' | 'failed' | 'budget_exceeded'
 
 export type RuntimeToolCall = {
   callId: string
@@ -27,7 +28,7 @@ export type RuntimeToolObservation = RuntimeToolCall & {
 export type RuntimeTraceEvent = {
   sequence: number
   elapsedMs: number
-  type: 'run_started' | 'planner_response' | 'tool_guard' | 'tool_result' | 'run_completed' | 'run_failed'
+  type: 'run_started' | 'run_resumed' | 'planner_response' | 'tool_guard' | 'tool_result' | 'run_completed' | 'run_failed'
   title: string
   detail: string
   tool?: RuntimeToolName
@@ -44,7 +45,7 @@ export type RuntimeRunResult = {
   runId: string
   mode: RuntimeMode
   model: string
-  status: 'completed' | 'failed' | 'budget_exceeded'
+  status: RuntimeRunStatus
   goal: string
   summary: string
   stepsUsed: number
@@ -52,6 +53,7 @@ export type RuntimeRunResult = {
   observations: RuntimeToolObservation[]
   trace: RuntimeTraceEvent[]
   usage: RuntimeUsage
+  requestIds: string[]
   persistence: RuntimePersistence
   replayUrl?: string
   rateLimit?: {
@@ -62,11 +64,30 @@ export type RuntimeRunResult = {
   }
 }
 
+export type RuntimeCheckpoint = {
+  version: 1
+  runId: string
+  goal: string
+  mode: RuntimeMode
+  model: string
+  status: 'running' | RuntimeRunStatus
+  nextTurnIndex: number
+  maxSteps: number
+  history: unknown[]
+  observations: RuntimeToolObservation[]
+  trace: RuntimeTraceEvent[]
+  usage: RuntimeUsage
+  requestIds: string[]
+  summary?: string
+  updatedAt: string
+}
+
 export type PlannerTurn = {
   calls: RuntimeToolCall[]
   finalText?: string
   rawOutput: unknown[]
   usage: RuntimeUsage
+  requestId?: string
 }
 
 export type PlannerContext = {

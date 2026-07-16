@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "validate:content": "tsx scripts/validate-content.ts",
     "test:unit": "tsx --test tests/*.test.mjs tests/*.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "eval:agent:live": "tsx scripts/run-agent-baseline.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

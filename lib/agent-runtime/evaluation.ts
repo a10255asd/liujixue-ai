@@ -12,6 +12,10 @@ const evaluationCaseSchema = z.object({
 
 const evaluationCases = z.array(evaluationCaseSchema).length(20).parse(evaluationData)
 
+export function getRuntimeEvaluationCases() {
+  return evaluationCases
+}
+
 export function evaluateRuntimePlanner() {
   const cases = evaluationCases.map((item) => {
     const actualTools = planFixtureTools(item.goal).map((call) => call.name)

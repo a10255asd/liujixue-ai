@@ -31,6 +31,7 @@ UPSTASH_REDIS_REST_TOKEN
 - 限流模式从 `memory` 变为 `redis`。
 - 完成的运行记录保存 24 小时。
 - 可通过 `GET /api/agent/run?id=<runId>` 回放单条运行。
+- 每个工具结果后保存 `agent:checkpoint:<runId>`；客户端可通过 `resumeRunId` 从下一轮继续。
 - 不提供运行列表接口，`runId` 视为临时访问凭据。
 
 ## 真实模型配置
@@ -44,6 +45,14 @@ OPENAI_AGENT_MODEL=gpt-5.6-luna
 ```
 
 真实模型模式的限制是每个来源标识 4 次/分钟。缺少模型密钥、Redis 持久化限流未生效或 Redis 不可用时，API 返回 `503`，不得静默降级。
+
+配置完成后运行真实模型基线：
+
+```bash
+npm run eval:agent:live
+```
+
+默认报告写入 `artifacts/agent-runtime/openai-baseline.json`。缺少 `OPENAI_API_KEY` 时命令必须失败；报告只有 20 条样本全部通过时才标记 `releaseCandidate: true`。
 
 ## 冒烟检查
 
@@ -60,6 +69,7 @@ curl -i -X POST https://ai.liujixue.cn/api/agent/run \
 - 响应包含 `runId`、`status`、`rateLimit` 和 `persistence`。
 - 响应头包含 `X-RateLimit-Limit`、`X-RateLimit-Remaining` 和 `X-RateLimit-Reset`。
 - Redis 已配置时，`persistence` 为 `redis-24h`，随后用回放接口读取同一个 `runId`。
+- 模拟中断后使用 `POST { "resumeRunId": "<runId>" }`，确认轨迹包含 `run_resumed` 且已成功工具没有重复执行。
 - Redis 未配置时，生产 `persistence` 必须为 `response-only`。
 
 ## 数据边界

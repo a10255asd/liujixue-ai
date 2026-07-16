@@ -53,15 +53,14 @@ function fixtureSummary(context: PlannerContext) {
 }
 
 export function createFixturePlanner(): RuntimePlanner {
-  let planned = false
   return {
     mode: 'fixture',
     model: 'deterministic-server-planner-v1',
     async next(context) {
-      if (!planned) {
-        planned = true
-        return { calls: planFixtureTools(context.goal), rawOutput: [], usage: emptyUsage }
-      }
+      const plannedCalls = planFixtureTools(context.goal)
+      const completedNames = context.observations.map((item) => item.name)
+      const nextCall = plannedCalls.find((call, index) => completedNames[index] !== call.name)
+      if (nextCall) return { calls: [nextCall], rawOutput: [], usage: emptyUsage }
       return { calls: [], finalText: fixtureSummary(context), rawOutput: [], usage: emptyUsage }
     }
   }
@@ -140,6 +139,7 @@ export function createOpenAiPlanner(options: { apiKey: string; model?: string; f
         calls,
         finalText: parsed.output_text ?? extractOutputText(parsed.output),
         rawOutput: parsed.output,
+        requestId: response.headers.get('x-request-id') ?? undefined,
         usage: {
           inputTokens: parsed.usage?.input_tokens ?? 0,
           outputTokens: parsed.usage?.output_tokens ?? 0,

@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, Database, LoaderCircle, Play, Search, ServerCog, ShieldCheck, TerminalSquare } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import type { RuntimeRunResult, RuntimeToolObservation } from '@/lib/agent-runtime/contracts'
 
@@ -62,24 +62,31 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
   const [run, setRun] = useState<RuntimeRunResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [pendingRunId, setPendingRunId] = useState<string | null>(null)
   const persistenceLabel = run?.persistence === 'redis-24h'
     ? 'Redis 保存 24 小时，可按 runId 回放'
     : run?.persistence === 'ephemeral-memory'
       ? '开发进程内临时回放'
       : '仅保留在本次响应中'
 
-  async function startRun() {
+  useEffect(() => {
+    setPendingRunId(window.localStorage.getItem('agent-runtime-pending-run'))
+  }, [])
+
+  async function execute(body: { goal: string; runId: string } | { resumeRunId: string }) {
     setLoading(true)
     setError(null)
     try {
       const response = await fetch('/api/agent/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal })
+        body: JSON.stringify(body)
       })
       const result = await response.json() as RuntimeRunResult | { error?: string }
       if (!response.ok || !('runId' in result)) throw new Error('error' in result ? result.error : '服务端运行失败。')
       setRun(result)
+      setPendingRunId(null)
+      window.localStorage.removeItem('agent-runtime-pending-run')
     } catch (caught) {
       setRun(null)
       setError(caught instanceof Error ? caught.message : '服务端运行失败。')
@@ -88,13 +95,38 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
     }
   }
 
+  async function startRun() {
+    const runId = window.crypto.randomUUID()
+    setPendingRunId(runId)
+    window.localStorage.setItem('agent-runtime-pending-run', runId)
+    await execute({ goal, runId })
+  }
+
+  async function resumeRun() {
+    if (!pendingRunId) return
+    try {
+      const replayResponse = await fetch(`/api/agent/run?id=${pendingRunId}`, { cache: 'no-store' })
+      if (replayResponse.ok) {
+        const record = await replayResponse.json() as { run: RuntimeRunResult }
+        setRun(record.run)
+        setError(null)
+        setPendingRunId(null)
+        window.localStorage.removeItem('agent-runtime-pending-run')
+        return
+      }
+    } catch {
+      // A missing completed record can still have a resumable running checkpoint.
+    }
+    await execute({ resumeRunId: pendingRunId })
+  }
+
   return (
     <section className="server-runtime" aria-labelledby="server-runtime-title">
       <header className="server-runtime__header">
         <div>
-          <p className="eyebrow">SERVER RUNTIME · CANDIDATE 01</p>
-          <h2 id="server-runtime-title">让规划器读取真实证据</h2>
-          <p>任务从浏览器发送到服务端，经过规划、严格工具 Schema、权限守卫和工具预算，再返回真实知识与项目证据。</p>
+          <p className="eyebrow">SERVER RUNTIME · CANDIDATE 02</p>
+          <h2 id="server-runtime-title">让每一步都可验证、可恢复</h2>
+          <p>任务在服务端逐轮规划；每个工具结果经过 Schema、权限和预算守卫，并在可用仓储中写入版本化检查点。</p>
         </div>
         <dl>
           <div><dt>真实只读工具</dt><dd>2</dd></div>
@@ -126,6 +158,9 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
             {loading ? <LoaderCircle className="spin" size={17} /> : <Play size={17} />}
             {loading ? '服务端执行中' : '开始受控运行'}
           </button>
+          {pendingRunId && error ? (
+            <button className="button runtime-run-button" disabled={loading} onClick={resumeRun} type="button">从服务端检查点恢复</button>
+          ) : null}
 
           <div className="runtime-guardrails">
             <div><ShieldCheck size={16} /><span>仅开放 <code>knowledge:read</code> 与 <code>projects:read</code></span></div>

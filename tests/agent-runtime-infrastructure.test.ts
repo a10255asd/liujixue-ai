@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
+import { runRuntimeBaseline } from '../lib/agent-runtime/baseline'
+import type { RuntimeCheckpoint } from '../lib/agent-runtime/contracts'
 import { createFixturePlanner } from '../lib/agent-runtime/planners'
 import { createRuntimeRateLimiter } from '../lib/agent-runtime/rate-limit'
 import { createRedisRestClient, resolveRedisRestConfig } from '../lib/agent-runtime/redis-rest'
@@ -67,6 +69,68 @@ test('development runtime store can replay a completed run', async () => {
   assert.equal(store.mode, 'memory')
   assert.equal(restored?.run.runId, result.runId)
   assert.equal(restored?.run.persistence, 'ephemeral-memory')
+})
+
+test('runtime resumes from the last completed tool without duplicate execution', async () => {
+  let savedCheckpoint: RuntimeCheckpoint | null = null
+  const interrupted = await runServerAgent({
+    goal: '先查找 Agent 工具权限知识，再检查 task-planning-agent 项目证据',
+    planner: createFixturePlanner(),
+    async onCheckpoint(checkpoint) {
+      if (checkpoint.status === 'running' && checkpoint.observations.length === 1) {
+        savedCheckpoint = checkpoint
+        throw new Error('模拟函数实例中断')
+      }
+    }
+  })
+  assert.equal(interrupted.status, 'failed')
+  assert.ok(savedCheckpoint)
+  const checkpoint = savedCheckpoint as RuntimeCheckpoint
+  assert.equal(checkpoint.nextTurnIndex, 1)
+  assert.deepEqual(checkpoint.observations.map((item) => item.name), ['search_knowledge'])
+
+  const resumed = await runServerAgent({
+    goal: checkpoint.goal,
+    planner: createFixturePlanner(),
+    resumeFrom: checkpoint
+  })
+  assert.equal(resumed.status, 'completed')
+  assert.equal(resumed.runId, checkpoint.runId)
+  assert.deepEqual(resumed.observations.map((item) => item.name), ['search_knowledge', 'inspect_project_evidence'])
+  assert.equal(resumed.trace.filter((event) => event.type === 'run_resumed').length, 1)
+})
+
+test('runtime store persists versioned checkpoints', async () => {
+  const store = createRuntimeStore({ redis: null, allowMemory: true })
+  let latest: RuntimeCheckpoint | null = null
+  await runServerAgent({
+    goal: '检查 task-planning-agent 项目证据',
+    planner: createFixturePlanner(),
+    async onCheckpoint(checkpoint) {
+      latest = checkpoint
+      await store.saveCheckpoint(checkpoint)
+    }
+  })
+  assert.ok(latest)
+  const checkpoint = latest as RuntimeCheckpoint
+  const restored = await store.getCheckpoint(checkpoint.runId)
+  assert.equal(restored?.version, 1)
+  assert.equal(restored?.status, 'completed')
+  assert.equal(restored?.nextTurnIndex, 2)
+})
+
+test('twenty-case baseline report is reproducible with fixture planners', async () => {
+  const report = await runRuntimeBaseline({
+    plannerFactory: createFixturePlanner,
+    now: () => new Date('2026-07-16T00:00:00.000Z')
+  })
+  assert.equal(report.generatedAt, '2026-07-16T00:00:00.000Z')
+  assert.equal(report.caseCount, 20)
+  assert.equal(report.passedCount, 20)
+  assert.equal(report.passRate, 1)
+  assert.equal(report.allCasesPassed, true)
+  assert.equal(report.releaseCandidate, false)
+  assert.ok(report.samples.every((sample) => sample.checks.exactToolSequence))
 })
 
 test('production store stays disabled without Redis credentials', async () => {

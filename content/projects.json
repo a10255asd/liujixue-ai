@@ -300,7 +300,7 @@
       "agent-tool-permissions"
     ],
     "evidence": {
-      "summary": "站内已提供服务端 Agent 运行 API，能够通过严格工具 Schema 和权限守卫读取真实知识库与项目证据；同时具备固定窗口限流、可选 Redis 原子限流、24 小时完成运行回放、五类安全轨迹和 20 条规划契约评测。生产尚未配置 Redis 与模型密钥，也不支持中断续跑，因此仍为 prototype。",
+      "summary": "站内已提供服务端 Agent 运行 API，能够通过严格工具 Schema 和权限守卫读取真实知识库与项目证据；同时具备限流、可选 Redis 仓储、逐工具检查点、resumeRunId 恢复、五类安全轨迹和 20 条真实模型基线命令。生产尚未配置 Redis 与模型密钥，缺少跨实例恢复和真实报告，因此仍为 prototype。",
       "repositoryUrl": "https://github.com/a10255asd/liujixue-ai",
       "demoPath": "/labs/controlled-agent",
       "verifiedAt": "2026-07-16",
@@ -314,6 +314,7 @@
         "真实知识检索和项目证据读取两个只读工具",
         "OpenAI Responses 严格函数调用适配器与缺少持久化限流时的失败关闭",
         "Upstash/Vercel Redis 原子限流、24 小时运行仓储和 runId 回放",
+        "RuntimeCheckpoint v1、无重复工具恢复测试和 20 条真实模型基线报告器",
         "20 条规划契约评测和五类安全轨迹回放"
       ]
     },

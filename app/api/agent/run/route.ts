@@ -11,6 +11,10 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const runIdSchema = z.string().uuid()
+const runtimeRequestSchema = z.union([
+  runtimeGoalSchema.extend({ runId: runIdSchema.optional() }).strict(),
+  z.object({ resumeRunId: runIdSchema }).strict()
+])
 
 function noStoreHeaders() {
   return { 'Cache-Control': 'no-store' }
@@ -73,15 +77,32 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '请求体必须是 JSON。' }, { status: 400, headers: noStoreHeaders() })
   }
 
-  const input = runtimeGoalSchema.safeParse(body)
+  const input = runtimeRequestSchema.safeParse(body)
   if (!input.success) {
     return NextResponse.json({ error: input.error.issues[0]?.message ?? '任务目标无效。' }, { status: 400, headers: noStoreHeaders() })
   }
 
-  const liveRequested = process.env.AGENT_RUNTIME_MODE === 'openai'
-  const liveEnabled = liveRequested && Boolean(process.env.OPENAI_API_KEY)
   const limiter = createRuntimeRateLimiter()
   const store = createRuntimeStore({ allowMemory: process.env.NODE_ENV !== 'production' })
+  let resumeFrom = null
+
+  if ('resumeRunId' in input.data) {
+    if (store.mode === 'disabled') {
+      return NextResponse.json({ error: '生产运行仓储尚未配置，无法恢复运行。' }, { status: 503, headers: noStoreHeaders() })
+    }
+    try {
+      resumeFrom = await store.getCheckpoint(input.data.resumeRunId)
+    } catch {
+      return NextResponse.json({ error: '运行检查点暂时不可用。' }, { status: 503, headers: noStoreHeaders() })
+    }
+    if (!resumeFrom) return NextResponse.json({ error: '运行检查点不存在或已过期。' }, { status: 404, headers: noStoreHeaders() })
+    if (resumeFrom.status !== 'running') {
+      return NextResponse.json({ error: `运行已经处于 ${resumeFrom.status} 终态。` }, { status: 409, headers: noStoreHeaders() })
+    }
+  }
+
+  const liveRequested = resumeFrom ? resumeFrom.mode === 'openai' : process.env.AGENT_RUNTIME_MODE === 'openai'
+  const liveEnabled = liveRequested && Boolean(process.env.OPENAI_API_KEY)
 
   if (liveRequested && !process.env.OPENAI_API_KEY) {
     return NextResponse.json({ error: '真实模型模式缺少服务端模型密钥。' }, { status: 503, headers: noStoreHeaders() })
@@ -111,9 +132,16 @@ export async function POST(request: Request) {
   }
 
   const planner = liveEnabled
-    ? createOpenAiPlanner({ apiKey: process.env.OPENAI_API_KEY!, model: process.env.OPENAI_AGENT_MODEL })
+    ? createOpenAiPlanner({ apiKey: process.env.OPENAI_API_KEY!, model: resumeFrom?.model ?? process.env.OPENAI_AGENT_MODEL })
     : createFixturePlanner()
-  const result = await runServerAgent({ goal: input.data.goal, planner })
+  const goal = resumeFrom?.goal ?? ('goal' in input.data ? input.data.goal : '')
+  const result = await runServerAgent({
+    goal,
+    planner,
+    runId: 'runId' in input.data ? input.data.runId : undefined,
+    resumeFrom: resumeFrom ?? undefined,
+    onCheckpoint: store.mode === 'disabled' ? undefined : (checkpoint) => store.saveCheckpoint(checkpoint).then(() => undefined)
+  })
   const baseResult = { ...result, rateLimit }
   let responseResult = baseResult
 

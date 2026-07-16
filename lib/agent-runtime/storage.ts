@@ -1,4 +1,4 @@
-import type { RuntimePersistence, RuntimeRunResult } from './contracts'
+import type { RuntimeCheckpoint, RuntimePersistence, RuntimeRunResult } from './contracts'
 import { createRedisRestClient, resolveRedisRestConfig, type RedisRestClient } from './redis-rest'
 
 export type RuntimeStorageMode = 'redis' | 'memory' | 'disabled'
@@ -13,10 +13,13 @@ const RUN_TTL_SECONDS = 24 * 60 * 60
 
 const globalStorage = globalThis as typeof globalThis & {
   __liujixueAgentRuns?: Map<string, StoredRun>
+  __liujixueAgentCheckpoints?: Map<string, RuntimeCheckpoint>
 }
 
 const memoryRuns = globalStorage.__liujixueAgentRuns ?? new Map<string, StoredRun>()
 globalStorage.__liujixueAgentRuns = memoryRuns
+const memoryCheckpoints = globalStorage.__liujixueAgentCheckpoints ?? new Map<string, RuntimeCheckpoint>()
+globalStorage.__liujixueAgentCheckpoints = memoryCheckpoints
 
 function persistenceFor(mode: RuntimeStorageMode): RuntimePersistence {
   if (mode === 'redis') return 'redis-24h'
@@ -71,6 +74,28 @@ export function createRuntimeStore(options: {
         return null
       }
       return record
+    },
+    async saveCheckpoint(checkpoint: RuntimeCheckpoint) {
+      if (mode === 'disabled') return false
+      if (redis) {
+        await redis.command('SET', `agent:checkpoint:${checkpoint.runId}`, JSON.stringify(checkpoint), 'EX', RUN_TTL_SECONDS)
+      } else {
+        memoryCheckpoints.set(checkpoint.runId, checkpoint)
+      }
+      return true
+    },
+    async getCheckpoint(runId: string): Promise<RuntimeCheckpoint | null> {
+      if (mode === 'disabled') return null
+      if (redis) {
+        const value = await redis.command<string | null>('GET', `agent:checkpoint:${runId}`)
+        if (!value) return null
+        try {
+          return JSON.parse(value) as RuntimeCheckpoint
+        } catch {
+          throw new Error('运行检查点无法解析')
+        }
+      }
+      return memoryCheckpoints.get(runId) ?? null
     }
   }
 }

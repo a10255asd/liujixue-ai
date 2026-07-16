@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-阶段 6.2A 已完成，但项目仍为 `prototype`：
+阶段 6.2B-1 已完成，但项目仍为 `prototype`：
 
 - 新增 `POST /api/agent/run` 服务端运行入口。
 - 新增 `search_knowledge` 与 `inspect_project_evidence` 两个真实只读工具。
@@ -16,10 +16,13 @@
 - 新增固定窗口 API 限流；Redis 模式使用单次原子脚本计数。
 - 新增 24 小时 Redis 运行仓储和单条 `runId` 回放接口。
 - 真实模型模式缺少 Redis 持久化限流时会拒绝启动，不允许静默降级。
+- 每个工具结果后保存版本化检查点，支持通过 `resumeRunId` 从下一规划轮次继续。
+- 客户端预生成 `runId` 并保留失败任务，恢复时先读取已完成结果，再尝试继续检查点。
+- 新增 20 条真实模型基线命令，采集精确工具序列、完成率、延迟、Token 和 request id。
 - 原五类权限、预算、重试、审批和副作用轨迹继续作为安全回归基线。
 - 1440px 与 390px 已完成真实浏览器验收，服务端运行返回 2 个工具结果和 8 条事件。
 
-未完成：Vercel Redis 实例配置、真实模型生产实测、中断续跑、身份隔离、受审批写工具和成本基线。因此不得改为 `verified`。
+未完成：Vercel Redis 实例配置、真实模型生产实测、跨实例恢复冒烟、身份隔离、受审批写工具和成本基线。因此不得改为 `verified`。
 
 ## 目录边界
 
@@ -37,6 +40,8 @@ lib/agent-runtime/evaluation.ts         规划契约评测
 lib/agent-runtime/redis-rest.ts         Upstash/Vercel Redis REST 命令适配
 lib/agent-runtime/rate-limit.ts         内存/Redis 固定窗口限流
 lib/agent-runtime/storage.ts            响应内/内存/Redis 运行仓储
+lib/agent-runtime/baseline.ts           20 条统一基线指标与样本报告
+scripts/run-agent-baseline.ts           真实模型基线命令和 JSON 产物
 tests/agent-runtime.test.ts             运行时单元测试
 tests/agent-runtime-infrastructure.test.ts
                                         限流、Redis 命令和回放测试
@@ -105,7 +110,7 @@ OPENAI_AGENT_MODEL=gpt-5.6-luna
 - `usage`
 - `persistence`、`replayUrl` 与 `rateLimit`
 
-Redis 已配置时返回 `persistence: redis-24h` 和回放地址；生产未配置 Redis 时必须返回 `response-only`。当前只能回放已完成运行，尚不能从中断步骤继续执行。
+Redis 已配置时返回 `persistence: redis-24h` 和回放地址；生产未配置 Redis 时必须返回 `response-only`。客户端可携带预生成的 `runId` 创建任务，失败后用 `{ "resumeRunId": "..." }` 从最后一个已确认工具结果继续。
 
 ## 验证记录
 
@@ -127,18 +132,19 @@ npm run test:e2e
 - Playwright 49 项通过、1 项按设备条件跳过。
 - 真实浏览器 1440px 与 390px 均无横向溢出。
 
-## 阶段 6.2A 验证
+## 阶段 6.2B-1 验证
 
 - TypeScript 检查通过。
-- 46 项单元测试通过，其中 6 项覆盖 Redis 命令格式、固定窗口限流和运行回放。
+- 50 项单元测试通过，新增覆盖中断恢复不重复工具、版本化检查点、request id 采集和 20 条基线报告。
+- `npm run eval:agent:live` 在缺少模型密钥时按预期失败，不生成伪造报告。
 - 运维与环境变量说明见 `docs/AGENT_RUNTIME_OPERATIONS.md`。
 
 ## 下一步唯一主线
 
-阶段 6.2B 按以下顺序执行：
+阶段 6.2B-2 按以下顺序执行：
 
 1. 在 Vercel Marketplace 配置 Upstash Redis，完成生产限流和 24 小时回放冒烟。
 2. 配置生产模型密钥，把 20 条夹具升级为真实模型基线；采集成功率、工具选择、延迟、Token、成本和 request id。
-3. 将完成后保存升级为逐步骤保存，验证中断后续跑和轨迹重放。
+3. 在生产 Redis 上验证跨实例中断续跑和轨迹重放。
 4. 增加身份隔离和一个受审批保护的写工具，验证幂等键、副作用确认和失败补偿。
 5. 完成监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。
