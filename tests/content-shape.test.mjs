@@ -117,8 +117,9 @@ test('practical projects include resume value and honest delivery evidence', () 
     }
   }
 
-  assert.equal(projects.filter((project) => project.deliveryStatus === 'prototype').length, 2)
+  assert.equal(projects.filter((project) => project.deliveryStatus === 'prototype').length, 3)
   assert.equal(projects.filter((project) => project.deliveryStatus === 'verified').length, 0)
   assert.equal(projects.find((project) => project.slug === 'prompt-debugger')?.evidence.demoPath, '/labs/prompt-regression')
   assert.equal(projects.find((project) => project.slug === 'rag-knowledge-base')?.evidence.demoPath, '/labs/rag-retrieval')
+  assert.equal(projects.find((project) => project.slug === 'task-planning-agent')?.evidence.demoPath, '/labs/controlled-agent')
 })

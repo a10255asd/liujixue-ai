@@ -241,14 +241,14 @@
     "slug": "task-planning-agent",
     "title": "受控任务执行 Agent",
     "level": "高级",
-    "deliveryStatus": "blueprint",
-    "summary": "把模糊目标拆成步骤，按权限调用工具并保留可恢复的执行记录。",
+    "deliveryStatus": "prototype",
+    "summary": "用显式状态机控制计划、工具调用、重试、审批和终止，并保留可回放的确定性执行轨迹。",
     "targetUser": "需要自动化多步骤内部流程的团队。",
     "stack": [
-      "Python",
-      "OpenAI Agents SDK",
-      "PostgreSQL",
-      "Redis"
+      "Next.js",
+      "TypeScript",
+      "Zod",
+      "Node Test"
     ],
     "features": [
       "任务拆解",
@@ -300,9 +300,19 @@
       "agent-tool-permissions"
     ],
     "evidence": {
-      "summary": "当前仅完成状态机、工具权限和验收方案，尚无对应代码仓库、可运行 Demo 或测试输出。",
-      "commands": [],
-      "artifacts": []
+      "summary": "站内已提供确定性受控 Agent 原型，覆盖正常完成、临时故障恢复、越权拦截、步数预算终止和高风险人工审批五类轨迹；暂未接入模型、数据库和真实外部工具。",
+      "repositoryUrl": "https://github.com/a10255asd/liujixue-ai",
+      "demoPath": "/labs/controlled-agent",
+      "verifiedAt": "2026-07-16",
+      "commands": [
+        "npm run test:unit",
+        "npm run build"
+      ],
+      "artifacts": [
+        "显式状态机与工具权限守卫",
+        "幂等重试、步数预算和审批双分支测试",
+        "五类确定性轨迹回放与双端验收"
+      ]
     },
     "status": "published",
     "lastReviewedAt": "2026-07-15",

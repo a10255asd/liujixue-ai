@@ -11,6 +11,7 @@ const routes = [
   '/projects',
   '/labs/prompt-regression',
   '/labs/rag-retrieval',
+  '/labs/controlled-agent',
   '/resources',
   '/journal'
 ]
@@ -73,14 +74,14 @@ test('training workspace restores selected track and local progress', async ({ p
 
 test('project catalog separates runnable evidence from blueprints', async ({ page }) => {
   await page.goto('/projects')
-  await expect(page.locator('.delivery-badge--prototype')).toHaveCount(2)
-  await expect(page.locator('.delivery-badge--blueprint')).toHaveCount(4)
+  await expect(page.locator('.delivery-badge--prototype')).toHaveCount(3)
+  await expect(page.locator('.delivery-badge--blueprint')).toHaveCount(3)
 
   await page.goto('/projects/prompt-debugger')
   await expect(page.getByRole('link', { name: /运行原型/ })).toBeVisible()
   await expect(page.getByText('固定响应夹具')).toBeVisible()
 
-  await page.goto('/projects/task-planning-agent')
+  await page.goto('/projects/agent-evaluation-console')
   await expect(page.getByText('尚无可执行命令')).toBeVisible()
   await expect(page.getByRole('link', { name: /运行原型/ })).toHaveCount(0)
 })
@@ -109,4 +110,21 @@ test('RAG prototype returns stable citations and rejects unsupported questions',
   await page.getByRole('button', { name: '检索并生成引用答案' }).click()
   await expect(page.getByTestId('rag-answer')).toContainText('指数退避')
   await expect(page.getByTestId('rag-citation')).toHaveCount(2)
+})
+
+test('controlled Agent prototype enforces budget and human approval gates', async ({ page }) => {
+  await page.goto('/labs/controlled-agent')
+  await expect(page.getByTestId('agent-state')).toContainText('已完成')
+
+  await page.getByRole('tab', { name: /步数预算终止/ }).click()
+  await expect(page.getByTestId('agent-state')).toContainText('预算终止')
+  await expect(page.getByTestId('agent-trace')).toContainText('步数预算耗尽')
+
+  await page.getByRole('tab', { name: /高风险人工审批/ }).click()
+  await expect(page.getByTestId('agent-state')).toContainText('等待审批')
+  await expect(page.getByTestId('agent-side-effects')).toHaveText('0')
+
+  await page.getByRole('button', { name: '批准一次执行' }).click()
+  await expect(page.getByTestId('agent-state')).toContainText('已完成')
+  await expect(page.getByTestId('agent-side-effects')).toHaveText('1')
 })
