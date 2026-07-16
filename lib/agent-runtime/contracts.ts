@@ -8,6 +8,7 @@ export const runtimeToolNameSchema = z.enum(['search_knowledge', 'inspect_projec
 
 export type RuntimeToolName = z.infer<typeof runtimeToolNameSchema>
 export type RuntimeMode = 'fixture' | 'openai'
+export type RuntimePersistence = 'response-only' | 'ephemeral-memory' | 'redis-24h'
 
 export type RuntimeToolCall = {
   callId: string
@@ -51,7 +52,14 @@ export type RuntimeRunResult = {
   observations: RuntimeToolObservation[]
   trace: RuntimeTraceEvent[]
   usage: RuntimeUsage
-  persistence: 'response-only'
+  persistence: RuntimePersistence
+  replayUrl?: string
+  rateLimit?: {
+    mode: 'redis' | 'memory'
+    limit: number
+    remaining: number
+    resetAt: number
+  }
 }
 
 export type PlannerTurn = {

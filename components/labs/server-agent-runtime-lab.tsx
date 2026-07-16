@@ -62,6 +62,11 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
   const [run, setRun] = useState<RuntimeRunResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const persistenceLabel = run?.persistence === 'redis-24h'
+    ? 'Redis 保存 24 小时，可按 runId 回放'
+    : run?.persistence === 'ephemeral-memory'
+      ? '开发进程内临时回放'
+      : '仅保留在本次响应中'
 
   async function startRun() {
     setLoading(true)
@@ -125,7 +130,7 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
           <div className="runtime-guardrails">
             <div><ShieldCheck size={16} /><span>仅开放 <code>knowledge:read</code> 与 <code>projects:read</code></span></div>
             <div><TerminalSquare size={16} /><span>最多 4 个工具步，参数不符合 Schema 时直接失败</span></div>
-            <div><Database size={16} /><span>当前运行只随响应返回，尚未接持久化恢复</span></div>
+            <div data-testid="runtime-persistence"><Database size={16} /><span>{run ? persistenceLabel : '仓储能力由服务端环境决定，页面不预设持久化'}</span></div>
           </div>
         </div>
 
@@ -140,7 +145,7 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
                 <div><span data-testid="runtime-provider">{run.mode === 'openai' ? 'OPENAI RESPONSES' : 'SERVER FIXTURE'}</span><h3 data-testid="runtime-status">{run.status === 'completed' ? '运行完成' : '运行已停止'}</h3></div>
                 <dl>
                   <div><dt>工具步数</dt><dd>{run.stepsUsed}/{run.maxSteps}</dd></div>
-                  <div><dt>总 Token</dt><dd>{run.usage.totalTokens}</dd></div>
+                  <div><dt>{run.rateLimit ? '本窗口余量' : '总 Token'}</dt><dd>{run.rateLimit ? run.rateLimit.remaining : run.usage.totalTokens}</dd></div>
                 </dl>
               </header>
               <p className="runtime-summary" data-testid="runtime-summary">{run.summary}</p>

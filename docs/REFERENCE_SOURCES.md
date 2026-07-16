@@ -24,6 +24,8 @@
 - OpenAI Agents SDK Tracing：`https://openai.github.io/openai-agents-python/tracing/`
 - OpenAI Function Calling：`https://developers.openai.com/api/docs/guides/function-calling`
 - OpenAI 最新模型指南：`https://developers.openai.com/api/docs/guides/latest-model.md`
+- Upstash Redis REST API：`https://upstash.com/docs/redis/features/restapi`
+- Vercel Redis 集成：`https://vercel.com/docs/redis`
 - Model Context Protocol Docs：`https://modelcontextprotocol.io/docs`
 - Model Context Protocol Architecture：`https://modelcontextprotocol.io/docs/learn/architecture`
 - Vercel AI SDK Docs：`https://ai-sdk.dev/docs`

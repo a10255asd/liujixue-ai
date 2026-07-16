@@ -137,6 +137,7 @@ test('controlled Agent prototype enforces budget and human approval gates', asyn
   await expect(page.getByTestId('runtime-observation')).toHaveCount(2)
   await expect(page.getByTestId('runtime-summary')).toContainText('受控任务执行 Agent')
   await expect(page.getByTestId('runtime-summary')).toContainText('prototype')
+  await expect(page.getByTestId('runtime-persistence')).toContainText(/临时回放|本次响应|Redis/)
 
   await expect(page.getByTestId('agent-state')).toContainText('已完成')
 
