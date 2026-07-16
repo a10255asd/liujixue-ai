@@ -15,7 +15,9 @@
     "validate:content": "tsx scripts/validate-content.ts",
     "test:unit": "tsx --test tests/*.test.mjs tests/*.test.ts",
     "test:e2e": "playwright test",
-    "eval:agent:live": "tsx scripts/run-agent-baseline.ts"
+    "eval:agent:live": "tsx scripts/run-agent-baseline.ts",
+    "smoke:agent:production": "tsx scripts/smoke-agent-production.ts",
+    "smoke:agent:release": "AGENT_SMOKE_REQUIRE_READY=1 tsx scripts/smoke-agent-production.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

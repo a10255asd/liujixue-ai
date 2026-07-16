@@ -1,12 +1,12 @@
 # Agent Runtime Verified 候选
 
-更新时间：2026-07-16
+更新时间：2026-07-17
 
 本文档是“受控任务执行 Agent”从 `prototype` 走向 `verified` 的专项交接文件。项目总成熟度仍以 `PROJECT_EVIDENCE_AUDIT.md` 为准。
 
 ## 当前状态
 
-阶段 6.2B-2A 已完成，但项目仍为 `prototype`：
+阶段 6.2B-2A 已完成，6.2B-2B 进行中，但项目仍为 `prototype`：
 
 - 新增 `POST /api/agent/run` 服务端运行入口。
 - 新增 `search_knowledge` 与 `inspect_project_evidence` 两个真实只读工具。
@@ -19,6 +19,7 @@
 - 每个工具结果后保存版本化检查点，支持通过 `resumeRunId` 从下一规划轮次继续。
 - 客户端预生成 `runId` 并保留失败任务，恢复时先读取已完成结果，再尝试继续检查点。
 - 新增 20 条真实模型基线命令，采集精确工具序列、完成率、延迟、Token 和 request id。
+- 新增机器可读生产冒烟与发布门禁，覆盖能力探针、同会话回放、跨会话拒绝、审批写入和重复审批拦截。
 - 新增服务端 HMAC 签名会话；生产缺少 `AGENT_SESSION_SECRET` 时自动关闭身份相关能力。
 - 运行、检查点和学习笔记均按 actor 哈希隔离，跨会话 `runId` 无法回放。
 - `RuntimeCheckpoint v2` 支持 `waiting_approval`，写入前暂停并展示精确副作用。
@@ -47,7 +48,9 @@ lib/agent-runtime/redis-rest.ts         Upstash/Vercel Redis REST 命令适配
 lib/agent-runtime/rate-limit.ts         内存/Redis 固定窗口限流
 lib/agent-runtime/storage.ts            响应内/内存/Redis 运行仓储
 lib/agent-runtime/baseline.ts           20 条统一基线指标与样本报告
+lib/agent-runtime/production-smoke.ts   生产可用性与完整发布门禁
 scripts/run-agent-baseline.ts           真实模型基线命令和 JSON 产物
+scripts/smoke-agent-production.ts       线上冒烟 CLI 与可选 JSON 留档
 tests/agent-runtime.test.ts             运行时单元测试
 tests/agent-runtime-infrastructure.test.ts
                                         限流、Redis 命令和回放测试
@@ -146,19 +149,23 @@ npm run test:e2e
 - Playwright 49 项通过、1 项按设备条件跳过。
 - 真实浏览器 1440px 与 390px 均无横向溢出。
 
-## 阶段 6.2B-2A 验证
+## 阶段 6.2B-2B 当前验证
 
 - TypeScript 检查通过。
-- 54 项单元测试通过，新增覆盖签名篡改、跨租户回放、审批前零副作用、批准幂等和拒绝终止。
+- 57 项单元测试通过，新增覆盖安全只读冒烟、完整发布门禁和未配置时失败关闭。
 - 桌面与移动浏览器均通过完整写入审批流程；本地 HTTP 与生产 HTTPS 使用匹配协议的 Cookie 安全属性。
+- `npm run smoke:agent:production` 在线通过，`safeToServe: true`。
+- `npm run smoke:agent:release` 按预期退出 1，明确标记 Redis、签名身份与写工具尚未启用。
 - `npm run eval:agent:live` 在缺少模型密钥时按预期失败，不生成伪造报告。
 - 运维与环境变量说明见 `docs/AGENT_RUNTIME_OPERATIONS.md`。
+- 当前生产事实、Marketplace 条款阻塞和回滚 deployment 见 `docs/AGENT_RUNTIME_RELEASE_RECORD.md`。
 
 ## 下一步唯一主线
 
 阶段 6.2B-2B 按以下顺序执行：
 
-1. 在 Vercel Marketplace 配置 Upstash Redis，完成生产限流和 24 小时回放冒烟。
-2. 配置生产模型密钥，把 20 条夹具升级为真实模型基线；采集成功率、工具选择、延迟、Token、成本和 request id。
-3. 在生产 Redis 上验证跨实例中断续跑和轨迹重放。
-4. 完成监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。
+1. 账户所有者接受 Upstash Marketplace 条款后，在 Vercel 配置免费 Redis；确认关闭自动升级。
+2. 配置 `AGENT_SESSION_SECRET` 并重新部署，执行完整发布门禁。
+3. 在生产 Redis 上验证同会话回放、跨会话拒绝、跨实例中断续跑和审批写入幂等。
+4. 门禁通过后再配置生产模型密钥，把 20 条夹具升级为真实模型基线；采集成功率、工具选择、延迟、Token、成本和 request id。
+5. 保留监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。

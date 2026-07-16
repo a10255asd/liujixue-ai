@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-16T23:00:12.052Z",
+  "target": "https://ai.liujixue.cn",
+  "expectation": "safe-readonly",
+  "capability": {
+    "plannerMode": "fixture",
+    "openAiConfigured": false,
+    "rateLimitMode": "memory",
+    "storageMode": "disabled",
+    "identityMode": "disabled",
+    "writeToolsEnabled": false
+  },
+  "safeToServe": true,
+  "releaseReady": false,
+  "expectationPassed": true,
+  "checks": [
+    {
+      "id": "capability-http",
+      "passed": true,
+      "gate": "always",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "planner-declared",
+      "passed": true,
+      "gate": "always",
+      "detail": "planner=fixture"
+    },
+    {
+      "id": "signed-session",
+      "passed": false,
+      "gate": "release",
+      "detail": "identity=disabled"
+    },
+    {
+      "id": "redis-storage",
+      "passed": false,
+      "gate": "release",
+      "detail": "storage=disabled, limiter=memory"
+    },
+    {
+      "id": "write-tool-enabled",
+      "passed": false,
+      "gate": "release",
+      "detail": "writeToolsEnabled=false"
+    },
+    {
+      "id": "read-run-http",
+      "passed": true,
+      "gate": "always",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "read-run-completed",
+      "passed": true,
+      "gate": "always",
+      "detail": "status=completed"
+    },
+    {
+      "id": "read-tool-boundary",
+      "passed": true,
+      "gate": "always",
+      "detail": "tools=inspect_project_evidence"
+    },
+    {
+      "id": "same-session-replay",
+      "passed": false,
+      "gate": "release",
+      "detail": "runtime prerequisites disabled"
+    },
+    {
+      "id": "cross-session-denied",
+      "passed": false,
+      "gate": "release",
+      "detail": "runtime prerequisites disabled"
+    },
+    {
+      "id": "write-waits-for-approval",
+      "passed": false,
+      "gate": "release",
+      "detail": "runtime prerequisites disabled"
+    },
+    {
+      "id": "approved-write-once",
+      "passed": false,
+      "gate": "release",
+      "detail": "runtime prerequisites disabled"
+    },
+    {
+      "id": "duplicate-approval-blocked",
+      "passed": false,
+      "gate": "release",
+      "detail": "runtime prerequisites disabled"
+    }
+  ]
+}

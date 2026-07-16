@@ -1,6 +1,6 @@
 # Agent Runtime 运维手册
 
-更新时间：2026-07-16
+更新时间：2026-07-17
 
 本文只描述 `POST /api/agent/run` 的生产配置、检查和回滚，不替代功能设计文档。
 
@@ -65,6 +65,24 @@ npm run eval:agent:live
 
 ## 冒烟检查
 
+首选机器可读命令：
+
+```bash
+# 当前公开服务可用性；允许安全只读模式
+npm run smoke:agent:production
+
+# 完整发布门禁；Redis、签名身份、隔离回放和审批写入必须全部通过
+npm run smoke:agent:release
+
+# 需要留档时显式指定输出位置
+AGENT_SMOKE_OUTPUT=docs/evidence/agent-runtime-production-smoke-YYYY-MM-DD.json \
+  npm run smoke:agent:production
+```
+
+完整发布门禁会验证同会话回放、跨会话拒绝、审批前零副作用、批准后单次写入和重复审批拦截。报告不得包含 Cookie 或服务端凭据。
+
+手工检查可使用：
+
 ```bash
 COOKIE_JAR="$(mktemp)"
 curl -sS -c "$COOKIE_JAR" https://ai.liujixue.cn/api/agent/run
@@ -101,3 +119,11 @@ curl -i -b "$COOKIE_JAR" -c "$COOKIE_JAR" -X POST https://ai.liujixue.cn/api/age
 4. 若 Redis 本身故障，移除 Redis 环境变量后重新部署；公开夹具模式会退回基础限流与响应内记录。
 
 不得通过把服务端 Token 暴露到浏览器来绕过故障。
+
+## 监控边界
+
+- 使用 `vercel alerts --project liujixue-ai --since 24h --format json` 检查告警组。
+- 使用 `vercel alerts rules ls --format json` 检查默认告警规则。
+- 当前账户的函数级 `vercel metrics` 需要 Observability Plus；未明确批准付费升级前不启用。
+- 零成本持续检查以 `npm run smoke:agent:production` 为准，发布前以 `npm run smoke:agent:release` 为准。
+- 当前线上证据和精确续接步骤见 `docs/AGENT_RUNTIME_RELEASE_RECORD.md`。
