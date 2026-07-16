@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-16T23:15:38.102Z",
+  "target": "https://ai.liujixue.cn",
+  "expectation": "runtime-ready",
+  "capability": {
+    "plannerMode": "fixture",
+    "openAiConfigured": false,
+    "rateLimitMode": "redis",
+    "storageMode": "redis",
+    "identityMode": "signed-session",
+    "writeToolsEnabled": true
+  },
+  "safeToServe": true,
+  "releaseReady": true,
+  "expectationPassed": true,
+  "checks": [
+    {
+      "id": "capability-http",
+      "passed": true,
+      "gate": "always",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "planner-declared",
+      "passed": true,
+      "gate": "always",
+      "detail": "planner=fixture"
+    },
+    {
+      "id": "signed-session",
+      "passed": true,
+      "gate": "release",
+      "detail": "identity=signed-session"
+    },
+    {
+      "id": "redis-storage",
+      "passed": true,
+      "gate": "release",
+      "detail": "storage=redis, limiter=redis"
+    },
+    {
+      "id": "write-tool-enabled",
+      "passed": true,
+      "gate": "release",
+      "detail": "writeToolsEnabled=true"
+    },
+    {
+      "id": "read-run-http",
+      "passed": true,
+      "gate": "always",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "read-run-completed",
+      "passed": true,
+      "gate": "always",
+      "detail": "status=completed"
+    },
+    {
+      "id": "read-tool-boundary",
+      "passed": true,
+      "gate": "always",
+      "detail": "tools=inspect_project_evidence"
+    },
+    {
+      "id": "same-session-replay",
+      "passed": true,
+      "gate": "release",
+      "detail": "HTTP 200"
+    },
+    {
+      "id": "cross-session-denied",
+      "passed": true,
+      "gate": "release",
+      "detail": "HTTP 404"
+    },
+    {
+      "id": "write-waits-for-approval",
+      "passed": true,
+      "gate": "release",
+      "detail": "HTTP 202, status=waiting_approval"
+    },
+    {
+      "id": "approved-write-once",
+      "passed": true,
+      "gate": "release",
+      "detail": "HTTP 200, writes=1"
+    },
+    {
+      "id": "duplicate-approval-blocked",
+      "passed": true,
+      "gate": "release",
+      "detail": "HTTP 409"
+    }
+  ]
+}

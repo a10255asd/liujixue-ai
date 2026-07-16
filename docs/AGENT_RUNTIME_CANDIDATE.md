@@ -28,7 +28,7 @@
 - 原五类权限、预算、重试、审批和副作用轨迹继续作为安全回归基线。
 - 1440px 与 390px 已完成真实浏览器验收，服务端运行返回 2 个工具结果和 8 条事件。
 
-未完成：Vercel Redis 实例配置、生产签名身份冒烟、真实模型生产实测、跨实例恢复冒烟和成本基线。因此不得改为 `verified`。
+已完成：Vercel Redis、生产签名身份、同会话回放、跨会话拒绝、审批幂等和跨 deployment 恢复。未完成真实模型生产实测与成本基线，因此不得改为 `verified`。
 
 ## 目录边界
 
@@ -155,17 +155,17 @@ npm run test:e2e
 - 57 项单元测试通过，新增覆盖安全只读冒烟、完整发布门禁和未配置时失败关闭。
 - 桌面与移动浏览器均通过完整写入审批流程；本地 HTTP 与生产 HTTPS 使用匹配协议的 Cookie 安全属性。
 - `npm run smoke:agent:production` 在线通过，`safeToServe: true`。
-- `npm run smoke:agent:release` 按预期退出 1，明确标记 Redis、签名身份与写工具尚未启用。
+- `npm run smoke:agent:release` 在线通过，`releaseReady: true`；Redis、签名身份、隔离回放和审批幂等全部通过。
+- 等待审批的运行从 deployment `dpl_7fySDLCwvvr5Kv7gmKN7CEKXF4o3` 跨部署恢复到 `dpl_6dsZCg1gLtqK8dcxGB85Gzj6EMyt`，批准后只写入一次，重复审批返回 409。
 - `npm run eval:agent:live` 在缺少模型密钥时按预期失败，不生成伪造报告。
 - 运维与环境变量说明见 `docs/AGENT_RUNTIME_OPERATIONS.md`。
-- 当前生产事实、Marketplace 条款阻塞和回滚 deployment 见 `docs/AGENT_RUNTIME_RELEASE_RECORD.md`。
+- 当前生产事实、Redis 资源、发布证据和回滚 deployment 见 `docs/AGENT_RUNTIME_RELEASE_RECORD.md`。
 
 ## 下一步唯一主线
 
 阶段 6.2B-2B 按以下顺序执行：
 
-1. 账户所有者接受 Upstash Marketplace 条款后，在 Vercel 配置免费 Redis；确认关闭自动升级。
-2. 配置 `AGENT_SESSION_SECRET` 并重新部署，执行完整发布门禁。
-3. 在生产 Redis 上验证同会话回放、跨会话拒绝、跨实例中断续跑和审批写入幂等。
-4. 门禁通过后再配置生产模型密钥，把 20 条夹具升级为真实模型基线；采集成功率、工具选择、延迟、Token、成本和 request id。
-5. 保留监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。
+1. 账户所有者配置服务端 `OPENAI_API_KEY`；密钥不得进入仓库、浏览器或聊天记录。
+2. 配置 `AGENT_RUNTIME_MODE=openai` 与明确模型后重新部署，先重跑完整发布门禁。
+3. 把 20 条夹具升级为真实模型基线，采集成功率、工具选择、延迟、Token、成本和 request id。
+4. 保留失败样本、监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。

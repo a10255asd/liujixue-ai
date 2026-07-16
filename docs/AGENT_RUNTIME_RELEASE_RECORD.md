@@ -9,17 +9,23 @@
 | 项目 | 结果 |
 | --- | --- |
 | 生产域名 | `https://ai.liujixue.cn` |
+| 当前生产 deployment | `dpl_6dsZCg1gLtqK8dcxGB85Gzj6EMyt` |
+| 当前代码提交 | `e7dbec8` |
 | 记录建立时的稳定回滚 deployment | `dpl_CiQKaNAyFeTo824QLtXmv85bFgxD` |
 | 回滚基线代码提交 | `76c4262` |
 | 安全只读冒烟 | 通过，`safeToServe: true` |
-| 完整发布门禁 | 未通过，`releaseReady: false` |
+| 完整发布门禁 | 通过，`releaseReady: true` |
 | 规划器 | `fixture` |
-| 限流 | `memory` |
-| 运行仓储 | `disabled` |
-| 签名身份 | `disabled` |
-| 写工具 | `disabled` |
+| 限流 | `redis` |
+| 运行仓储 | `redis`，完成运行保留 24 小时 |
+| 签名身份 | `signed-session` |
+| 写工具 | `enabled`，逐次审批 |
 
-机器可读证据：`docs/evidence/agent-runtime-production-smoke-2026-07-17.json`。
+机器可读证据：
+
+- 安全降级历史基线：`docs/evidence/agent-runtime-production-smoke-2026-07-17.json`
+- 完整生产门禁：`docs/evidence/agent-runtime-production-release-2026-07-17.json`
+- 跨 deployment 恢复：`docs/evidence/agent-runtime-cross-deployment-2026-07-17.json`
 
 ## Redis 配置进度
 
@@ -34,14 +40,15 @@ autoUpgrade=false
 environments=production,preview,development
 ```
 
-2026-07-17 创建时 Vercel 要求账户所有者在浏览器接受 Upstash Marketplace 条款。AI 未代替用户接受法律条款，因此：
+2026-07-17 账户所有者完成 Marketplace 条款确认后，原创建命令成功完成。当前事实：
 
-- Marketplace installation 尚未创建。
-- Redis resource 尚未创建。
-- 项目环境变量仍为空。
-- 没有产生费用，也没有开启自动升级。
+- Marketplace installation：`icfg_2CmfGW9WTwCHFpdgLkORTk5u`。
+- Redis resource：`store_dMdzN4C6VcNfhYMC`，名称 `liujixue-ai-runtime`，状态 `available`。
+- 创建命令使用 `free` 计划并显式传入 `autoUpgrade=false`。
+- Redis/KV 环境变量已注入 Production、Preview 和 Development。
+- `AGENT_SESSION_SECRET` 已作为 Production Sensitive 变量配置，实际值未写入仓库或证据文件。
 
-条款由用户接受后，在项目目录重跑：
+资源重建时使用：
 
 ```bash
 vercel integration add upstash/upstash-kv \
@@ -64,13 +71,11 @@ vercel integration add upstash/upstash-kv \
 
 ## 唯一续接顺序
 
-1. 用户接受 Upstash 条款后重跑免费资源命令。
-2. 确认 `vercel env ls` 出现 Redis REST URL 与 Token。
-3. 生成至少 32 字节随机值，配置 `AGENT_SESSION_SECRET`，重新部署。
-4. 运行 `npm run smoke:agent:release`，必须验证同会话回放、跨会话拒绝、审批前零副作用、批准后单次写入和重复审批拦截。
-5. 只有第 4 步通过后才配置 `OPENAI_API_KEY` 与 `AGENT_RUNTIME_MODE=openai`。
-6. 执行 `npm run eval:agent:live` 获取 20 条真实模型报告。
-7. 真实报告未全通过前，项目继续保持 `prototype`。
+1. 由账户所有者把 `OPENAI_API_KEY` 配置为 Production Sensitive 变量；不要写进仓库、浏览器或聊天记录。
+2. 配置 `AGENT_RUNTIME_MODE=openai` 和明确的 `OPENAI_AGENT_MODEL` 后重新部署。
+3. 先运行 `npm run smoke:agent:release`，再执行 `npm run eval:agent:live` 获取 20 条真实模型报告。
+4. 报告必须记录成功率、工具选择、延迟、Token、成本和 request id；失败样本需保留原始错误边界。
+5. 真实报告未全通过、成本基线未记录前，项目继续保持 `prototype`。
 
 ## 回滚基线
 

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-16T23:18:59.436Z",
+  "target": "https://ai.liujixue.cn",
+  "runId": "9cb1398d-f170-4c82-8e34-281b85b78617",
+  "preparedOnDeployment": "dpl_7fySDLCwvvr5Kv7gmKN7CEKXF4o3",
+  "completedOnDeployment": "dpl_6dsZCg1gLtqK8dcxGB85Gzj6EMyt",
+  "prepareHttpStatus": 202,
+  "prepareRunStatus": "waiting_approval",
+  "completionHttpStatus": 200,
+  "completionRunStatus": "completed",
+  "persistence": "redis-24h",
+  "writeCreated": true,
+  "writeObservationCount": 1,
+  "duplicateApprovalHttpStatus": 409,
+  "passed": true,
+  "secretMaterialRecorded": false
+}
