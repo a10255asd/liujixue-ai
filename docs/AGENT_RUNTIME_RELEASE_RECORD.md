@@ -9,8 +9,8 @@
 | 项目 | 结果 |
 | --- | --- |
 | 生产域名 | `https://ai.liujixue.cn` |
-| 当前生产 deployment | `dpl_6dsZCg1gLtqK8dcxGB85Gzj6EMyt` |
-| 当前代码提交 | `e7dbec8` |
+| 最后验证的生产 deployment | `dpl_3r26syMxgjNXgXdd4j2UAj14DaUz` |
+| 已验证的 Agent 运行时代码提交 | `c458ef8` |
 | 记录建立时的稳定回滚 deployment | `dpl_CiQKaNAyFeTo824QLtXmv85bFgxD` |
 | 回滚基线代码提交 | `76c4262` |
 | 安全只读冒烟 | 通过，`safeToServe: true` |
@@ -20,6 +20,8 @@
 | 运行仓储 | `redis`，完成运行保留 24 小时 |
 | 签名身份 | `signed-session` |
 | 写工具 | `enabled`，逐次审批 |
+
+以上 deployment 是 2026-07-17 最后一次完整门禁的验证目标，不作为永久固定的线上版本号；后续页面部署可以更新 deployment，但不得跳过同一套发布门禁。
 
 机器可读证据：
 

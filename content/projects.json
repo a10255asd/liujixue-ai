@@ -300,10 +300,10 @@
       "agent-tool-permissions"
     ],
     "evidence": {
-      "summary": "站内已提供服务端 Agent 运行 API，能够通过严格工具 Schema 和权限守卫读取真实证据，并具备签名会话隔离、Checkpoint v2、断点恢复和受审批的幂等学习笔记写入；同时保留五类安全轨迹与 20 条真实模型基线命令。生产尚未配置签名密钥、Redis 与模型密钥，缺少跨实例恢复和真实报告，因此仍为 prototype。",
+      "summary": "站内已提供服务端 Agent 运行 API，能够通过严格工具 Schema 和权限守卫读取真实证据，并具备签名会话隔离、Checkpoint v2、Redis 断点恢复和受审批的幂等学习笔记写入。生产发布门禁与跨部署恢复已经验证通过；当前仅缺真实模型密钥和 Schema v2 的 20 条在线基线报告，因此仍为 prototype。",
       "repositoryUrl": "https://github.com/a10255asd/liujixue-ai",
       "demoPath": "/labs/controlled-agent",
-      "verifiedAt": "2026-07-16",
+      "verifiedAt": "2026-07-17",
       "commands": [
         "npm run test:unit",
         "npm run build",
@@ -314,8 +314,9 @@
         "真实知识检索和项目证据读取两个只读工具",
         "OpenAI Responses 严格函数调用适配器与缺少持久化限流时的失败关闭",
         "Upstash/Vercel Redis 原子限流、24 小时运行仓储和 runId 回放",
-        "RuntimeCheckpoint v1、无重复工具恢复测试和 20 条真实模型基线报告器",
-        "20 条规划契约评测和五类安全轨迹回放"
+        "RuntimeCheckpoint v2、无重复工具恢复测试和跨部署恢复发布门禁",
+        "20 条规划契约评测、五类安全轨迹回放与 Schema v2 真实模型基线报告器",
+        "签名会话、Redis 原子限流和逐次审批幂等写入的生产冒烟证据"
       ]
     },
     "status": "published",
