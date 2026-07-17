@@ -9,7 +9,7 @@
 | 项目 | 结果 |
 | --- | --- |
 | 生产域名 | `https://ai.liujixue.cn` |
-| 最后验证的生产 deployment | `dpl_3r26syMxgjNXgXdd4j2UAj14DaUz` |
+| 已归档的生产验证基线 deployment | `dpl_3r26syMxgjNXgXdd4j2UAj14DaUz` |
 | 已验证的 Agent 运行时代码提交 | `c458ef8` |
 | 记录建立时的稳定回滚 deployment | `dpl_CiQKaNAyFeTo824QLtXmv85bFgxD` |
 | 回滚基线代码提交 | `76c4262` |
@@ -21,7 +21,7 @@
 | 签名身份 | `signed-session` |
 | 写工具 | `enabled`，逐次审批 |
 
-以上 deployment 是 2026-07-17 最后一次完整门禁的验证目标，不作为永久固定的线上版本号；后续页面部署可以更新 deployment，但不得跳过同一套发布门禁。
+以上 deployment 是 2026-07-17 已归档的一轮完整门禁验证目标，不作为永久固定的线上版本号；后续部署可以更新 deployment，但不得跳过同一套发布门禁。当前生产状态以 `npm run smoke:agent:release` 的实时结果为准。
 
 机器可读证据：
 
