@@ -73,8 +73,8 @@ vercel integration add upstash/upstash-kv \
 
 1. 由账户所有者把 `OPENAI_API_KEY` 配置为 Production Sensitive 变量；不要写进仓库、浏览器或聊天记录。
 2. 配置 `AGENT_RUNTIME_MODE=openai` 和明确的 `OPENAI_AGENT_MODEL` 后重新部署。
-3. 先运行 `npm run smoke:agent:release`，再执行 `npm run eval:agent:live` 获取 20 条真实模型报告。
-4. 报告必须记录成功率、工具选择、延迟、Token、成本和 request id；失败样本需保留原始错误边界。
+3. 先运行 `npm run smoke:agent:release`，再执行 `npm run eval:agent:live` 获取 Schema v2 的 20 条真实模型报告。
+4. 报告必须达到 20/20，且 request id、Token、成本覆盖率均为 100%；失败样本需保留原始错误边界。
 5. 真实报告未全通过、成本基线未记录前，项目继续保持 `prototype`。
 
 ## 回滚基线

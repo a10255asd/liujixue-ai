@@ -39,7 +39,21 @@ export async function runServerAgent(input: {
   const trace: RuntimeTraceEvent[] = input.resumeFrom ? [...input.resumeFrom.trace] : []
   const observations: RuntimeToolObservation[] = input.resumeFrom ? [...input.resumeFrom.observations] : []
   const history: unknown[] = input.resumeFrom ? [...input.resumeFrom.history] : [{ role: 'user', content: input.goal }]
-  const usage: RuntimeUsage = input.resumeFrom ? { ...input.resumeFrom.usage } : { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+  const usage: RuntimeUsage = input.resumeFrom ? {
+    inputTokens: input.resumeFrom.usage.inputTokens,
+    cachedInputTokens: input.resumeFrom.usage.cachedInputTokens ?? 0,
+    cacheWriteTokens: input.resumeFrom.usage.cacheWriteTokens ?? 0,
+    outputTokens: input.resumeFrom.usage.outputTokens,
+    reasoningTokens: input.resumeFrom.usage.reasoningTokens ?? 0,
+    totalTokens: input.resumeFrom.usage.totalTokens
+  } : {
+    inputTokens: 0,
+    cachedInputTokens: 0,
+    cacheWriteTokens: 0,
+    outputTokens: 0,
+    reasoningTokens: 0,
+    totalTokens: 0
+  }
   const requestIds = input.resumeFrom ? [...input.resumeFrom.requestIds] : []
   const elapsedOffset = trace.at(-1)?.elapsedMs ?? 0
 
@@ -138,7 +152,10 @@ export async function runServerAgent(input: {
     for (let turnIndex = firstTurnIndex; turnIndex < MAX_PLANNER_TURNS; turnIndex += 1) {
       const turn = await input.planner.next({ goal: input.goal, history, observations })
       usage.inputTokens += turn.usage.inputTokens
+      usage.cachedInputTokens += turn.usage.cachedInputTokens
+      usage.cacheWriteTokens += turn.usage.cacheWriteTokens
       usage.outputTokens += turn.usage.outputTokens
+      usage.reasoningTokens += turn.usage.reasoningTokens
       usage.totalTokens += turn.usage.totalTokens
       if (turn.requestId && !requestIds.includes(turn.requestId)) requestIds.push(turn.requestId)
       push({

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { runRuntimeBaseline } from '../lib/agent-runtime/baseline'
+import { estimateRuntimeCost, getRuntimeBaselinePricing, runRuntimeBaseline } from '../lib/agent-runtime/baseline'
 import type { RuntimeCheckpoint } from '../lib/agent-runtime/contracts'
 import { resolveRuntimeIdentity } from '../lib/agent-runtime/identity'
 import { createFixturePlanner } from '../lib/agent-runtime/planners'
@@ -131,7 +131,59 @@ test('twenty-case baseline report is reproducible with fixture planners', async 
   assert.equal(report.passRate, 1)
   assert.equal(report.allCasesPassed, true)
   assert.equal(report.releaseCandidate, false)
+  assert.deepEqual(report.releaseChecks, {
+    allCasesPassed: true,
+    requestIdsComplete: false,
+    tokenUsageComplete: false,
+    costComplete: false
+  })
   assert.ok(report.samples.every((sample) => sample.checks.exactToolSequence))
+})
+
+test('baseline pricing accounts for cache reads and GPT-5.6 cache writes', () => {
+  const pricing = getRuntimeBaselinePricing('gpt-5.6-luna')
+  assert.ok(pricing)
+  assert.equal(estimateRuntimeCost({
+    inputTokens: 1_000,
+    cachedInputTokens: 200,
+    cacheWriteTokens: 100,
+    outputTokens: 100,
+    reasoningTokens: 30,
+    totalTokens: 1_100
+  }, pricing), 0.001445)
+  assert.equal(getRuntimeBaselinePricing('unknown-model'), null)
+})
+
+test('live baseline requires complete request ids, token usage and priced cost evidence', async () => {
+  const report = await runRuntimeBaseline({
+    plannerFactory() {
+      const fixture = createFixturePlanner()
+      return {
+        mode: 'openai' as const,
+        model: 'gpt-5.6-luna',
+        async next(context: Parameters<typeof fixture.next>[0]) {
+          const turn = await fixture.next(context)
+          return {
+            ...turn,
+            requestId: `req_${context.observations.length}`,
+            usage: {
+              inputTokens: 100,
+              cachedInputTokens: 20,
+              cacheWriteTokens: 10,
+              outputTokens: 20,
+              reasoningTokens: 5,
+              totalTokens: 120
+            }
+          }
+        }
+      }
+    }
+  })
+
+  assert.equal(report.releaseCandidate, true)
+  assert.ok(report.estimatedCostUsd && report.estimatedCostUsd > 0)
+  assert.deepEqual(report.evidenceCoverage, { requestIds: 1, tokenUsage: 1, cost: 1 })
+  assert.ok(Object.values(report.releaseChecks).every(Boolean))
 })
 
 test('production store stays disabled without Redis credentials', async () => {

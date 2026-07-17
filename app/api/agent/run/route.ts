@@ -160,7 +160,11 @@ export async function POST(request: Request) {
   }
 
   const planner = liveEnabled
-    ? createOpenAiPlanner({ apiKey: process.env.OPENAI_API_KEY!, model: resumeFrom?.model ?? process.env.OPENAI_AGENT_MODEL })
+    ? createOpenAiPlanner({
+      apiKey: process.env.OPENAI_API_KEY!,
+      model: resumeFrom?.model ?? process.env.OPENAI_AGENT_MODEL,
+      safetyIdentifier: identity.actorId
+    })
     : createFixturePlanner()
   const goal = resumeFrom?.goal ?? ('goal' in input.data ? input.data.goal : '')
   const writeEnabled = identity.configured && store.mode !== 'disabled'

@@ -3,7 +3,14 @@ import { z } from 'zod'
 import type { PlannerContext, PlannerTurn, RuntimePlanner, RuntimeToolCall, RuntimeUsage } from './contracts'
 import { runtimeToolDefinitions } from './tools'
 
-const emptyUsage: RuntimeUsage = { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+const emptyUsage: RuntimeUsage = {
+  inputTokens: 0,
+  cachedInputTokens: 0,
+  cacheWriteTokens: 0,
+  outputTokens: 0,
+  reasoningTokens: 0,
+  totalTokens: 0
+}
 
 const projectAliases: Array<[RegExp, string]> = [
   [/task-planning-agent|受控任务执行/i, 'task-planning-agent'],
@@ -83,7 +90,14 @@ const openAiResponseSchema = z.object({
   output_text: z.string().optional(),
   usage: z.object({
     input_tokens: z.number().int().nonnegative().optional(),
+    input_tokens_details: z.object({
+      cached_tokens: z.number().int().nonnegative().optional(),
+      cache_write_tokens: z.number().int().nonnegative().optional()
+    }).optional(),
     output_tokens: z.number().int().nonnegative().optional(),
+    output_tokens_details: z.object({
+      reasoning_tokens: z.number().int().nonnegative().optional()
+    }).optional(),
     total_tokens: z.number().int().nonnegative().optional()
   }).optional()
 })
@@ -106,7 +120,12 @@ function extractOutputText(output: unknown[]) {
   return undefined
 }
 
-export function createOpenAiPlanner(options: { apiKey: string; model?: string; fetchImpl?: typeof fetch }): RuntimePlanner {
+export function createOpenAiPlanner(options: {
+  apiKey: string
+  model?: string
+  safetyIdentifier?: string
+  fetchImpl?: typeof fetch
+}): RuntimePlanner {
   const model = options.model ?? 'gpt-5.6-luna'
   const fetchImpl = options.fetchImpl ?? fetch
   return {
@@ -128,6 +147,8 @@ export function createOpenAiPlanner(options: { apiKey: string; model?: string; f
           parallel_tool_calls: false,
           reasoning: { effort: 'low' },
           max_output_tokens: 900,
+          service_tier: 'default',
+          ...(options.safetyIdentifier ? { safety_identifier: options.safetyIdentifier } : {}),
           store: false
         })
       })
@@ -154,7 +175,10 @@ export function createOpenAiPlanner(options: { apiKey: string; model?: string; f
         requestId: response.headers.get('x-request-id') ?? undefined,
         usage: {
           inputTokens: parsed.usage?.input_tokens ?? 0,
+          cachedInputTokens: parsed.usage?.input_tokens_details?.cached_tokens ?? 0,
+          cacheWriteTokens: parsed.usage?.input_tokens_details?.cache_write_tokens ?? 0,
           outputTokens: parsed.usage?.output_tokens ?? 0,
+          reasoningTokens: parsed.usage?.output_tokens_details?.reasoning_tokens ?? 0,
           totalTokens: parsed.usage?.total_tokens ?? 0
         }
       }

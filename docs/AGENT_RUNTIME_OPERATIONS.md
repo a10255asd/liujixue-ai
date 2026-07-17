@@ -55,13 +55,23 @@ OPENAI_AGENT_MODEL=gpt-5.6-luna
 
 真实模型模式的限制是每个来源标识 4 次/分钟。缺少模型密钥、Redis 持久化限流未生效或 Redis 不可用时，API 返回 `503`，不得静默降级。
 
+默认 `gpt-5.6-luna` 用于高频、成本敏感基线；请求固定使用标准服务层，并发送当前签名会话生成的无个人信息 `safety_identifier`。模型选择与价格来源见 [OpenAI 模型文档](https://developers.openai.com/api/docs/models/gpt-5.6-luna)。
+
 配置完成后运行真实模型基线：
 
 ```bash
 npm run eval:agent:live
 ```
 
-默认报告写入 `artifacts/agent-runtime/openai-baseline.json`。缺少 `OPENAI_API_KEY` 时命令必须失败；报告只有 20 条样本全部通过时才标记 `releaseCandidate: true`。
+默认报告写入 `artifacts/agent-runtime/openai-baseline.json`。缺少 `OPENAI_API_KEY` 时命令必须失败。报告 Schema v2 固定记录：
+
+- 20 条样本的精确工具序列、状态、延迟和失败原因。
+- input、cached input、cache write、output、reasoning 与 total Token。
+- 每条请求的 OpenAI request id 覆盖率。
+- 按模型价格快照计算的逐样本和总美元成本，包含缓存写入 1.25 倍费率。
+- 价格快照的日期、适用范围和官方来源 URL。
+
+只有 20 条全部通过、request id 覆盖率 100%、Token 覆盖率 100%、成本覆盖率 100% 时才标记 `releaseCandidate: true`。未知模型没有受审价格快照时必须失败关闭，不能估算成零成本。
 
 ## 冒烟检查
 

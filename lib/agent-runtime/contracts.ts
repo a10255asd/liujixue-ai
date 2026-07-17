@@ -46,7 +46,10 @@ export type RuntimeTraceEvent = {
 
 export type RuntimeUsage = {
   inputTokens: number
+  cachedInputTokens: number
+  cacheWriteTokens: number
   outputTokens: number
+  reasoningTokens: number
   totalTokens: number
 }
 

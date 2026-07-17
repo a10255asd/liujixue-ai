@@ -72,17 +72,33 @@ test('twenty runtime contract cases are deterministic and passing', () => {
 })
 
 test('OpenAI planner captures usage and request ids for production evidence', async () => {
+  let requestBody: Record<string, unknown> = {}
   const planner = createOpenAiPlanner({
     apiKey: 'test-key',
     model: 'test-model',
-    fetchImpl: async () => new Response(JSON.stringify({
-      output: [{ type: 'message', content: [{ type: 'output_text', text: '已完成证据总结。' }] }],
-      output_text: '已完成证据总结。',
-      usage: { input_tokens: 12, output_tokens: 8, total_tokens: 20 }
-    }), { status: 200, headers: { 'x-request-id': 'req_test_123' } })
+    safetyIdentifier: 'actor-hash-test',
+    fetchImpl: async (_url, init) => {
+      requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>
+      return new Response(JSON.stringify({
+        output: [{ type: 'message', content: [{ type: 'output_text', text: '已完成证据总结。' }] }],
+        output_text: '已完成证据总结。',
+        usage: {
+          input_tokens: 12,
+          input_tokens_details: { cached_tokens: 4, cache_write_tokens: 2 },
+          output_tokens: 8,
+          output_tokens_details: { reasoning_tokens: 3 },
+          total_tokens: 20
+        }
+      }), { status: 200, headers: { 'x-request-id': 'req_test_123' } })
+    }
   })
   const turn = await planner.next({ goal: '检查 Agent 证据', history: [], observations: [] })
   assert.equal(turn.requestId, 'req_test_123')
   assert.equal(turn.usage.totalTokens, 20)
+  assert.equal(turn.usage.cachedInputTokens, 4)
+  assert.equal(turn.usage.cacheWriteTokens, 2)
+  assert.equal(turn.usage.reasoningTokens, 3)
   assert.equal(turn.finalText, '已完成证据总结。')
+  assert.equal(requestBody.service_tier, 'default')
+  assert.equal(requestBody.safety_identifier, 'actor-hash-test')
 })

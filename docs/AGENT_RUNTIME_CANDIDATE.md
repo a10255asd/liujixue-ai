@@ -152,12 +152,13 @@ npm run test:e2e
 ## 阶段 6.2B-2B 当前验证
 
 - TypeScript 检查通过。
-- 57 项单元测试通过，新增覆盖安全只读冒烟、完整发布门禁和未配置时失败关闭。
+- 59 项单元测试通过，新增覆盖安全只读冒烟、完整发布门禁、成本快照和真实证据完整性门禁。
 - 桌面与移动浏览器均通过完整写入审批流程；本地 HTTP 与生产 HTTPS 使用匹配协议的 Cookie 安全属性。
 - `npm run smoke:agent:production` 在线通过，`safeToServe: true`。
 - `npm run smoke:agent:release` 在线通过，`releaseReady: true`；Redis、签名身份、隔离回放和审批幂等全部通过。
 - 等待审批的运行从 deployment `dpl_7fySDLCwvvr5Kv7gmKN7CEKXF4o3` 跨部署恢复到 `dpl_6dsZCg1gLtqK8dcxGB85Gzj6EMyt`，批准后只写入一次，重复审批返回 409。
 - `npm run eval:agent:live` 在缺少模型密钥时按预期失败，不生成伪造报告。
+- 基线报告已升级到 Schema v2；只有 20/20、request id、Token 和成本四项同时完整才允许成为候选。
 - 运维与环境变量说明见 `docs/AGENT_RUNTIME_OPERATIONS.md`。
 - 当前生产事实、Redis 资源、发布证据和回滚 deployment 见 `docs/AGENT_RUNTIME_RELEASE_RECORD.md`。
 
