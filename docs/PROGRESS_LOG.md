@@ -1,12 +1,12 @@
 # AI 学习知识库进度日志
 
-更新时间：2026-07-16
+更新时间：2026-07-17
 
 本文档只记录已完成、验证结果、当前状态和下一步，供不同 AI agent 无缝接手。产品方向看 `PRODUCT_DESIGN.md`，技术实现看 `TECHNICAL_DESIGN.md`。
 
 ## 当前里程碑
 
-状态：Batch 7 阶段 1 至 5 已完成。Prompt 回归、可评估 RAG、受控 Agent 和 Agent 评测四个原型均可运行，真实 JD 岗位校准与固定模拟面试闭环已完成；6 个项目当前为 4 个 `prototype`、2 个 `blueprint`、0 个 `verified`。线上基础设施继续沿用已接通的 GitHub、Vercel 和 `ai.liujixue.cn`。
+状态：Batch 10 服务器面试题组已接入。Prompt 回归、可评估 RAG、受控 Agent 和 Agent 评测四个原型均可运行，真实 JD 岗位校准与固定模拟面试闭环已完成；AI 知识库、面试题库、学习路径集合和面试题组均已接入 `liujixue-api` 服务器知识库，并保留本地 JSON 兜底；6 个项目当前为 4 个 `prototype`、2 个 `blueprint`、0 个 `verified`。线上基础设施继续沿用已接通的 GitHub、Vercel 和 `ai.liujixue.cn`。
 
 ## 已完成
 
@@ -108,6 +108,32 @@
 - 每个岗位确定性生成 5 道不重复面试题；使用概念、设计、证据、验证四项量表自评，输出薄弱能力和训练建议。
 - 评分不调用模型、不保存回答、不判断表达真实性，也不代表录用概率。
 
+### 2026-07-16：Batch 8 服务器内容桥接
+
+- 新增 API 内容适配层 `lib/content/knowledge-api.ts`，优先读取 `liujixue-api`，失败时回退本地 JSON。
+- `/knowledge`、`/knowledge/[slug]`、`/interview`、`/interview/[id]` 和 `sitemap.xml` 已切换到 API 感知仓储函数。
+- 首批服务器 AI 内容已导入：8 道面试题和 4 篇知识文章，覆盖 LLM 参数、上下文窗口、结构化输出、RAG、Agent、评测和工程化。
+- 知识详情和面试答案详情新增受限 Markdown 渲染，服务器正文会按标题、段落和列表展示；详情页分类标签改为中文显示。
+- 生产构建从 139 个静态页面增加到 151 个静态页面，包含服务器新增详情页。
+- 最新生产部署已 alias 到 `https://ai.liujixue.cn`，当前部署 ID 以 `vercel inspect ai.liujixue.cn` 为准。
+
+### 2026-07-17：Batch 9 服务器学习路径集合
+
+- `liujixue-api` 新增的 AI 学习路径集合已接入 AI 子站前端，`/roadmap` 会读取 `learning_path` collections。
+- 前端会先取集合列表，再按 slug 补详情，确保使用详情接口里的路径条目、排序、小节标题和知识点链接。
+- 新增服务器路径区域，当前展示“AI 应用工程入门路径”及 4 个已发布知识点：RAG、Agent/Workflow、质量评估和工程可观测性。
+- 新增 collection 单元测试，覆盖列表补详情、只展示 published article、条目映射和链接生成。
+- 修复 `lib/agent-runtime/baseline.ts` 里重复 `releaseCandidate` 字段导致的 TypeScript 报错，并保留证据门禁版本的判定逻辑。
+- API 生产数据已扩充到 3 条学习路径：AI 应用工程入门路径、RAG 质量闭环路径、Agent 上线治理路径。
+
+### 2026-07-17：Batch 10 服务器面试题组
+
+- `liujixue-api` 新增 3 个 `interview_set` collections：LLM 应用工程、RAG、Agent 可靠性。
+- `/interview` 顶部新增“服务器面试题组”区域，会读取集合列表并按 slug 补详情，只展示已发布的 `interview_question` 条目。
+- 新增 `InterviewSetCollection` 类型、映射函数和 API 读取函数，链接统一指向 `/interview/{slug}`。
+- 新增题组单元测试，覆盖详情补全、过滤非面试题内容、难度映射和链接生成。
+- 本地浏览器验收：1440px 和 390px 下均显示 3 个题组、10 个题组条目，横向溢出为 0。
+
 ## 验证记录
 
 - `validate:content`：通过。
@@ -151,12 +177,32 @@
 - 岗位校准生产构建通过，生成 139 个静态页面。
 - 岗位校准 Playwright 桌面与手机共 49 项通过、1 项按设备条件跳过。
 - 岗位校准真实浏览器验收：1440px 与 390px 均无横向溢出；OpenAI 覆盖率 70，Planera 覆盖率 64；勾选 1 个评分锚点后得分稳定为 5%。
+- Batch 8 内容桥接验证：`validate:content`、`typecheck`、`lint`、40 项单元测试和生产构建通过。
+- Batch 8 生产构建：通过，生成 151 个静态页面。
+- Batch 8 Vercel 生产部署：远端构建通过，部署 `dpl_CcQpwJRHsRV5nWD6GwVj5E8JGw91` 已 alias 到正式域名。
+- 正式域名抽检：`/interview`、`/interview/llm-temperature-top-p-tradeoffs`、`/knowledge/rag-from-zero-to-one` 和 `sitemap.xml` 均返回 200，并包含服务器新增内容。
+- Batch 9 本地验证：`validate:content`、`typecheck`、`lint`、59 项单元测试和生产构建通过。
+- Batch 9 生产构建：通过，生成 151 个静态页面，`/roadmap` 为 5 分钟 revalidate。
+- Batch 9 浏览器验收：1440px 与 390px 下 `/roadmap` 均显示“AI 应用工程入门路径”和 4 个条目，横向溢出为 0。
+- Batch 9 Vercel 生产部署：远端构建通过，部署 `https://liujixue-qyfq0gx2v-a10255asds-projects.vercel.app` 已 alias 到 `https://ai.liujixue.cn`。
+- Batch 9 正式域名抽检：`/roadmap` 返回 200，HTML 包含“AI 应用工程入门路径”和 4 个服务器知识点；Playwright 生产域名桌面与手机验收均无横向溢出。
+- Batch 9 路径扩充部署：API 生产 collections 扩充到 3 条后，AI 子站已重新部署到 `https://liujixue-izen2u5yy-a10255asds-projects.vercel.app` 并 alias 到正式域名。
+- Batch 9 路径扩充抽检：`/roadmap` 返回 200，HTML 包含 AI 应用工程入门路径、RAG 质量闭环路径、Agent 上线治理路径；Playwright 桌面与手机均为 3 条路径、10 个条目、横向溢出 0。
+- Batch 10 本地验证：后端 3 个题组 JSON 校验通过，`bash -n scripts/admin-fetch.sh` 通过；AI 子站 `test:unit` 67 项通过、`typecheck`、`lint` 和生产构建通过。
+- Batch 10 API 生产验证：`interview_set` 列表返回 3 个集合，详情分别返回 4、3、3 个已发布面试题条目。
+- Batch 10 本地浏览器验收：`/interview` 在 1440px 与 390px 下均显示 3 个服务器面试题组、10 个题组条目，横向溢出为 0。
+- Batch 10 Vercel 生产部署：远端构建通过，部署 `https://liujixue-a9pz1wzw5-a10255asds-projects.vercel.app` 已 alias 到 `https://ai.liujixue.cn`。
+- Batch 10 正式域名抽检：`/interview` 返回 200，HTML 包含服务器面试题组和 3 个题组名；Chrome 桌面与手机验收均为 3 个题组、10 个条目、横向溢出 0。
 
 ## 当前数据规模
 
 - 路线阶段：7。
-- 知识点：33。
-- 面试题：80。
+- 知识点：本地 33，线上合并服务器内容后 37。
+- 面试题：本地 80，线上合并服务器内容后 88。
+- 服务器学习路径集合：3。
+- 学习路径集合条目：10。
+- 服务器面试题组：3。
+- 面试题组条目：10。
 - 项目：6。
 - 官方资料：14。
 - 学习日志：1。
@@ -167,9 +213,16 @@
 - 交付任务：7。
 - 真实 JD 样本：6。
 
-## 下一步唯一主线
+## 下一步推荐
 
-把“多步骤任务规划 Agent”推进为 `verified` 候选：
+内容平台化：
+
+1. 补一个更顺手的后台或审核导入流，让 AI、运动学、投资和心理学内容不用长期依赖命令行脚本。
+2. 优化 API 详情页渲染，完整展示 `body_md`、来源、标签、追问、评分点和更新时间。
+3. 扩充服务器 AI 题库与知识库时，继续保留本地 JSON 作为兜底和回归样本。
+4. 给运动学、投资和心理学子站补前端入口与公开页面，同时继续让高风险内容走审核状态。
+
+项目证据化：
 
 1. 用服务端适配器接入真实模型规划器，保留确定性夹具作为回归基线。
 2. 接入至少两个权限受控的真实工具，覆盖 Schema、超时、重试、幂等与人工审批。
@@ -179,7 +232,7 @@
 
 ## 不要做
 
-- 暂不做登录、收藏、错题本、付费和数据库。
+- 暂不做登录、收藏、错题本、付费和 AI 子站内置数据库；服务器内容统一由 `liujixue-api` 管理。
 - 暂不接模型 API 自动生成或评判内容。
 - 不为了数量批量生成没有来源、没有工程解释的面试题。
 - 不重做当前架构；如需变更，先更新技术设计和本日志。

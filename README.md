@@ -6,7 +6,7 @@
 
 > 给 0 基础开发者，尤其是想转 AI Agent 工程师的人，用一条可执行路线学 AI、做项目、刷面试、准备求职。
 
-当前阶段：Batch 7 阶段 5 已完成。4 个项目原型、真实 JD 岗位校准与固定模拟面试闭环均可运行；GitHub、Vercel、正式域名和主站入口已接通。
+当前阶段：Batch 8 服务器内容桥接已完成。4 个项目原型、真实 JD 岗位校准与固定模拟面试闭环均可运行；AI 知识库和面试题库已接入 `liujixue-api` 的服务器数据，并保留本地 JSON 兜底；GitHub、Vercel、正式域名和主站入口已接通。
 
 ## 必读文档
 
@@ -22,10 +22,11 @@
 
 - Next.js App Router + TypeScript
 - React Server Components
-- 静态 JSON 内容数据源 + 构建期 Schema 校验
+- 静态 JSON 内容数据源 + 服务器知识库 API 数据源，本地 JSON 兜底
+- 构建期 Schema 校验
 - Vercel 部署
 - 阿里云 DNS 记录配置
-- 第一版不做登录、不做数据库、不做 AI 生成内容
+- 当前子站不做登录、用户系统、收藏、错题本、付费和 AI 生成内容；内容存储与导入由 `liujixue-api` 后端知识库承担
 
 ## 本地命令
 

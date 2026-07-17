@@ -977,6 +977,237 @@ strong {
   border: 1px solid var(--line);
 }
 
+.server-paths {
+  margin-bottom: 58px;
+}
+
+.server-paths .section-heading {
+  margin-bottom: 28px;
+}
+
+.server-path-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.server-path {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.74fr) minmax(0, 1.26fr);
+  overflow: hidden;
+  background: var(--surface-strong);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+}
+
+.server-path__summary {
+  padding: 34px;
+  background: #f7f6f3;
+  border-right: 1px solid var(--line);
+}
+
+.server-path__badge {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 7px 10px;
+  color: var(--steel);
+  background: var(--steel-soft);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 750;
+  gap: 8px;
+}
+
+.server-path__summary h2 {
+  margin-bottom: 13px;
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 29px;
+  line-height: 1.25;
+}
+
+.server-path__summary p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.server-path__steps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.server-path__steps li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 24px;
+  align-items: flex-start;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--line);
+  gap: 16px;
+}
+
+.server-path__steps li:last-child {
+  border-bottom: 0;
+}
+
+.server-path__index {
+  color: var(--copper);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.server-path__meta {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--quiet);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.server-path__steps a {
+  display: inline-block;
+  font-size: 17px;
+  font-weight: 720;
+  line-height: 1.35;
+}
+
+.server-path__steps a:hover {
+  color: var(--copper);
+}
+
+.server-path__steps p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.server-path__steps svg {
+  margin-top: 3px;
+  color: var(--success);
+}
+
+.interview-sets {
+  margin-bottom: 58px;
+}
+
+.interview-sets .section-heading {
+  margin-bottom: 28px;
+}
+
+.interview-set-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 16px;
+}
+
+.interview-set {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface-strong);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+}
+
+.interview-set__summary {
+  padding: 27px;
+  background: #f7f6f3;
+  border-bottom: 1px solid var(--line);
+}
+
+.interview-set__badge {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 7px 10px;
+  color: var(--copper);
+  background: var(--copper-soft);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 750;
+  gap: 8px;
+}
+
+.interview-set__summary h2 {
+  margin-bottom: 11px;
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 25px;
+  line-height: 1.28;
+}
+
+.interview-set__summary p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.interview-set__questions {
+  display: grid;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.interview-set__questions li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 22px;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 21px 22px;
+  border-bottom: 1px solid var(--line);
+  gap: 12px;
+}
+
+.interview-set__questions li:last-child {
+  border-bottom: 0;
+}
+
+.interview-set__index {
+  color: var(--copper);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.interview-set__meta {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--quiet);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.interview-set__questions a {
+  display: inline-block;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  font-weight: 720;
+  line-height: 1.42;
+}
+
+.interview-set__questions a:hover {
+  color: var(--copper);
+}
+
+.interview-set__questions p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.interview-set__questions svg {
+  margin-top: 3px;
+  color: var(--steel);
+}
+
 .roadmap-rail {
   position: relative;
 }
@@ -1758,6 +1989,44 @@ strong {
   border-left: 3px solid #c79c75;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 13px;
+}
+
+.rich-text {
+  display: grid;
+  color: var(--ink-soft);
+  line-height: 1.9;
+  gap: 15px;
+}
+
+.rich-text h3 {
+  margin: 8px 0 0;
+  font-family: ui-serif, "Songti SC", serif;
+  font-size: 20px;
+  color: var(--ink);
+}
+
+.rich-text p {
+  margin: 0;
+}
+
+.rich-text ul,
+.rich-text ol {
+  display: grid;
+  margin: 0;
+  padding-left: 22px;
+  gap: 9px;
+}
+
+.rich-text pre {
+  margin: 0;
+  padding: 20px;
+  overflow-x: auto;
+  color: #dce1de;
+  background: var(--charcoal);
+  border-left: 3px solid #c79c75;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.75;
 }
 
 .detail-content blockquote {
@@ -5429,6 +5698,10 @@ strong {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .interview-set-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .capability-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -5544,6 +5817,15 @@ strong {
     align-items: flex-start;
     flex-direction: column;
     gap: 28px;
+  }
+
+  .server-path {
+    grid-template-columns: 1fr;
+  }
+
+  .server-path__summary {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
 
   .roadmap-stage__heading,
@@ -6430,6 +6712,55 @@ strong {
 
   .page-heading__copy > p:last-child {
     font-size: 15px;
+  }
+
+  .server-paths {
+    margin-bottom: 42px;
+  }
+
+  .server-path__summary {
+    padding: 24px 21px;
+  }
+
+  .server-path__summary h2 {
+    font-size: 25px;
+  }
+
+  .server-path__steps li {
+    grid-template-columns: 34px minmax(0, 1fr);
+    padding: 21px;
+    gap: 11px;
+  }
+
+  .server-path__steps svg {
+    display: none;
+  }
+
+  .interview-sets {
+    margin-bottom: 42px;
+  }
+
+  .interview-set-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .interview-set__summary {
+    padding: 23px 21px;
+  }
+
+  .interview-set__summary h2 {
+    font-size: 24px;
+  }
+
+  .interview-set__questions li {
+    grid-template-columns: 32px minmax(0, 1fr);
+    padding: 20px 21px;
+    gap: 10px;
+  }
+
+  .interview-set__questions svg {
+    display: none;
   }
 
   .roadmap-rail::before {

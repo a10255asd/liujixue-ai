@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 
 import { KnowledgeCatalog } from '@/components/filters/catalog-filters'
 import { PageHeading } from '@/components/ui/page-heading'
-import { getKnowledgePoints } from '@/lib/content/repository'
+import { getKnowledgePointsWithApi } from '@/lib/content/knowledge-api'
 
 export const metadata: Metadata = {
   title: 'AI 工程知识库',
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/knowledge' }
 }
 
-export default function KnowledgePage() {
-  const knowledge = getKnowledgePoints()
+export default async function KnowledgePage() {
+  const knowledge = await getKnowledgePointsWithApi()
 
   return (
     <div className="page-shell page-view">
