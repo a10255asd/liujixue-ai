@@ -53,6 +53,14 @@ OPENAI_API_KEY=<server-only secret>
 OPENAI_AGENT_MODEL=gpt-5.6-luna
 ```
 
+先对当前环境快照执行预检：
+
+```bash
+npm run check:agent:live
+```
+
+命令会分别输出 `baselineReady` 与 `productionReady`，且只报告配置是否存在，不打印任何密钥值。两项未全部通过时不得执行真实报告或切换生产模式。
+
 真实模型模式的限制是每个来源标识 4 次/分钟。缺少模型密钥、Redis 持久化限流未生效或 Redis 不可用时，API 返回 `503`，不得静默降级。
 
 默认 `gpt-5.6-luna` 用于高频、成本敏感基线；请求固定使用标准服务层，并发送当前签名会话生成的无个人信息 `safety_identifier`。模型选择与价格来源见 [OpenAI 模型文档](https://developers.openai.com/api/docs/models/gpt-5.6-luna)。

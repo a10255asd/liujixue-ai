@@ -10,7 +10,7 @@ const redisResponseSchema = z.object({
   error: z.string().optional()
 })
 
-export function resolveRedisRestConfig(env: NodeJS.ProcessEnv = process.env): RedisRestConfig | null {
+export function resolveRedisRestConfig(env: Readonly<Record<string, string | undefined>> = process.env): RedisRestConfig | null {
   const url = env.UPSTASH_REDIS_REST_URL ?? env.KV_REST_API_URL
   const token = env.UPSTASH_REDIS_REST_TOKEN ?? env.KV_REST_API_TOKEN
   if (!url || !token) return null
