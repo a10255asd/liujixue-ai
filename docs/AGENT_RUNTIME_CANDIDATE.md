@@ -152,12 +152,13 @@ npm run test:e2e
 ## 阶段 6.2B-2B 当前验证
 
 - TypeScript 检查通过。
-- 59 项单元测试通过，新增覆盖安全只读冒烟、完整发布门禁、成本快照和真实证据完整性门禁。
+- 单元测试通过，覆盖安全只读冒烟、基础运行时门禁、真实模型门禁、成本快照、独立报告复核和真实证据完整性门禁。
 - 桌面与移动浏览器均通过完整写入审批流程；本地 HTTP 与生产 HTTPS 使用匹配协议的 Cookie 安全属性。
 - `npm run smoke:agent:production` 在线通过，`safeToServe: true`。
 - `npm run smoke:agent:release` 在线通过，`releaseReady: true`；Redis、签名身份、隔离回放和审批幂等全部通过。
 - 等待审批的运行从 deployment `dpl_7fySDLCwvvr5Kv7gmKN7CEKXF4o3` 跨部署恢复到 `dpl_6dsZCg1gLtqK8dcxGB85Gzj6EMyt`，批准后只写入一次，重复审批返回 409。
 - `npm run eval:agent:live` 在缺少模型密钥时按预期失败，不生成伪造报告。
+- `npm run verify:agent:live` 独立复核固定 20 例、工具序列、request id、Token 汇总与成本，截断或篡改报告必须失败。
 - 基线报告已升级到 Schema v2；只有 20/20、request id、Token 和成本四项同时完整才允许成为候选。
 - 运维与环境变量说明见 `docs/AGENT_RUNTIME_OPERATIONS.md`。
 - 当前生产事实、Redis 资源、发布证据和回滚 deployment 见 `docs/AGENT_RUNTIME_RELEASE_RECORD.md`。
@@ -167,6 +168,7 @@ npm run test:e2e
 阶段 6.2B-2B 按以下顺序执行：
 
 1. 账户所有者配置服务端 `OPENAI_API_KEY`；密钥不得进入仓库、浏览器或聊天记录。
-2. 配置 `AGENT_RUNTIME_MODE=openai` 与明确模型后重新部署，先重跑完整发布门禁。
-3. 把 20 条夹具升级为真实模型基线，采集成功率、工具选择、延迟、Token、成本和 request id。
-4. 保留失败样本、监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。
+2. 本地预检达到 `baselineReady: true` 后，配置 `AGENT_RUNTIME_MODE=openai` 并重新部署；目标模型已预设为 `gpt-5.6-luna`。
+3. 运行 `npm run smoke:agent:live`，确认实际部署同时达到 `releaseReady` 与 `liveModelReady`。
+4. 把 20 条夹具升级为真实模型基线，采集成功率、工具选择、延迟、Token、成本和 request id，并通过独立复核。
+5. 保留失败样本、监控、告警、回滚与线上冒烟记录，再审计是否达到 `verified`。

@@ -3,7 +3,11 @@ import { dirname, resolve } from 'node:path'
 
 import { runAgentProductionSmoke, type AgentSmokeExpectation } from '../lib/agent-runtime/production-smoke'
 
-const expectation: AgentSmokeExpectation = process.env.AGENT_SMOKE_REQUIRE_READY === '1' ? 'runtime-ready' : 'safe-readonly'
+const expectation: AgentSmokeExpectation = process.env.AGENT_SMOKE_EXPECTATION === 'live-model-ready'
+  ? 'live-model-ready'
+  : process.env.AGENT_SMOKE_REQUIRE_READY === '1'
+    ? 'runtime-ready'
+    : 'safe-readonly'
 const report = await runAgentProductionSmoke({
   baseUrl: process.env.AGENT_SMOKE_TARGET ?? 'https://ai.liujixue.cn',
   expectation

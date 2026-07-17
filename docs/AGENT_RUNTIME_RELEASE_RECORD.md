@@ -16,6 +16,8 @@
 | 安全只读冒烟 | 通过，`safeToServe: true` |
 | 完整发布门禁 | 通过，`releaseReady: true` |
 | 规划器 | `fixture` |
+| Vercel 目标模型配置 | `gpt-5.6-luna`，已预设，待下一次部署生效 |
+| 真实模型门禁 | 未通过，缺少 `OPENAI_API_KEY` 且模式尚未开启 |
 | 限流 | `redis` |
 | 运行仓储 | `redis`，完成运行保留 24 小时 |
 | 签名身份 | `signed-session` |
@@ -68,17 +70,19 @@ vercel integration add upstash/upstash-kv \
 - Vercel 已存在团队默认告警规则 `ar_default`。
 - 查询过去 24 小时，当前项目无告警组。
 - `vercel metrics` 的函数级指标需要付费 Observability Plus；本阶段不升级套餐。
-- 零成本监控使用 `npm run smoke:agent:production`，完整发布门禁使用 `npm run smoke:agent:release`。
+- 零成本监控使用 `npm run smoke:agent:production`，基础运行时门禁使用 `npm run smoke:agent:release`，真实模型切换使用 `npm run smoke:agent:live`。
 - 冒烟报告不输出 Cookie、Redis Token 或模型密钥。
 
 ## 唯一续接顺序
 
-1. 由账户所有者把 `OPENAI_API_KEY` 配置为 Production Sensitive 变量；不要写进仓库、浏览器或聊天记录。
-2. 配置 `AGENT_RUNTIME_MODE=openai` 和明确的 `OPENAI_AGENT_MODEL` 后运行 `npm run check:agent:live`。
-3. 预检的 `baselineReady` 与 `productionReady` 都为 `true` 后重新部署。
-4. 先运行 `npm run smoke:agent:release`，再执行 `npm run eval:agent:live` 获取 Schema v2 的 20 条真实模型报告。
-5. 报告必须达到 20/20，且 request id、Token、成本覆盖率均为 100%；失败样本需保留原始错误边界。
-6. 真实报告未全通过、成本基线未记录前，项目继续保持 `prototype`。
+1. 由账户所有者把 `OPENAI_API_KEY` 配置为 Production Sensitive 变量，并在执行基线的终端临时配置同一密钥；不要写进仓库、浏览器或聊天记录。
+2. 本地运行 `npm run check:agent:live`，确认 `baselineReady: true`。`OPENAI_AGENT_MODEL=gpt-5.6-luna` 已在 Vercel Production 预设。
+3. 将 `AGENT_RUNTIME_MODE=openai` 配置到 Production 后重新部署；未配置模型密钥前不得提前开启。
+4. 运行 `npm run smoke:agent:live`，确认 `releaseReady` 与 `liveModelReady` 都为 `true`。
+5. 执行 `npm run eval:agent:live` 获取 Schema v2 的 20 条真实模型报告和独立复核报告。
+6. 归档或交接时运行 `npm run verify:agent:live`，确认固定样本、request id、Token 和成本仍可重新计算。
+7. 报告必须达到 20/20，且 request id、Token、成本覆盖率均为 100%；失败样本需保留原始错误边界。
+8. 真实报告及独立复核未全通过、成本基线未记录前，项目继续保持 `prototype`。
 
 ## 回滚基线
 

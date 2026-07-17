@@ -2,12 +2,12 @@ import { randomUUID } from 'node:crypto'
 
 import type { RuntimeRunResult } from './contracts'
 
-export type AgentSmokeExpectation = 'safe-readonly' | 'runtime-ready'
+export type AgentSmokeExpectation = 'safe-readonly' | 'runtime-ready' | 'live-model-ready'
 
 export type AgentSmokeCheck = {
   id: string
   passed: boolean
-  gate: 'always' | 'release'
+  gate: 'always' | 'release' | 'live'
   detail: string
 }
 
@@ -61,6 +61,7 @@ export async function runAgentProductionSmoke(options: {
     primaryCookie = cookieFrom(capabilityResponse)
     add('capability-http', capabilityResponse.status === 200, 'always', `HTTP ${capabilityResponse.status}`)
     add('planner-declared', capability.plannerMode === 'fixture' || capability.plannerMode === 'openai', 'always', `planner=${capability.plannerMode ?? 'missing'}`)
+    add('live-planner', capability.plannerMode === 'openai' && capability.openAiConfigured === true, 'live', `planner=${capability.plannerMode ?? 'missing'}, key=${capability.openAiConfigured === true ? 'configured' : 'missing'}`)
     add('signed-session', capability.identityMode === 'signed-session' && Boolean(primaryCookie), 'release', `identity=${capability.identityMode ?? 'missing'}`)
     add('redis-storage', capability.storageMode === 'redis' && capability.rateLimitMode === 'redis', 'release', `storage=${capability.storageMode ?? 'missing'}, limiter=${capability.rateLimitMode ?? 'missing'}`)
     add('write-tool-enabled', capability.writeToolsEnabled === true, 'release', `writeToolsEnabled=${String(capability.writeToolsEnabled)}`)
@@ -147,8 +148,15 @@ export async function runAgentProductionSmoke(options: {
 
   const alwaysChecks = checks.filter((check) => check.gate === 'always')
   const releaseChecks = checks.filter((check) => check.gate === 'release')
+  const liveChecks = checks.filter((check) => check.gate === 'live')
   const safeToServe = alwaysChecks.length > 0 && alwaysChecks.every((check) => check.passed)
   const releaseReady = safeToServe && releaseChecks.length > 0 && releaseChecks.every((check) => check.passed)
+  const liveModelReady = releaseReady && liveChecks.length > 0 && liveChecks.every((check) => check.passed)
+  const expectationPassed = expectation === 'live-model-ready'
+    ? liveModelReady
+    : expectation === 'runtime-ready'
+      ? releaseReady
+      : safeToServe
 
   return {
     schemaVersion: 1,
@@ -158,7 +166,8 @@ export async function runAgentProductionSmoke(options: {
     capability,
     safeToServe,
     releaseReady,
-    expectationPassed: expectation === 'runtime-ready' ? releaseReady : safeToServe,
+    liveModelReady,
+    expectationPassed,
     checks
   }
 }

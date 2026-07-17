@@ -17,8 +17,10 @@
     "test:e2e": "playwright test",
     "check:agent:live": "tsx scripts/check-agent-live-readiness.ts",
     "eval:agent:live": "tsx scripts/run-agent-baseline.ts",
+    "verify:agent:live": "tsx scripts/verify-agent-baseline.ts",
     "smoke:agent:production": "tsx scripts/smoke-agent-production.ts",
-    "smoke:agent:release": "AGENT_SMOKE_REQUIRE_READY=1 tsx scripts/smoke-agent-production.ts"
+    "smoke:agent:release": "AGENT_SMOKE_REQUIRE_READY=1 tsx scripts/smoke-agent-production.ts",
+    "smoke:agent:live": "AGENT_SMOKE_EXPECTATION=live-model-ready tsx scripts/smoke-agent-production.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

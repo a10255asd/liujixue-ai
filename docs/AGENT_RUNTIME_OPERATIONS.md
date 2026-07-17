@@ -59,7 +59,7 @@ OPENAI_AGENT_MODEL=gpt-5.6-luna
 npm run check:agent:live
 ```
 
-命令会分别输出 `baselineReady` 与 `productionReady`，且只报告配置是否存在，不打印任何密钥值。两项未全部通过时不得执行真实报告或切换生产模式。
+命令会分别输出 `baselineReady` 与 `productionReady`，且只报告配置是否存在，不打印任何密钥值。运行真实报告前必须确保本地环境的 `baselineReady: true`。Vercel 不会把 Production Sensitive 变量回传给本地命令，因此 `productionReady` 只用于完整环境快照诊断，不能替代部署后的线上门禁。
 
 真实模型模式的限制是每个来源标识 4 次/分钟。缺少模型密钥、Redis 持久化限流未生效或 Redis 不可用时，API 返回 `503`，不得静默降级。
 
@@ -69,17 +69,19 @@ npm run check:agent:live
 
 ```bash
 npm run eval:agent:live
+npm run verify:agent:live
 ```
 
-默认报告写入 `artifacts/agent-runtime/openai-baseline.json`。缺少 `OPENAI_API_KEY` 时命令必须失败。报告 Schema v2 固定记录：
+第一条命令默认同时写入 `artifacts/agent-runtime/openai-baseline.json` 和 `openai-baseline.verification.json`；第二条命令可在交接、归档或部署验收时重新独立复核已有报告。缺少 `OPENAI_API_KEY` 时评测命令必须失败。报告 Schema v2 固定记录：
 
 - 20 条样本的精确工具序列、状态、延迟和失败原因。
 - input、cached input、cache write、output、reasoning 与 total Token。
 - 每条请求的 OpenAI request id 覆盖率。
 - 按模型价格快照计算的逐样本和总美元成本，包含缓存写入 1.25 倍费率。
 - 价格快照的日期、适用范围和官方来源 URL。
+- 独立复核重新检查固定 20 例、工具顺序、request id 唯一性、Token 汇总、逐样本成本和发布结论。
 
-只有 20 条全部通过、request id 覆盖率 100%、Token 覆盖率 100%、成本覆盖率 100% 时才标记 `releaseCandidate: true`。未知模型没有受审价格快照时必须失败关闭，不能估算成零成本。
+只有 20 条全部通过、request id 覆盖率 100%、Token 覆盖率 100%、成本覆盖率 100% 且独立复核通过时才允许进入候选。未知模型没有受审价格快照时必须失败关闭，不能估算成零成本；报告缺失、截断或被修改时复核也必须失败。
 
 ## 冒烟检查
 
@@ -92,12 +94,15 @@ npm run smoke:agent:production
 # 完整发布门禁；Redis、签名身份、隔离回放和审批写入必须全部通过
 npm run smoke:agent:release
 
+# 真实模型门禁；额外要求 planner=openai 且模型密钥生效
+npm run smoke:agent:live
+
 # 需要留档时显式指定输出位置
 AGENT_SMOKE_OUTPUT=docs/evidence/agent-runtime-production-smoke-YYYY-MM-DD.json \
   npm run smoke:agent:production
 ```
 
-完整发布门禁会验证同会话回放、跨会话拒绝、审批前零副作用、批准后单次写入和重复审批拦截。报告不得包含 Cookie 或服务端凭据。
+完整发布门禁会验证同会话回放、跨会话拒绝、审批前零副作用、批准后单次写入和重复审批拦截。真实模型门禁在此基础上还要求实际部署公开声明 `planner=openai` 且模型密钥已配置；报告不得包含 Cookie 或服务端凭据。
 
 手工检查可使用：
 

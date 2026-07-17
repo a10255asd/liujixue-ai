@@ -55,6 +55,7 @@ test('production smoke accepts the honest read-only fixture baseline', async () 
   assert.equal(report.generatedAt, '2026-07-17T00:00:00.000Z')
   assert.equal(report.safeToServe, true)
   assert.equal(report.releaseReady, false)
+  assert.equal(report.liveModelReady, false)
   assert.equal(report.expectationPassed, true)
   assert.equal(report.checks.find((check) => check.id === 'redis-storage')?.passed, false)
 })
@@ -66,6 +67,7 @@ test('release smoke requires Redis, signed isolation and one approved write', as
   let approvalCount = 0
   let readRunId = ''
   let writeRunId = ''
+  let livePlanner = false
 
   const fetchImpl: typeof fetch = async (urlInput, init) => {
     const url = String(urlInput)
@@ -76,8 +78,8 @@ test('release smoke requires Redis, signed isolation and one approved write', as
     if (method === 'GET' && !url.includes('?id=')) {
       capabilityCount += 1
       return response({
-        plannerMode: 'fixture',
-        openAiConfigured: false,
+        plannerMode: livePlanner ? 'openai' : 'fixture',
+        openAiConfigured: livePlanner,
         rateLimitMode: 'redis',
         storageMode: 'redis',
         identityMode: 'signed-session',
@@ -129,8 +131,25 @@ test('release smoke requires Redis, signed isolation and one approved write', as
 
   assert.equal(report.safeToServe, true)
   assert.equal(report.releaseReady, true)
+  assert.equal(report.liveModelReady, false)
   assert.equal(report.expectationPassed, true)
-  assert.ok(report.checks.every((check) => check.passed))
+  assert.ok(report.checks.filter((check) => check.gate !== 'live').every((check) => check.passed))
+
+  livePlanner = true
+  capabilityCount = 0
+  approvalCount = 0
+  readRunId = ''
+  writeRunId = ''
+  const liveReport = await runAgentProductionSmoke({
+    baseUrl: 'https://ai.example.com',
+    expectation: 'live-model-ready',
+    fetchImpl,
+    createId: idFactory()
+  })
+  assert.equal(liveReport.releaseReady, true)
+  assert.equal(liveReport.liveModelReady, true)
+  assert.equal(liveReport.expectationPassed, true)
+  assert.ok(liveReport.checks.every((check) => check.passed))
 })
 
 test('release expectation fails closed on the read-only fixture baseline', async () => {
