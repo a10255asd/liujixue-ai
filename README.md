@@ -15,6 +15,7 @@
 - [docs/CONTENT_MODEL.md](docs/CONTENT_MODEL.md)：知识点、面试题、项目实战、学习路线数据模型。
 - [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md)：分批开发计划和验收标准。
 - [docs/PROGRESS_LOG.md](docs/PROGRESS_LOG.md)：已完成内容、验证记录和下一步唯一主线。
+- [docs/SPARE_TIME_LEARNING_PLAN.md](docs/SPARE_TIME_LEARNING_PLAN.md)：工作之余的 8 周业余学习计划，含每周交付物和退出门禁。
 - [docs/HANDOFF.md](docs/HANDOFF.md)：给后续 AI agent 的接手说明。
 - [docs/REFERENCE_SOURCES.md](docs/REFERENCE_SOURCES.md)：内容来源和官方资料优先级。
 
