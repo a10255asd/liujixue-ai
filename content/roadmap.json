@@ -1,8 +1,73 @@
 [
   {
+    "slug": "stage-0-beginner-foundations",
+    "title": "第 0 阶段：零基础先导",
+    "order": 1,
+    "level": "入门",
+    "summary": "不要求任何编程或 AI 背景，先建立共同语言：认识大模型、API 与密钥、一次调用的结构、Prompt、温度采样，在本地跑通第一个 AI 应用，再弄清 Agent 与 RAG 到底解决什么问题。",
+    "goals": [
+      "能用自己的话解释大模型、API Key、Prompt、温度、Agent 与 RAG",
+      "看懂一次模型调用的请求与响应结构",
+      "在本地跑通第一个 AI 应用",
+      "通过 8 道初级自测题确认概念没有想当然"
+    ],
+    "prerequisites": [],
+    "topics": [
+      "大模型基础",
+      "API 与密钥",
+      "一次调用的结构",
+      "Prompt 入门",
+      "温度与采样",
+      "第一个 AI 应用",
+      "Agent 概念",
+      "RAG 直觉"
+    ],
+    "outputs": [
+      "本地可运行的第一个 AI 应用",
+      "8 个入门知识点的概念笔记"
+    ],
+    "interviewFocus": [
+      "什么是大模型、API Key、Prompt 和温度",
+      "Agent 和普通聊天机器人的本质区别",
+      "什么是 RAG、它解决什么问题"
+    ],
+    "projectRefs": [],
+    "resourceRefs": [
+      "openai-platform-docs"
+    ],
+    "knowledgeRefs": [
+      "what-is-an-llm",
+      "api-and-api-keys",
+      "anatomy-of-an-llm-call",
+      "what-is-a-prompt",
+      "temperature-and-sampling",
+      "first-ai-app-locally",
+      "what-is-an-agent",
+      "why-rag"
+    ],
+    "questionRefs": [
+      "what-is-an-llm",
+      "what-is-api-key",
+      "message-roles",
+      "temperature-basics",
+      "prompt-anatomy",
+      "agent-vs-chatbot-essence",
+      "what-is-rag",
+      "hallucination-and-mitigation"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
     "slug": "ai-user-basics",
     "title": "AI 使用基础",
-    "order": 1,
+    "order": 2,
     "level": "入门",
     "summary": "理解模型、Token、上下文和 AI 应用边界。",
     "goals": [
@@ -10,7 +75,9 @@
       "完成AI 概念笔记",
       "能回答：Token 与上下文如何影响工程"
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      "stage-0-beginner-foundations"
+    ],
     "topics": [
       "模型与 Token",
       "上下文窗口",
@@ -38,7 +105,7 @@
   {
     "slug": "llm-api",
     "title": "LLM API 开发",
-    "order": 2,
+    "order": 3,
     "level": "入门",
     "summary": "把大模型作为可观测、可校验的工程依赖调用。",
     "goals": [
@@ -80,7 +147,7 @@
   {
     "slug": "prompt-context",
     "title": "Prompt 与上下文工程",
-    "order": 3,
+    "order": 4,
     "level": "进阶",
     "summary": "用契约、上下文选择和安全边界提高稳定性。",
     "goals": [
@@ -121,7 +188,7 @@
   {
     "slug": "rag",
     "title": "RAG 知识库",
-    "order": 4,
+    "order": 5,
     "level": "进阶",
     "summary": "建立可检索、可引用、可评估的外部知识链路。",
     "goals": [
@@ -165,7 +232,7 @@
   {
     "slug": "agent-engineering",
     "title": "Agent 工程",
-    "order": 5,
+    "order": 6,
     "level": "进阶",
     "summary": "掌握状态、工具、控制循环、终止和人工确认。",
     "goals": [
@@ -208,7 +275,7 @@
   {
     "slug": "mcp-ecosystem",
     "title": "MCP 与工具生态",
-    "order": 6,
+    "order": 7,
     "level": "高级",
     "summary": "用标准协议连接受限工具和数据资源。",
     "goals": [
@@ -250,7 +317,7 @@
   {
     "slug": "production-career",
     "title": "评估、生产与求职",
-    "order": 7,
+    "order": 8,
     "level": "求职",
     "summary": "用 Eval、Trace、部署与项目表达形成可投递能力。",
     "goals": [

@@ -36,8 +36,17 @@ type RoadmapStage = {
   interviewFocus: string[]
   projectRefs: string[]
   resourceRefs: string[]
+  knowledgeRefs?: string[]
+  questionRefs?: string[]
 }
 ```
+
+`knowledgeRefs` / `questionRefs` 为可选字段（2026-07-18 随第 0 阶段引入）：
+
+- `knowledgeRefs`：知识点 slug 数组，数组顺序即学习顺序；`/roadmap` 阶段卡片渲染为指向 `/knowledge/[slug]` 的有序链接列表。
+- `questionRefs`：面试题 id 数组，作为阶段自测题；渲染为指向 `/interview/[id]` 的链接列表。
+- 两个字段都必须指向真实存在且 `status: published` 的记录，`validate:content` 与 `tests/content-relations.test.mjs` 双重强制；未填写的阶段不渲染对应区块，行为与旧版一致。
+- 当前仅第 0 阶段 `stage-0-beginner-foundations` 使用这两个字段，其余 7 个阶段不填写。
 
 示例：
 
@@ -55,6 +64,19 @@ type RoadmapStage = {
   "interviewFocus": ["如何保证 LLM 输出稳定", "如何处理超时和重试"],
   "projectRefs": ["prompt-debugger"],
   "resourceRefs": ["openai-platform-docs"]
+}
+```
+
+第 0 阶段示例（使用可选引用字段）：
+
+```json
+{
+  "slug": "stage-0-beginner-foundations",
+  "title": "第 0 阶段：零基础先导",
+  "order": 1,
+  "level": "入门",
+  "knowledgeRefs": ["what-is-an-llm", "api-and-api-keys", "anatomy-of-an-llm-call"],
+  "questionRefs": ["what-is-an-llm", "what-is-api-key", "message-roles"]
 }
 ```
 

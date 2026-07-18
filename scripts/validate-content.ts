@@ -64,11 +64,14 @@ const roadmapIds = new Set(roadmap.map((item) => item.slug))
 const questionIds = new Set(questions.map((item) => item.id))
 const projectIds = new Set(projects.map((item) => item.slug))
 const resourceIds = new Set(resources.map((item) => item.id))
+const knowledgeIds = new Set(knowledge.map((item) => item.slug))
 
 for (const stage of roadmap) {
   assertReferences(`路线 ${stage.slug}`, stage.prerequisites, roadmapIds, '前置路线')
   assertReferences(`路线 ${stage.slug}`, stage.projectRefs, projectIds, '项目')
   assertReferences(`路线 ${stage.slug}`, stage.resourceRefs, resourceIds, '资料')
+  assertReferences(`路线 ${stage.slug}`, stage.knowledgeRefs ?? [], knowledgeIds, '知识点')
+  assertReferences(`路线 ${stage.slug}`, stage.questionRefs ?? [], questionIds, '面试题')
 }
 
 for (const item of knowledge) {
@@ -90,7 +93,6 @@ for (const journal of journals) {
 }
 
 const capabilityIds = new Set(career.capabilities.map((item) => item.id))
-const knowledgeIds = new Set(knowledge.map((item) => item.slug))
 
 for (const capability of career.capabilities) {
   assertReferences(`求职能力 ${capability.id}`, capability.knowledgeRefs, knowledgeIds, '知识点')

@@ -8,13 +8,36 @@ function readJson(path) {
 
 test('roadmap stages have executable learning outputs', () => {
   const stages = readJson('../content/roadmap.json')
-  assert.equal(stages.length, 7)
+  assert.equal(stages.length, 8)
   for (const stage of stages) {
     assert.ok(stage.slug)
     assert.ok(stage.title)
     assert.ok(Array.isArray(stage.goals) && stage.goals.length > 0)
     assert.ok(Array.isArray(stage.outputs) && stage.outputs.length > 0)
     assert.ok(Array.isArray(stage.interviewFocus) && stage.interviewFocus.length > 0)
+  }
+})
+
+test('stage-0 beginner track wires ordered knowledge and self-check refs', () => {
+  const stages = readJson('../content/roadmap.json')
+  const stage0 = stages.find((stage) => stage.slug === 'stage-0-beginner-foundations')
+  assert.ok(stage0, '缺少第 0 阶段 stage-0-beginner-foundations')
+  assert.equal(stage0.order, 1)
+  assert.deepEqual(stage0.knowledgeRefs, [
+    'what-is-an-llm',
+    'api-and-api-keys',
+    'anatomy-of-an-llm-call',
+    'what-is-a-prompt',
+    'temperature-and-sampling',
+    'first-ai-app-locally',
+    'what-is-an-agent',
+    'why-rag'
+  ])
+  assert.ok(Array.isArray(stage0.questionRefs) && stage0.questionRefs.length >= 6)
+  for (const stage of stages) {
+    if (stage.slug === 'stage-0-beginner-foundations') continue
+    assert.equal(stage.knowledgeRefs, undefined, `${stage.slug} 不应携带 knowledgeRefs`)
+    assert.equal(stage.questionRefs, undefined, `${stage.slug} 不应携带 questionRefs`)
   }
 })
 

@@ -42,11 +42,14 @@ test('cross-content references resolve to real records', () => {
   const questionIds = new Set(questions.map((item) => item.id))
   const projectIds = new Set(projects.map((item) => item.slug))
   const resourceIds = new Set(resources.map((item) => item.id))
+  const knowledgeIds = new Set(knowledge.map((item) => item.slug))
 
   for (const stage of roadmap) {
     assertRefs(stage.prerequisites, roadmapIds, `路线 ${stage.slug}`)
     assertRefs(stage.projectRefs, projectIds, `路线 ${stage.slug}`)
     assertRefs(stage.resourceRefs, resourceIds, `路线 ${stage.slug}`)
+    assertRefs(stage.knowledgeRefs ?? [], knowledgeIds, `路线 ${stage.slug}`)
+    assertRefs(stage.questionRefs ?? [], questionIds, `路线 ${stage.slug}`)
   }
   for (const item of knowledge) {
     assertRefs(item.relatedQuestions, questionIds, `知识点 ${item.slug}`)
@@ -75,6 +78,24 @@ test('cross-content references resolve to real records', () => {
       assertRefs(task.knowledgeRefs, new Set(knowledge.map((item) => item.slug)), `训练任务 ${track.slug}/${task.id}`)
       assertRefs(task.questionRefs, questionIds, `训练任务 ${track.slug}/${task.id}`)
       assertRefs(task.projectRefs, projectIds, `训练任务 ${track.slug}/${task.id}`)
+    }
+  }
+})
+
+test('roadmap knowledgeRefs and questionRefs resolve to published records', () => {
+  const knowledgeBySlug = new Map(knowledge.map((item) => [item.slug, item]))
+  const questionById = new Map(questions.map((item) => [item.id, item]))
+
+  for (const stage of roadmap) {
+    for (const ref of stage.knowledgeRefs ?? []) {
+      const item = knowledgeBySlug.get(ref)
+      assert.ok(item, `路线 ${stage.slug} 引用了不存在的知识点 ${ref}`)
+      assert.equal(item.status, 'published', `路线 ${stage.slug} 引用了未发布的知识点 ${ref}`)
+    }
+    for (const ref of stage.questionRefs ?? []) {
+      const item = questionById.get(ref)
+      assert.ok(item, `路线 ${stage.slug} 引用了不存在的面试题 ${ref}`)
+      assert.equal(item.status, 'published', `路线 ${stage.slug} 引用了未发布的面试题 ${ref}`)
     }
   }
 })

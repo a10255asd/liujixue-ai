@@ -23,7 +23,9 @@ export const roadmapStageSchema = z.object({
   outputs: stringList.min(1),
   interviewFocus: stringList.min(1),
   projectRefs: stringList,
-  resourceRefs: stringList
+  resourceRefs: stringList,
+  knowledgeRefs: stringList.optional(),
+  questionRefs: stringList.optional()
 }).merge(contentAuditFieldsSchema)
 
 export const knowledgePointSchema = z.object({

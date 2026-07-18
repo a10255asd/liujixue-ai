@@ -14,7 +14,7 @@
 
 ## 当前阶段
 
-当前已完成 Batch 10：完成项目证据审计，交付 Prompt 回归、可评估 RAG、受控 Agent 与 Agent 评测控制台四个原型，并完成 6 个真实 JD 的岗位校准和固定模拟面试。可评估 RAG 实验已升级为三路检索对比（关键词 / 混合 / 向量）：向量模式用本地开源多语言模型（Xenova/multilingual-e5-small，q8），文档向量构建期固化进 `content/labs/rag-vectors.json`，查询向量在浏览器端经 transformers.js 本地生成（模型文件走同源代理，WASM 运行时自托管）；文档内容变化后必须运行 `npm run build:rag-vectors` 重新生成向量，`validate:content` 会通过内容 hash 强制。AI 知识库、面试题库、学习路径集合与面试题组已接入 `liujixue-api` 服务器知识库，生产构建会合并服务器数据和本地 JSON 兜底内容。6 个项目目前为 4 个 `prototype`、2 个 `blueprint`、0 个 `verified`，页面不会把方案模板写成已完成项目。
+当前已完成 Batch 10：完成项目证据审计，交付 Prompt 回归、可评估 RAG、受控 Agent 与 Agent 评测控制台四个原型，并完成 6 个真实 JD 的岗位校准和固定模拟面试。学习路线已扩展为 8 个阶段：新增第 0 阶段 `stage-0-beginner-foundations` 零基础先导，`roadmapStageSchema` 增加可选 `knowledgeRefs` / `questionRefs`，`/roadmap` 将其渲染为有序知识点链接与自测题链接，引用完整性由 `validate:content` 和 `content-relations.test.mjs` 强制。可评估 RAG 实验已升级为三路检索对比（关键词 / 混合 / 向量）：向量模式用本地开源多语言模型（Xenova/multilingual-e5-small，q8），文档向量构建期固化进 `content/labs/rag-vectors.json`，查询向量在浏览器端经 transformers.js 本地生成（模型文件走同源代理，WASM 运行时自托管）；文档内容变化后必须运行 `npm run build:rag-vectors` 重新生成向量，`validate:content` 会通过内容 hash 强制。AI 知识库、面试题库、学习路径集合与面试题组已接入 `liujixue-api` 服务器知识库，生产构建会合并服务器数据和本地 JSON 兜底内容。6 个项目目前为 4 个 `prototype`、2 个 `blueprint`、0 个 `verified`，页面不会把方案模板写成已完成项目。
 
 GitHub 仓库、Vercel 自动部署、`https://ai.liujixue.cn` 和主站显眼入口均已接通。Vercel 域名验证返回 `ok: true`，当前 CNAME 已是推荐记录。用 `vercel inspect ai.liujixue.cn` 获取当前生产部署 ID，不在文档中写死易过期编号。
 

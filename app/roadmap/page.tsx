@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
-import { ArrowRight, BookOpenCheck, Check, Flag, Route, Target } from 'lucide-react'
+import { ArrowRight, BookOpenCheck, Check, FileQuestion, Flag, Route, Target } from 'lucide-react'
 import Link from 'next/link'
 
 import { PageHeading } from '@/components/ui/page-heading'
 import { SectionHeading } from '@/components/ui/section-heading'
 import { getLearningPathCollectionsWithApi } from '@/lib/content/knowledge-api'
-import { getProjects, getRoadmapStages } from '@/lib/content/repository'
+import { getInterviewQuestions, getKnowledgePoints, getProjects, getRoadmapStages } from '@/lib/content/repository'
 
 export const metadata: Metadata = {
   title: 'AI Agent 工程师学习路线',
-  description: '从 AI 基础、LLM API、RAG、Agent 到 MCP 和求职工程化的七阶段路线。',
+  description: '从零基础先导、AI 基础、LLM API、RAG、Agent 到 MCP 和求职工程化的八阶段路线。',
   alternates: { canonical: '/roadmap' }
 }
 
@@ -17,13 +17,15 @@ export default async function RoadmapPage() {
   const stages = getRoadmapStages()
   const projects = getProjects()
   const learningPaths = await getLearningPathCollectionsWithApi()
+  const knowledgeBySlug = new Map(getKnowledgePoints().map((item) => [item.slug, item]))
+  const questionById = new Map(getInterviewQuestions().map((item) => [item.id, item]))
 
   return (
     <div className="page-shell page-view">
       <PageHeading
-        eyebrow="ROADMAP / 7 STAGES"
+        eyebrow="ROADMAP / 8 STAGES"
         title="从 0 到 Agent 工程交付"
-        description="每一阶段都有学习目标、工程产出和面试检查点。路线不是阅读顺序，而是一套能力验收协议。"
+        description="每一阶段都有学习目标、工程产出和面试检查点。路线不是阅读顺序，而是一套能力验收协议。完全没有基础时，从第 0 阶段的零基础先导开始。"
         aside={<div className="heading-stat"><strong>{stages.length}</strong><span>阶段</span><strong>{projects.length}</strong><span>项目</span></div>}
       />
 
@@ -83,6 +85,35 @@ export default async function RoadmapPage() {
                   <ul>{stage.outputs.map((output) => <li key={output}><Check size={15} />{output}</li>)}</ul>
                 </div>
               </div>
+              {(stage.knowledgeRefs?.length ?? 0) > 0 || (stage.questionRefs?.length ?? 0) > 0 ? (
+                <div className="stage-refs">
+                  {stage.knowledgeRefs?.length ? (
+                    <div className="stage-refs__block">
+                      <h3><BookOpenCheck size={17} /> 知识点学习顺序</h3>
+                      <ol className="stage-refs__list">
+                        {stage.knowledgeRefs.map((slug, index) => (
+                          <li key={slug}>
+                            <span className="stage-refs__index">{String(index + 1).padStart(2, '0')}</span>
+                            <Link href={`/knowledge/${slug}`}>{knowledgeBySlug.get(slug)?.title ?? slug}</Link>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  ) : null}
+                  {stage.questionRefs?.length ? (
+                    <div className="stage-refs__block">
+                      <h3><FileQuestion size={17} /> 自测面试题</h3>
+                      <ul className="stage-refs__list">
+                        {stage.questionRefs.map((id) => (
+                          <li key={id}>
+                            <Link href={`/interview/${id}`}>{questionById.get(id)?.question ?? id}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
               <div className="topic-line">{stage.topics.map((topic) => <span key={topic}>{topic}</span>)}</div>
             </div>
           </article>
@@ -91,7 +122,7 @@ export default async function RoadmapPage() {
 
       <div className="next-step-panel">
         <div><span>不知道从哪开始？</span><h2>先建立 AI 工程共同语言。</h2></div>
-        <Link className="button button--primary" href="/knowledge/what-is-token">阅读第一个知识点 <ArrowRight size={17} /></Link>
+        <Link className="button button--primary" href="/knowledge/what-is-an-llm">阅读第一个知识点 <ArrowRight size={17} /></Link>
       </div>
     </div>
   )

@@ -10,6 +10,16 @@
 
 ## 已完成
 
+### 2026-07-18：路线图接入第 0 阶段零基础先导入口
+
+- Schema 扩展：`roadmapStageSchema`（`lib/content/schemas.ts`）新增可选 `knowledgeRefs`（知识点 slug 数组）与 `questionRefs`（面试题 id 数组），向后兼容——现有 7 个阶段不填写仍合法。命名对齐 `careerCapabilitySchema` / `trainingTaskSchema` 已有的同名字段。
+- 引用完整性：`scripts/validate-content.ts` 在路线阶段循环内新增两条 `assertReferences`，目标集合来自仓储层（只含 `published` 记录），因此"指向真实存在且已发布内容"由同一道门禁保证。
+- 新增第 0 阶段：`content/roadmap.json` 头部插入 `stage-0-beginner-foundations`（order 1，入门，published），按学习顺序引用 8 个入门知识点（`what-is-an-llm` → `api-and-api-keys` → `anatomy-of-an-llm-call` → `what-is-a-prompt` → `temperature-and-sampling` → `first-ai-app-locally` → `what-is-an-agent` → `why-rag`），自测引用 8 道初级题（`what-is-an-llm`、`what-is-api-key`、`message-roles`、`temperature-basics`、`prompt-anatomy`、`agent-vs-chatbot-essence`、`what-is-rag`、`hallucination-and-mitigation`）。原 7 个阶段 order 顺延为 2-8，`ai-user-basics` 的 prerequisites 挂到 `stage-0-beginner-foundations`，其余前置链不变。
+- 页面渲染：`/roadmap` 阶段卡片在"学习目标/阶段产出"下方新增 `stage-refs` 区块——`knowledgeRefs` 渲染为带铜色序号的有序链接列表（`/knowledge/[slug]`，显示知识点标题），`questionRefs` 渲染为自测链接列表（`/interview/[id]`，显示题干）；仅当阶段携带对应字段时渲染，其余 7 个阶段行为不变。样式沿用 ink-gold 变量（`--copper` 序号、`--muted` 正文、等宽字体序号），桌面两列、960px 以下并入既有单列组，链接 `overflow-wrap: anywhere`，390px 不溢出。页头改为 `ROADMAP / 8 STAGES`，底部"不知道从哪开始"入口改指 `/knowledge/what-is-an-llm`。
+- 测试：`tests/content-shape.test.mjs` 阶段数断言 7 → 8，新增"stage-0 引用顺序与字段独占"用例；`tests/content-relations.test.mjs` 的路线循环扩展 knowledgeRefs/questionRefs 引用校验，并新增"引用必须指向 published 记录"用例。单测总数 109 → 111。
+- 文档：`CONTENT_MODEL.md` 路线阶段模型补充两个可选字段的语义与示例；`TECHNICAL_DESIGN.md` 更新 7.3 校验层与 8.3 `/roadmap` 渲染说明。
+- 验证记录：`npm run validate:content`（8 阶段）、`npm run typecheck`、`npm run lint`、`npm run test:unit`（111 项通过）全部通过；webpack 构建仍死锁（已知环境问题），`npx next build --turbopack` 通过；抽查 `/roadmap` 静态 HTML，第 0 阶段 8 个知识链接、8 道自测链接与 `ROADMAP / 8 STAGES` 均渲染正常，且只有第 0 阶段出现 `stage-refs` 区块。
+
 ### 2026-07-18：第 0 阶段入门内容层（8 个知识点 + 15 道初级面试题）
 
 - 针对"33 个知识点里入门只有 7 个、80 道面试题里初级只有 13 道、默认读者已见过 API Key"的缺口，补齐纯 0 基础导向的先导层：新增 8 个入门知识点（`what-is-an-llm`、`api-and-api-keys`、`anatomy-of-an-llm-call`、`what-is-a-prompt`、`temperature-and-sampling`、`what-is-an-agent`、`why-rag`、`first-ai-app-locally`）和 15 道初级面试题，全部 `status: published`，`lastReviewedAt: 2026-07-18`。
