@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ArrowRight, CheckCircle2, CircleDot, PackageCheck } from 'lucide-react'
 
 import { PageHeading } from '@/components/ui/page-heading'
+import { AgentNotesSection } from '@/components/journal/agent-notes-section'
 import { getJournals, getRoadmapStages } from '@/lib/content/repository'
 
 export const metadata: Metadata = {
@@ -39,6 +40,7 @@ export default function JournalPage() {
           </article>
         ))}
       </div>
+      <AgentNotesSection />
     </div>
   )
 }

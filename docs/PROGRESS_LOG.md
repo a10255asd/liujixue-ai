@@ -10,6 +10,16 @@
 
 ## 已完成
 
+### 2026-07-18：学习闭环改造——Agent 笔记可见、lab 关联自测
+
+- `/journal` 新增“Agent 学习笔记”客户端区块：`save_learning_note` 经审批写入的笔记现在可以在日志页看到，不再只停留在运行响应里。
+- `lib/agent-runtime/storage.ts` 新增 `listLearningNotes(actorId)`：Redis 模式用 `SCAN agent:<actor 哈希>:note:*` 按签名会话 actor 隔离列出笔记，内存模式按 key 前缀过滤，按 `createdAt` 倒序；不破坏现有 actor 隔离边界。
+- 新增 `GET /api/agent/notes`：返回当前签名 actor 的笔记列表（`id`、`title`、`content`、`createdAt`、`runId`）；复用固定窗口限流（30 次/60 秒）；无签名会话、身份未配置或仓储未配置时返回空列表，并用 `identityMode`、`storageMode`、`reason`（`no-session` / `identity-disabled` / `storage-disabled`）机器可读字段说明降级原因。
+- 5 个 lab 页底部新增“相关知识点 / 相关面试题”区块，学完即可自测；映射集中声明在 `lib/content/lab-relations.ts`（每个 lab 2-4 个知识点 + 2-4 道面试题），只引用 `published` 内容，不改内容模型，`validate:content` 不受影响。
+- 新增 10 项单测：`tests/agent-notes.test.ts`（actor 隔离、倒序、Redis SCAN 作用域、禁用仓储降级、API 三种降级/正常响应），`tests/lab-relations.test.ts`（lab 路由与映射一一对应、引用真实存在且 published、resolver 完整解析）。
+- 验证记录：`npm run validate:content`、`npm run typecheck`、`npm run lint`、`npm run test:unit`（89 项通过）全部通过。本机 webpack 构建仍死锁（已知环境问题），改用 `npx next build --turbopack` 通过，生成 152 个静态页面，`/api/agent/notes` 为动态路由、`/journal` 保持静态。
+- 实测记录（`next start` + 生产构建）：无会话返回 `{"identityMode":"signed-session","storageMode":"redis-24h","notes":[],"reason":"no-session"}`；经 `POST /api/agent/run` 审批流程真实写入一条笔记后，带会话 Cookie 返回该 actor 的 1 条笔记（含正确 `runId`）；另一会话读取为空的隔离验证通过；测试 actor 的 5 个 Redis 键（note/run/checkpoint）已清理，server 已关闭。
+
 ### 2026-07-15：项目设计基线
 
 - 创建 `liujixue-ai` 独立项目和 Git 仓库。

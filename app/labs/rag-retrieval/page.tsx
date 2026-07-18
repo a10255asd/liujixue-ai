@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
+import { LabRelatedContent } from '@/components/labs/lab-related-content'
 import { RagRetrievalLab } from '@/components/labs/rag-retrieval-lab'
 import { PageHeading } from '@/components/ui/page-heading'
 import { getRagPrototypeData } from '@/lib/labs/rag-retrieval'
@@ -30,6 +31,7 @@ export default function RagRetrievalLabPage() {
         evaluationCases={data.evaluationCases}
         reports={data.reports}
       />
+      <LabRelatedContent lab="rag-retrieval" />
     </div>
   )
 }

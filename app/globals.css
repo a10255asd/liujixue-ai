@@ -1900,6 +1900,96 @@ strong {
   font-size: 12px;
 }
 
+.agent-notes {
+  margin-top: 72px;
+}
+
+.agent-notes__hint {
+  padding: 22px 24px;
+  background: var(--steel-soft);
+  border-top: 3px solid var(--steel);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.agent-notes__hint a {
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.agent-notes__list {
+  display: grid;
+  border-top: 1px solid var(--line-strong);
+  list-style: none;
+}
+
+.agent-notes__item {
+  display: grid;
+  padding-block: 22px;
+  border-bottom: 1px solid var(--line);
+  gap: 8px;
+}
+
+.agent-notes__meta {
+  display: flex;
+  flex-wrap: wrap;
+  color: var(--quiet);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  gap: 8px 18px;
+}
+
+.agent-notes__item h3 {
+  font-size: 16px;
+}
+
+.agent-notes__item p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.lab-related {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 72px;
+  gap: 48px;
+}
+
+.lab-related__column {
+  display: grid;
+  align-content: start;
+  border-top: 2px solid var(--ink-soft);
+}
+
+.lab-related__column > span {
+  padding-block: 13px;
+  color: var(--quiet);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+.lab-related__column a {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-block: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  gap: 12px;
+}
+
+.lab-related__column a:hover {
+  color: var(--copper);
+}
+
+.lab-related__column p {
+  color: var(--quiet);
+  font-size: 12px;
+}
+
 .detail-page {
   min-height: 70vh;
   padding-block: 54px 112px;
@@ -5930,6 +6020,11 @@ strong {
   .journal-entry {
     grid-template-columns: 1fr;
     gap: 22px;
+  }
+
+  .lab-related {
+    grid-template-columns: 1fr;
+    gap: 32px;
   }
 
   .project-proof {

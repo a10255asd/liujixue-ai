@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
+import { LabRelatedContent } from '@/components/labs/lab-related-content'
 import { McpToolsLab } from '@/components/labs/mcp-tools-lab'
 import labStyles from '@/components/labs/mcp-tools-lab.module.css'
 import { PageHeading } from '@/components/ui/page-heading'
@@ -126,6 +127,7 @@ export default function McpToolsLabPage() {
       </section>
 
       <McpToolsLab projects={projects} />
+      <LabRelatedContent lab="mcp-tools" />
     </div>
   )
 }

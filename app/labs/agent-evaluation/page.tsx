@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 import { AgentEvaluationLab } from '@/components/labs/agent-evaluation-lab'
+import { LabRelatedContent } from '@/components/labs/lab-related-content'
 import { PageHeading } from '@/components/ui/page-heading'
 import { agentScenarios } from '@/lib/labs/controlled-agent'
 
@@ -23,6 +24,7 @@ export default function AgentEvaluationLabPage() {
         aside={<div className="heading-stat"><strong>2</strong><span>策略版本</span><strong>{agentScenarios.length} × 5</strong><span>样本与维度</span></div>}
       />
       <AgentEvaluationLab />
+      <LabRelatedContent lab="agent-evaluation" />
     </div>
   )
 }

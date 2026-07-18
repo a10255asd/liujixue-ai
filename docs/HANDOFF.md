@@ -168,3 +168,12 @@ npm run build
 - 新增 12 项协议单测；sitemap、README、e2e 路由清单和 `/labs/controlled-agent` 交叉链接已接入。
 - 验证：内容校验、类型检查、Lint、79 项单元测试、`next build --turbopack`（152 个静态页面）、Playwright 53 项通过 1 项按设备跳过全部通过；curl 实测 5 个协议方法与全部错误路径（-32700、-32600、-32601、-32602、405、429 限流逻辑）。
 - 环境注意：本机所有 Next 项目的 webpack `next build` 当前死锁在一个永不返回的 `open()` 系统调用上（未改动的 liujixue-xuan、liujixue-main 同样复现，与本批改动无关；当时机器交换内存 31.5G/32G 几乎耗尽）；本批构建验证改用 Turbopack 完成。下次在本机构建前若 webpack 仍卡死，先处理机器内存压力或直接在 CI/Vercel 构建。
+
+2026-07-18（学习闭环改造）：
+
+- 完成 `/journal` 与 Agent 学习笔记打通：`lib/agent-runtime/storage.ts` 新增 `listLearningNotes(actorId)`（Redis 走 `SCAN agent:<actor 哈希>:note:*`，内存走 key 前缀过滤，均按 actor 隔离、`createdAt` 倒序）；新增 `GET /api/agent/notes`，只返回当前签名会话 actor 的笔记，复用 30 次/60 秒固定窗口限流。
+- 笔记接口降级契约：200 空列表 + `identityMode` / `storageMode` / `reason`（`no-session`、`identity-disabled`、`storage-disabled`）机器可读字段；`/journal` 客户端区块据此区分“还没有笔记”和“当前环境不支持持久化（response-only）”两种空状态。
+- 5 个 lab 页底部接入“相关知识点 / 相关面试题”：映射集中声明在 `lib/content/lab-relations.ts`（TS 常量，不进 content/*.json，不影响 `validate:content`），解析走 repository 公开函数，天然只含 `published`。
+- 新增 10 项单测（笔记隔离/降级 7 项、lab 映射完整性 3 项），单测总数 89 全部通过；内容校验、typecheck、lint 通过；webpack `next build` 本机死锁仍未恢复，构建验证继续用 `next build --turbopack`（152 静态页）。
+- 实测证据：`next start` 下完成 无会话降级 → 发起运行 → 审批 → 真实 Upstash Redis 写入 → 带 Cookie 读回 1 条笔记 的完整闭环；第二会话读取为空；测试 actor 的 note/run/checkpoint 共 5 个 Redis 键已删除，无后台进程残留。
+- 注意：`next start` 以 production 模式运行，无 `AGENT_SESSION_SECRET` 时笔记接口返回 `identity-disabled`，这是预期降级；本地联调笔记流程需显式设置该变量。笔记 Redis 读取依赖 SCAN，单 actor 笔记量受 24h TTL 与人工审批约束，量级小，未建索引。

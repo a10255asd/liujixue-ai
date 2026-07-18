@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
 import { ControlledAgentLab } from '@/components/labs/controlled-agent-lab'
+import { LabRelatedContent } from '@/components/labs/lab-related-content'
 import { ServerAgentRuntimeLab } from '@/components/labs/server-agent-runtime-lab'
 import { PageHeading } from '@/components/ui/page-heading'
 import { evaluateRuntimePlanner } from '@/lib/agent-runtime/evaluation'
@@ -30,6 +31,7 @@ export default function ControlledAgentLabPage() {
         <Link className="text-link" href="/labs/mcp-tools">在 MCP 协议层观察同一批只读工具（initialize → tools/list → tools/call） <ArrowRight size={16} /></Link>
       </p>
       <ControlledAgentLab />
+      <LabRelatedContent lab="controlled-agent" />
     </div>
   )
 }

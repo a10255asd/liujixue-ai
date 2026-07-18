@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
+import { LabRelatedContent } from '@/components/labs/lab-related-content'
 import { PromptRegressionLab } from '@/components/labs/prompt-regression-lab'
 import { PageHeading } from '@/components/ui/page-heading'
 import { getPromptRegressionReports } from '@/lib/labs/prompt-regression'
@@ -25,6 +26,7 @@ export default function PromptRegressionLabPage() {
         aside={<div className="heading-stat"><strong>{reports.length}</strong><span>Prompt 版本</span><strong>{reports[0]?.samples.length ?? 0}</strong><span>固定样例</span></div>}
       />
       <PromptRegressionLab reports={reports} />
+      <LabRelatedContent lab="prompt-regression" />
     </div>
   )
 }

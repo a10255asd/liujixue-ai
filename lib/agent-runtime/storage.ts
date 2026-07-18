@@ -142,6 +142,38 @@ export function createRuntimeStore(options: {
         memoryNotes.set(key, note)
       }
       return note
+    },
+    async listLearningNotes(actorId: string): Promise<SavedLearningNote[]> {
+      if (mode === 'disabled') return []
+      const prefix = scopedKey(actorId, 'note', '')
+      const byCreatedDesc = (a: SavedLearningNote, b: SavedLearningNote) => b.createdAt.localeCompare(a.createdAt)
+      if (!redis) {
+        return [...memoryNotes.entries()]
+          .filter(([key]) => key.startsWith(prefix))
+          .map(([, note]) => note)
+          .sort(byCreatedDesc)
+      }
+
+      const keys: string[] = []
+      let cursor = '0'
+      do {
+        const page = await redis.command<unknown>('SCAN', cursor, 'MATCH', `${prefix}*`, 'COUNT', 100)
+        if (!Array.isArray(page) || page.length < 2 || !Array.isArray(page[1])) throw new Error('Redis 笔记扫描返回格式无效')
+        cursor = String(page[0])
+        keys.push(...page[1].map(String))
+      } while (cursor !== '0')
+
+      const notes: SavedLearningNote[] = []
+      for (const key of keys) {
+        const value = await redis.command<string | null>('GET', key)
+        if (!value) continue
+        try {
+          notes.push(JSON.parse(value) as SavedLearningNote)
+        } catch {
+          throw new Error('已保存学习笔记无法解析')
+        }
+      }
+      return notes.sort(byCreatedDesc)
     }
   }
 }
