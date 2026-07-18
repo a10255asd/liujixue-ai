@@ -24,7 +24,7 @@ export const labContentRelations = {
     questions: ['agent-evaluation', 'tool-call-evaluation', 'eval-regression-gate', 'eval-dataset-design']
   },
   'mcp-tools': {
-    knowledge: ['mcp-architecture', 'mcp-primitives', 'mcp-security'],
+    knowledge: ['mcp-architecture', 'mcp-primitives', 'mcp-lifecycle', 'mcp-security'],
     questions: ['what-is-mcp', 'mcp-architecture-question', 'mcp-primitives', 'mcp-security']
   }
 } as const
