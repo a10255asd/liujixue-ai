@@ -10,6 +10,21 @@
 
 ## 已完成
 
+### 2026-07-18：新增 4 道 MCP 初级面试题，mcp 学习路径形成难度梯度
+
+- 背景：95 道面试题中 mcp 类 8 道以中高级为主（初级仅 `what-is-mcp`），刚上线的 `mcp-transports`、`mcp-lifecycle` 两个进阶知识点没有对应初级自测题，路线难度断层。
+- 新增 4 道初级面试题，全部 `category: mcp`、`level: 初级`、`status: published`、`lastReviewedAt: 2026-07-18`，按 schema 写全考察点/短答案/完整答案/加分点/常见错误/2 个递进追问/项目关联/references，术语首次出现给一句人话解释：
+  - `mcp-transport-types`：stdio 与 Streamable HTTP 两种标准传输的场景选型（本地子进程 vs 远程共享服务），对应知识点 `mcp-transports`。
+  - `mcp-initialize-handshake`：initialize 握手交换版本/能力/身份三类信息与协议版本协商回退规则，对应知识点 `mcp-lifecycle`。
+  - `mcp-tools-list-call`：tools/list 与 tools/call 分工及"连接 → 握手 → initialized → 列工具 → 调工具"完整步骤，对应知识点 `mcp-lifecycle` + `mcp-primitives`。
+  - `mcp-error-codes`：-32601/-32602 含义与分层排查（协议错误 vs isError 工具执行失败），对应知识点 `mcp-lifecycle`，引用 `POST /api/mcp` 真实错误行为。
+- 站内事实与 `lib/agent-runtime/mcp.ts` 逐条核对：支持版本 2024-11-05 / 2025-03-26 / 2025-06-18、未知版本回退 2025-06-18、capabilities `tools.listChanged=false`、通知回 202、未知 method 回 -32601、参数问题与未知工具回 -32602（未知工具附 `error.data.exposedTools`）、写工具 `save_learning_note` 不经 MCP 暴露、工具执行失败走 `isError: true`。
+- 双向关联：知识点 `mcp-transports` relatedQuestions → `mcp-transport-types` 置首（共 3 个）；`mcp-lifecycle` → 新增 `mcp-initialize-handshake`、`mcp-error-codes`（共 4 个，达上限）；`mcp-primitives` → 新增 `mcp-tools-list-call`（共 2 个）。
+- 路线图：`mcp-ecosystem` questionRefs 头部插入 3 道新初级题（`mcp-transport-types`、`mcp-initialize-handshake`、`mcp-tools-list-call`），为控制总数 ≤ 10 移除尾部与新题覆盖重叠的 `mcp-capability-negotiation`（能力协商已被 initialize 握手题完整覆盖），最终 10 道，按初级在前、中高级在后形成难度梯度。`mcp-error-codes` 未挂路线图（避免与既有 `mcp-debugging` 主题重复），仅经知识点关联可达。
+- references 只引 `resources.json` 已有官方条目 `mcp-docs`、`mcp-architecture`（modelcontextprotocol.io），未新增资源。
+- 测试基线：`tests/content-shape.test.mjs` 两处面试题总数断言 95 → 99（内容增长的必要基线更新），ref 完整性用例继续通过。数据规模：面试题 95 → 99（mcp 类 8 → 12，初级 28 → 32）。
+- 验证记录：`npm run validate:content`（8 阶段、44 知识点、99 面试题）、`npm run typecheck`、`npm run lint`、`npm run test:unit`（113 项通过）全部通过；webpack 构建死锁未恢复（已知环境问题），`npx next build --turbopack` 通过，生成 182 个静态页面（178 + 4 个面试题详情页）。
+
 ### 2026-07-18：补 3 个进阶知识点并关闭两处路线图内容缺口
 
 - 新增 3 个知识点，全部 `published`、`lastReviewedAt: 2026-07-18`，结构与长度对齐现有 MCP 条目（单段 explanation + engineeringNotes/example/commonMistakes/interviewAnswer），术语首次出现给一句人话解释：

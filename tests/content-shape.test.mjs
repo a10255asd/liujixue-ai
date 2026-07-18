@@ -84,7 +84,7 @@ test('non-stage-0 knowledge points reach at least 85% roadmap coverage', () => {
 
 test('batch 2 reaches the reviewed content baseline', () => {
   assert.ok(readJson('../content/knowledge-points.json').length >= 30)
-  assert.equal(readJson('../content/interview-questions.json').length, 95)
+  assert.equal(readJson('../content/interview-questions.json').length, 99)
   assert.ok(readJson('../content/projects.json').length >= 6)
   assert.ok(readJson('../content/resources.json').length >= 12)
 })
@@ -146,7 +146,7 @@ test('career guide has a complete deterministic path', () => {
 
 test('interview questions include answer training fields', () => {
   const questions = readJson('../content/interview-questions.json')
-  assert.equal(questions.length, 95)
+  assert.equal(questions.length, 99)
   for (const item of questions) {
     assert.ok(item.id)
     assert.ok(item.question)

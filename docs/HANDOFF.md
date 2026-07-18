@@ -210,3 +210,9 @@ npm run build
 - 路线图：`mcp-ecosystem` knowledgeRefs 重排为 `mcp-architecture` → `mcp-primitives` → `mcp-transports` → `mcp-lifecycle` → `mcp-security`；`ai-user-basics` 在 `model-selection` 后插入 `llm-determinism`；questionRefs 未动。上一批记录的两处内容缺口（MCP Transport 与生命周期、非确定性专属知识点）关闭，非第 0 阶段覆盖率保持 100%。
 - 测试基线：`tests/content-shape.test.mjs` 非第 0 阶段知识点池断言 33 → 36，其余断言不变。
 - 验证：内容校验（44 知识点）、类型检查、Lint、113 项单元测试通过；webpack 构建死锁未恢复（已知环境问题），`next build --turbopack` 通过（178 静态页）。
+
+2026-07-18（MCP 初级面试题补齐）：
+
+- 新增 4 道 MCP 初级面试题（全部 published、lastReviewedAt 2026-07-18）：`mcp-transport-types`（stdio 与 Streamable HTTP 选型）、`mcp-initialize-handshake`（initialize 握手与协议版本协商）、`mcp-tools-list-call`（tools/list 与 tools/call 及调用五步骤）、`mcp-error-codes`（-32601/-32602 分层排查），与新知识点 `mcp-transports` / `mcp-lifecycle` / `mcp-primitives` 双向关联，站内协议事实逐条对齐 `lib/agent-runtime/mcp.ts`。
+- 路线图 `mcp-ecosystem` questionRefs 头部插入 3 道新初级题形成难度梯度，为控制 10 道上限移除与新题覆盖重叠的 `mcp-capability-negotiation`；`mcp-error-codes` 只经知识点关联可达，未挂路线图。
+- 测试基线：面试题总数断言 95 → 99；验证：内容校验、类型检查、Lint、113 项单元测试通过；webpack 构建死锁未恢复（已知环境问题），`next build --turbopack` 通过（182 静态页）。

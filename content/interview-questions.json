@@ -3180,6 +3180,175 @@
     ]
   },
   {
+    "id": "mcp-transport-types",
+    "question": "MCP 有哪几种传输方式？stdio 和 Streamable HTTP 分别适合什么场景？",
+    "category": "mcp",
+    "level": "初级",
+    "tags": [
+      "MCP",
+      "Transport",
+      "stdio",
+      "HTTP"
+    ],
+    "whatItTests": [
+      "是否知道 MCP 传输层与数据层分离，两种标准传输搬运的是同一套 JSON-RPC 消息",
+      "是否能按部署形态（本地子进程 vs 远程共享服务）做传输选型"
+    ],
+    "shortAnswer": "MCP 定义两种标准传输方式：stdio 和 Streamable HTTP。stdio 是 Host 把 Server 拉成本地子进程，协议消息走子进程的标准输入输出，进程即会话、不需要网络鉴权，适合桌面宿主接本地工具；Streamable HTTP 把 Server 当远程服务，Client 用 HTTP POST 发消息、服务端可用 SSE 回推，鉴权、TLS 和多客户端会话要自己解决，适合团队共享的远程部署。两种方式下 JSON-RPC 数据层完全一致，选型按部署形态选，不按功能选。",
+    "fullAnswer": "Transport（传输层）只负责搬运消息，方法、参数、结果在两种传输下相同，所以同一套 Server 逻辑可以两种都支持。stdio 模式下 Host 用命令行拉起 Server 子进程，写入 stdin、读出 stdout 就是收发消息；工程上要管进程生命周期：启动参数、退出重启，日志必须走 stderr——写进 stdout 会污染协议消息流。Claude Desktop 配置里的 command 加 args 就是 stdio。Streamable HTTP 模式下 Server 是一个 HTTP 端点：Client POST 发 JSON-RPC，响应可以直接返回，也可以是 SSE（Server-Sent Events，服务器向客户端的单向推送流）长连接；鉴权通常用 OAuth 或 Bearer Token，还要处理 TLS、会话头和水平扩展。判定口诀：要用本地文件、本地命令、跟随用户机器权限，选 stdio；要做统一鉴权、多客户端接入的共享服务，选 Streamable HTTP。",
+    "bonusPoints": [
+      "指出 stdio 的日志必须走 stderr，否则会污染 JSON-RPC 消息流",
+      "知道 Streamable HTTP 允许无状态单请求子集：只 POST、不开 SSE 也是合规实现，适合先跑通再补推送"
+    ],
+    "commonMistakes": [
+      "以为换传输方式消息格式也要换，其实数据层不变",
+      "给远程共享服务套 stdio，导致每台客户端机器都得安装并拉起一份 Server"
+    ],
+    "followUps": [
+      "stdio 模式下 Server 子进程崩溃或退出了，Host 应该怎么处理？",
+      "远程 MCP Server 不做鉴权就把工具暴露到公网，会有什么后果？"
+    ],
+    "projectConnection": "站内 POST /api/mcp 就是 Streamable HTTP 的真实实现（单请求无状态子集，curl 即可复现），/labs/mcp-tools 可逐帧观察协议消息；stdio 形态暂无站内可运行示例，可对照 Claude Desktop 的 command 配置理解。",
+    "references": [
+      "mcp-docs",
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-initialize-handshake",
+    "question": "MCP 的 initialize 握手做什么？协议版本协商是怎么进行的？",
+    "category": "mcp",
+    "level": "初级",
+    "tags": [
+      "MCP",
+      "Lifecycle",
+      "Handshake"
+    ],
+    "whatItTests": [
+      "是否理解 MCP 会话从 initialize 握手开始，握手一次交换版本、能力和身份三类信息",
+      "是否理解协议版本协商规则，以及版本对不上时的回退行为"
+    ],
+    "shortAnswer": "initialize 是 Client 发给 Server 的第一个请求，一次交换三样东西：协议版本、双方能力（capabilities）、双方身份信息。版本协商规则是 Client 报出自己支持的 protocolVersion（协议版本按日期命名，如 2025-06-18），Server 回一个双方都兼容的版本；对不上时常见做法是 Server 回退到自己支持的版本，由 Client 检查回应版本后决定是否继续。",
+    "fullAnswer": "握手在同一条响应里同时完成两件事：版本协商与 capability negotiation（能力协商，双方声明自己提供和接受的能力，此后只能用协商过的能力）。以本站 POST /api/mcp 的真实实现为例：Server 支持 2024-11-05、2025-03-26、2025-06-18 三个版本，Client 请求的版本在支持列表内就照用，不在就回退到服务端最新版 2025-06-18；同一条响应还返回 capabilities（如 tools.listChanged=false 表示工具列表变化时 Server 不主动推送）和 serverInfo。Client 确认后必须再发一条 notifications/initialized——通知是没有 id、不应答的消息，本站对通知一律回 202 空响应——会话才算就绪，之后才是 tools/list、tools/call 这类正常请求。等通知的响应是死等，跳过握手直接调用则属于协议违规。",
+    "bonusPoints": [
+      "能区分一次握手里完成的两件事：协议版本协商与能力协商",
+      "知道通知不应答：initialized 发完不等响应，等了就卡住"
+    ],
+    "commonMistakes": [
+      "跳过 initialize 直接发 tools/call",
+      "以为版本对不上握手一定失败，其实规范允许 Server 回退版本、由 Client 决定是否继续"
+    ],
+    "followUps": [
+      "Client 只支持 2024-11-05，Server 回应了 2025-06-18，Client 应该怎么决策？",
+      "capabilities 里 listChanged=false 对 Client 后续行为有什么约束？"
+    ],
+    "projectConnection": "/labs/mcp-tools 的第一帧就是 initialize 的请求与响应原文，能直接看到 protocolVersion、capabilities 和 serverInfo 三个字段的真实取值；版本列表与回退逻辑即 lib/agent-runtime/mcp.ts 的实现。",
+    "references": [
+      "mcp-docs",
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-tools-list-call",
+    "question": "tools/list 和 tools/call 分别是什么？一个 MCP Client 从连接到调用工具要走哪几步？",
+    "category": "mcp",
+    "level": "初级",
+    "tags": [
+      "MCP",
+      "Tools",
+      "JSON-RPC"
+    ],
+    "whatItTests": [
+      "是否理解 tools/list 拿工具清单、tools/call 按名执行的分工",
+      "是否能按正确顺序说出连接、握手、就绪通知、列工具、调工具的完整步骤"
+    ],
+    "shortAnswer": "tools/list 是向 Server 要当前可用工具清单，返回每个工具的 name、description 和 inputSchema（参数结构）；tools/call 是按清单里的 name 加 arguments 真正执行一个工具。完整步骤：建立连接 → initialize 握手 → 发 notifications/initialized 确认就绪 → tools/list 拿清单 → 按 inputSchema 组装参数发 tools/call。",
+    "fullAnswer": "tools/list 的价值是让 Host 拿到工具定义后喂给模型做选择——它对应 function calling 里的 tools 参数，模型看到 name、description、inputSchema 才知道有什么可调、怎么填参，所以清单以握手后的 tools/list 为准，不该在 Client 里硬编码。tools/call 的 params 固定是 name（字符串）加可选 arguments（对象），结果放在 content 数组里返回；注意工具执行失败不是协议错误，按约定返回带 isError: true 的正常结果。顺序不能乱：没完成 initialize 和 initialized 通知就调用，属于跳过握手。以本站 POST /api/mcp 为例：tools/call 缺 name 或参数结构不合法返回 -32602；调用未暴露的工具名同样返回 -32602，并在 error.data.exposedTools 里列出可用工具。",
+    "bonusPoints": [
+      "把 tools/list 与 function calling 的 tools 参数对应起来，说明模型选工具的信息来源",
+      "指出工具清单应以 tools/list 动态获取而非硬编码，便于 Server 侧增删工具"
+    ],
+    "commonMistakes": [
+      "从不调 tools/list，把工具名和参数硬编码在 Client 里",
+      "以为 tools/call 执行失败会返回协议错误码，其实走结果里的 isError 字段"
+    ],
+    "followUps": [
+      "工具列表在会话中途变化了，Client 怎么感知？（提示：回看 capabilities 里的 listChanged）",
+      "tools/call 返回 isError: true 时，上层 Agent 应该怎么处理？"
+    ],
+    "projectConnection": "/labs/mcp-tools 完整演示 initialize → notifications/initialized → tools/list → tools/call 四步轨迹，每帧都是真实请求/响应原文；站内 MCP server 只暴露 2 个只读工具，写工具 save_learning_note 不经 MCP 暴露，调它会收到 -32602。",
+    "references": [
+      "mcp-docs",
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "mcp-error-codes",
+    "question": "调用 MCP 工具时返回错误码 -32601 或 -32602 是什么意思？怎么排查？",
+    "category": "mcp",
+    "level": "初级",
+    "tags": [
+      "MCP",
+      "Error Handling",
+      "Debugging"
+    ],
+    "whatItTests": [
+      "是否认得 JSON-RPC 标准错误码 -32601（未知方法）与 -32602（参数不合法）的含义",
+      "是否会按协议错误与工具执行失败两层分开排查"
+    ],
+    "shortAnswer": "两个都是 JSON-RPC 标准协议错误：-32601 是 Method not found，方法名写错或 Server 不支持（比如把 tools/call 拼成 tool/call）；-32602 是 Invalid params，方法对但参数不合法（比如 tools/call 缺 name、arguments 类型不对，或调了未暴露的工具名）。排查先看 method 拼写，再对照 tools/list 返回的 inputSchema 逐字段校验参数。",
+    "fullAnswer": "先分两层：协议错误走 JSON-RPC error 字段和错误码，工具执行失败不走错误码，走正常结果里的 isError: true——两者处置路径不同，混为一谈会改错地方。再按码定位：-32601 检查 method 字符串是否在 Server 支持的方法列表里；-32602 对照 inputSchema 校验每个字段，未知工具名也归在这一档。同族错误码还有 -32700（请求体不是合法 JSON）和 -32600（请求结构非法，比如缺 id）。本站 POST /api/mcp 的真实行为可以逐条复现：未知 method 返回 -32601；tools/call 缺 name、调用未知工具、或调写工具 save_learning_note（不经 MCP 暴露）都返回 -32602，其中未知工具还在 error.data.exposedTools 里列出可用工具名——error.data 是 Server 给排查留的线索，排障时先读它。收到 -32602 不要盲目重试，参数不合法重试多少次都一样。",
+    "bonusPoints": [
+      "能完整说出 -32700 / -32600 / -32601 / -32602 四个协议错误码的分层",
+      "指出 error.data 可携带排查线索（如 exposedTools），排障先读 data 再改请求"
+    ],
+    "commonMistakes": [
+      "把 isError: true 的工具执行失败当成 -32601/-32602 去改协议层代码",
+      "收到 -32602 不做参数校验就盲目重试"
+    ],
+    "followUps": [
+      "-32602 和 isError: true 都表现为“调用失败”，监控告警应该分开统计吗，为什么？",
+      "怎么设计 Client，让这类协议错误在开发期而不是线上暴露？"
+    ],
+    "projectConnection": "/labs/mcp-tools 可以直接发未知方法名或错误参数，逐帧复现 -32601 与 -32602 的真实响应；POST /api/mcp 的错误响应附中文排查提示，未知工具还会列出 exposedTools。",
+    "references": [
+      "mcp-docs",
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
     "id": "agent-evaluation",
     "question": "Agent 评估为什么要同时看结果和轨迹？",
     "category": "eval-observability",

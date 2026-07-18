@@ -1345,6 +1345,7 @@
     ],
     "interviewAnswer": "三类原语的核心区别是能力语义与控制方，不只是接口名字。",
     "relatedQuestions": [
+      "mcp-tools-list-call",
       "mcp-primitives"
     ],
     "relatedProjects": [
@@ -1385,6 +1386,7 @@
     ],
     "interviewAnswer": "数据层不变，传输层二选一：stdio 是本地子进程、进程即会话、免网络鉴权，适合桌面宿主与本地工具；Streamable HTTP 是远程服务，要自己处理鉴权、TLS 与多客户端会话，适合共享部署。按部署形态选，不按功能选。",
     "relatedQuestions": [
+      "mcp-transport-types",
       "mcp-transports",
       "mcp-server-design"
     ],
@@ -1426,6 +1428,8 @@
     ],
     "interviewAnswer": "生命周期是 initialize 协商版本与能力，initialized 通知就绪，然后请求/响应循环，最后连接终止。错误分两层：协议层走标准错误码 -32700/-32600/-32601/-32602，工具执行失败走结果里的 isError；分清这两层，排障才不会乱。",
     "relatedQuestions": [
+      "mcp-initialize-handshake",
+      "mcp-error-codes",
       "mcp-capability-negotiation",
       "mcp-debugging"
     ],

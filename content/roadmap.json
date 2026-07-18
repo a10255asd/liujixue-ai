@@ -396,12 +396,14 @@
       "mcp-security"
     ],
     "questionRefs": [
+      "mcp-transport-types",
+      "mcp-initialize-handshake",
+      "mcp-tools-list-call",
       "what-is-mcp",
       "mcp-architecture-question",
       "mcp-primitives",
       "mcp-transports",
       "mcp-debugging",
-      "mcp-capability-negotiation",
       "mcp-security",
       "mcp-server-design"
     ],
