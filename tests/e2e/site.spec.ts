@@ -14,6 +14,7 @@ const routes = [
   '/labs/rag-retrieval',
   '/labs/controlled-agent',
   '/labs/agent-evaluation',
+  '/labs/mcp-tools',
   '/resources',
   '/journal'
 ]
@@ -174,4 +175,19 @@ test('Agent evaluation gate blocks regressions and passes the controlled version
   await expect(page.getByTestId('eval-release-status')).toContainText('允许进入发布流程')
   await expect(page.getByTestId('eval-overall-score')).toHaveText('100/100')
   await expect(page.getByTestId('eval-regression-row')).toHaveCount(0)
+})
+
+test('MCP lab completes a real protocol session with visible JSON-RPC messages', async ({ page }) => {
+  await page.goto('/labs/mcp-tools')
+  await expect(page.getByTestId('mcp-transport')).toContainText('JSON-RPC 2.0')
+  await page.getByTestId('mcp-run').click()
+  await expect(page.getByTestId('mcp-message')).toHaveCount(8)
+  await expect(page.getByTestId('mcp-trace')).toContainText('notifications/initialized')
+  await expect(page.getByTestId('mcp-trace')).toContainText('tools/list')
+  await expect(page.getByTestId('mcp-tool-result')).toContainText('isError: false')
+
+  await page.getByRole('button', { name: /inspect_project_evidence/ }).click()
+  await page.getByTestId('mcp-run').click()
+  await expect(page.getByTestId('mcp-message')).toHaveCount(8)
+  await expect(page.getByTestId('mcp-tool-result')).toContainText('受控任务执行 Agent')
 })

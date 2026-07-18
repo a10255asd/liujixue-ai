@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
 import { ControlledAgentLab } from '@/components/labs/controlled-agent-lab'
@@ -26,6 +26,9 @@ export default function ControlledAgentLabPage() {
         aside={<div className="heading-stat"><strong>2</strong><span>真实只读工具</span><strong>{runtimeEvaluation.caseCount}</strong><span>契约评测</span></div>}
       />
       <ServerAgentRuntimeLab evaluationCases={runtimeEvaluation.caseCount} evaluationPassRate={runtimeEvaluation.passRate} />
+      <p>
+        <Link className="text-link" href="/labs/mcp-tools">在 MCP 协议层观察同一批只读工具（initialize → tools/list → tools/call） <ArrowRight size={16} /></Link>
+      </p>
       <ControlledAgentLab />
     </div>
   )

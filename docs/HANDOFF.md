@@ -1,6 +1,6 @@
 # AI Agent 接手说明
 
-更新时间：2026-07-17
+更新时间：2026-07-18
 
 ## 项目概况
 
@@ -159,3 +159,12 @@ npm run build
 - 完成 Batch 10 服务器面试题组：API 生产新增 3 个 `interview_set` collections，`/interview` 顶部会展示 LLM 应用工程、RAG、Agent 可靠性三个题组，共 10 个题组条目。
 - Batch 10 验证通过：后端 JSON 和脚本语法通过，AI 子站 67 项单元测试、类型检查、Lint、生产构建通过；1440px 与 390px 本地和正式域名浏览器验收均为 3 个题组、10 个条目、横向溢出 0。
 - Batch 10 已完成 Vercel 生产部署，`https://liujixue-a9pz1wzw5-a10255asds-projects.vercel.app` 已 alias 到 `https://ai.liujixue.cn`，`https://ai.liujixue.cn/interview` 返回 200 并展示服务器面试题组。
+
+2026-07-18：
+
+- 完成 MCP 工具协议实验 `/labs/mcp-tools`：新增 `POST /api/mcp` 最小 MCP server（JSON-RPC 2.0 over HTTP POST 单请求模式），支持 `initialize`、`notifications/initialized`、`ping`、`tools/list`、`tools/call`，零新依赖。
+- 协议处理位于 `lib/agent-runtime/mcp.ts`，工具 Schema、权限守卫和执行逻辑全部复用 `lib/agent-runtime/tools.ts` 单一实现；MCP 只暴露 2 个只读工具，`save_learning_note` 不经 MCP 暴露，仍只走站内人工审批通道。
+- 页面逐帧展示 initialize → notifications/initialized → tools/list → tools/call 的完整 JSON-RPC 消息轨迹（请求/响应原文、状态码、耗时），并用工程手册风格对比 MCP（协议层标准化）与 function calling（模型能力）的分层关系和适用场景。
+- 新增 12 项协议单测；sitemap、README、e2e 路由清单和 `/labs/controlled-agent` 交叉链接已接入。
+- 验证：内容校验、类型检查、Lint、79 项单元测试、`next build --turbopack`（152 个静态页面）、Playwright 53 项通过 1 项按设备跳过全部通过；curl 实测 5 个协议方法与全部错误路径（-32700、-32600、-32601、-32602、405、429 限流逻辑）。
+- 环境注意：本机所有 Next 项目的 webpack `next build` 当前死锁在一个永不返回的 `open()` 系统调用上（未改动的 liujixue-xuan、liujixue-main 同样复现，与本批改动无关；当时机器交换内存 31.5G/32G 几乎耗尽）；本批构建验证改用 Turbopack 完成。下次在本机构建前若 webpack 仍卡死，先处理机器内存压力或直接在 CI/Vercel 构建。

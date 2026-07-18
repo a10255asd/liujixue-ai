@@ -58,6 +58,7 @@ npm run build
 - `/labs/rag-retrieval`：确定性 RAG 原型，覆盖版本化文档、混合检索、稳定引用、离线评估和未知问题拒答。
 - `/labs/controlled-agent`：受控 Agent 状态机原型，覆盖权限、预算、幂等重试、人工审批和轨迹回放。
 - `/labs/agent-evaluation`：Agent 评测与发布门禁原型，比较双版本五维轨迹评分并定位样本级回归。
+- `/labs/mcp-tools`：最小 MCP server 协议实验，逐帧展示 initialize、tools/list 与 tools/call 的 JSON-RPC 2.0 消息。
 - `/resources`：官方文档和高质量资料导航。
 - `/journal`：学习日志。
 

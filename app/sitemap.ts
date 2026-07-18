@@ -6,7 +6,7 @@ import { siteConfig } from '@/lib/site-config'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const updatedAt = new Date('2026-07-15')
-  const routes = ['', '/tracks', '/roadmap', '/knowledge', '/agent', '/career', '/career/calibration', '/interview', '/projects', '/labs/prompt-regression', '/labs/rag-retrieval', '/labs/controlled-agent', '/labs/agent-evaluation', '/resources', '/journal']
+  const routes = ['', '/tracks', '/roadmap', '/knowledge', '/agent', '/career', '/career/calibration', '/interview', '/projects', '/labs/prompt-regression', '/labs/rag-retrieval', '/labs/controlled-agent', '/labs/agent-evaluation', '/labs/mcp-tools', '/resources', '/journal']
   const knowledge = await getKnowledgePointsWithApi()
   const questions = await getInterviewQuestionsWithApi()
 

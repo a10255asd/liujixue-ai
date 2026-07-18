@@ -34,13 +34,16 @@
 
 ```text
 app/api/agent/run/route.ts              HTTP 输入校验、规划器选择、无缓存响应
+app/api/mcp/route.ts                    MCP 单请求 HTTP 入口、限流与 JSON-RPC 错误映射
 components/labs/server-agent-runtime-lab.tsx
                                         浏览器任务输入、审批、工具证据和轨迹展示
+components/labs/mcp-tools-lab.tsx       MCP 协议会话输入与逐帧消息轨迹展示
 content/labs/agent-runtime-evaluation.json
                                         20 条规划契约夹具
 lib/agent-runtime/contracts.ts          API、规划器、工具和轨迹类型
 lib/agent-runtime/identity.ts           HMAC 签名会话与 Cookie 校验
 lib/agent-runtime/tools.ts              严格工具 Schema、权限守卫、真实读取
+lib/agent-runtime/mcp.ts                最小 MCP server 协议层：握手、tools/list 与 tools/call，复用 tools.ts
 lib/agent-runtime/planners.ts           确定性规划器与 Responses 适配器
 lib/agent-runtime/runner.ts             最多四步的服务端编排循环
 lib/agent-runtime/evaluation.ts         规划契约评测
@@ -54,6 +57,7 @@ scripts/smoke-agent-production.ts       线上冒烟 CLI 与可选 JSON 留档
 tests/agent-runtime.test.ts             运行时单元测试
 tests/agent-runtime-infrastructure.test.ts
                                         限流、Redis 命令和回放测试
+tests/mcp-protocol.test.ts              MCP 协议单元测试
 ```
 
 不要把模型调用、工具实现或运行状态重新塞进 React 组件。页面只能调用 API 并展示序列化结果。

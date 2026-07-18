@@ -1,12 +1,12 @@
 # AI 学习知识库进度日志
 
-更新时间：2026-07-17
+更新时间：2026-07-18
 
 本文档只记录已完成、验证结果、当前状态和下一步，供不同 AI agent 无缝接手。产品方向看 `PRODUCT_DESIGN.md`，技术实现看 `TECHNICAL_DESIGN.md`。
 
 ## 当前里程碑
 
-状态：Batch 10 服务器面试题组已接入。Prompt 回归、可评估 RAG、受控 Agent 和 Agent 评测四个原型均可运行，真实 JD 岗位校准与固定模拟面试闭环已完成；AI 知识库、面试题库、学习路径集合和面试题组均已接入 `liujixue-api` 服务器知识库，并保留本地 JSON 兜底；6 个项目当前为 4 个 `prototype`、2 个 `blueprint`、0 个 `verified`。线上基础设施继续沿用已接通的 GitHub、Vercel 和 `ai.liujixue.cn`。
+状态：Batch 10 服务器面试题组已接入。Prompt 回归、可评估 RAG、受控 Agent、Agent 评测和 MCP 工具协议五个实验原型均可运行，真实 JD 岗位校准与固定模拟面试闭环已完成；AI 知识库、面试题库、学习路径集合和面试题组均已接入 `liujixue-api` 服务器知识库，并保留本地 JSON 兜底；6 个项目当前为 4 个 `prototype`、2 个 `blueprint`、0 个 `verified`。线上基础设施继续沿用已接通的 GitHub、Vercel 和 `ai.liujixue.cn`。
 
 ## 已完成
 
@@ -134,6 +134,15 @@
 - 新增题组单元测试，覆盖详情补全、过滤非面试题内容、难度映射和链接生成。
 - 本地浏览器验收：1440px 和 390px 下均显示 3 个题组、10 个题组条目，横向溢出为 0。
 
+### 2026-07-18：MCP 工具协议实验
+
+- 新增 `POST /api/mcp` 最小 MCP server：JSON-RPC 2.0 over HTTP POST 无状态子集（streamable HTTP 单请求模式），支持 `initialize`、`notifications/initialized`、`ping`、`tools/list`、`tools/call` 五个方法，零新依赖。
+- 工具清单、输入 Schema、权限守卫和执行逻辑全部复用 `lib/agent-runtime/tools.ts` 单一实现；MCP 只暴露 `search_knowledge` 与 `inspect_project_evidence` 两个只读工具，`save_learning_note` 仍只走站内人工审批通道。
+- 协议错误按标准 JSON-RPC error 返回：-32700 解析错误、-32600 非法请求（batch、缺 id、多余字段）、-32601 未知 method、-32602 非法参数（含未暴露工具）；工具级失败按 MCP 约定返回 `isError: true` 而非协议错误；通知一律 202 空响应。
+- 新增 `/labs/mcp-tools`：每次运行真实发出 initialize → notifications/initialized → tools/list → tools/call 四条 HTTP 消息，逐帧展示请求/响应原文、状态码与耗时；页面用工程手册风格讲清 MCP（协议层标准化）与 function calling（模型能力）的分层关系和适用场景。
+- 新增 12 项 MCP 协议单测，覆盖握手版本协商、通知不应答、Schema 与运行时单一来源（防漂移）、两个工具真实调用、写工具拦截、未知 method、非法请求与三类 id 回显。
+- 入口接入 sitemap、README、e2e 路由清单，`/labs/controlled-agent` 增加交叉链接。
+
 ## 验证记录
 
 - `validate:content`：通过。
@@ -193,6 +202,10 @@
 - Batch 10 本地浏览器验收：`/interview` 在 1440px 与 390px 下均显示 3 个服务器面试题组、10 个题组条目，横向溢出为 0。
 - Batch 10 Vercel 生产部署：远端构建通过，部署 `https://liujixue-a9pz1wzw5-a10255asds-projects.vercel.app` 已 alias 到 `https://ai.liujixue.cn`。
 - Batch 10 正式域名抽检：`/interview` 返回 200，HTML 包含服务器面试题组和 3 个题组名；Chrome 桌面与手机验收均为 3 个题组、10 个条目、横向溢出 0。
+- MCP 实验内容校验、TypeScript、ESLint 和 79 项单元测试通过（新增 12 项协议测试）。
+- 本机 `npm run build`（webpack 编译）因机器级故障无法完成：所有 Next 项目的 webpack 构建（含未改动的 liujixue-xuan、liujixue-main）都死锁在一个永不返回的 `open()` 系统调用上，与本批改动无关；改用 `next build --turbopack` 完整构建通过，生成 152 个静态页面（新增 `/labs/mcp-tools`）。需在 Vercel 或 CI 上确认 webpack 构建恢复正常。
+- MCP 生产服务器 curl 实测：initialize 返回 protocolVersion、capabilities 与 serverInfo；notifications/initialized 返回 202 空响应；tools/list 返回 2 个只读工具及其严格 Schema；tools/call 两个工具均 `isError: false`；save_learning_note 返回 -32602；未知 method 返回 -32601；非法 JSON 返回 -32700；GET 返回 405。
+- Playwright 桌面与手机共 53 项通过、1 项按设备条件跳过（生产服务器 + 签名会话）；`/labs/mcp-tools` 在 1440px 与 390px 均无横向溢出，完整协议会话真实往返可见。
 
 ## 当前数据规模
 
@@ -212,7 +225,7 @@
 - 核心训练路径：3。
 - 交付任务：7。
 - 真实 JD 样本：6。
-- 生产构建静态页面：151（历史验证记录中的更小数字为当时 Batch 事实，不 retroactive 修改）。
+- 生产构建静态页面：152（历史验证记录中的更小数字为当时 Batch 事实，不 retroactive 修改）。
 
 ## 下一步推荐
 
