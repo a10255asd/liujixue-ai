@@ -9,6 +9,11 @@ import {
   getRoadmapStages,
   getTrainingTracks
 } from '../lib/content/repository'
+import evaluationReportData from '../content/labs/rag-evaluation-report.json'
+import { ragDocuments, ragEvaluationCases, ingestRagDocuments } from '../lib/labs/rag-documents'
+import { computeRagDocumentsHash, computeRagEvaluationHash } from '../lib/labs/rag-vector-hash'
+import { ragVectorStore, validateRagVectorStoreCoverage } from '../lib/labs/rag-vectors'
+import { diffEvaluationSnapshot, getRagPrototypeData, ragEvaluationSnapshotSchema } from '../lib/labs/rag-retrieval'
 
 function assertUnique(values: string[], label: string): void {
   const seen = new Set<string>()
@@ -116,6 +121,33 @@ for (const track of trainingTracks) {
   }
 }
 
+// ---- RAG 向量库一致性：章节块全覆盖 + 内容 hash 未漂移 + 评估快照未漂移 ----
+const ragChunks = ingestRagDocuments(ragDocuments)
+const vectorErrors = validateRagVectorStoreCoverage(
+  ragVectorStore,
+  ragChunks.map((chunk) => chunk.id),
+  ragEvaluationCases.map((item) => item.id)
+)
+if (ragVectorStore.documentsHash !== computeRagDocumentsHash(ragDocuments)) {
+  vectorErrors.push('rag-documents.json 内容与 rag-vectors.json 的 documentsHash 不匹配')
+}
+if (ragVectorStore.evaluationHash !== computeRagEvaluationHash(ragEvaluationCases)) {
+  vectorErrors.push('rag-evaluation.json 内容与 rag-vectors.json 的 evaluationHash 不匹配')
+}
+if (vectorErrors.length) {
+  throw new Error(
+    `RAG 向量库校验失败：\n${vectorErrors.join('\n')}\n请运行 npm run build:rag-vectors 重新生成 content/labs/rag-vectors.json`
+  )
+}
+
+const evaluationSnapshot = ragEvaluationSnapshotSchema.parse(evaluationReportData)
+const snapshotDrift = diffEvaluationSnapshot(evaluationSnapshot, getRagPrototypeData().reports)
+if (snapshotDrift.length) {
+  throw new Error(
+    `RAG 评估快照校验失败：\n${snapshotDrift.join('\n')}\n请运行 npm run build:rag-evaluation 重新生成 content/labs/rag-evaluation-report.json`
+  )
+}
+
 console.log(
-  `内容校验通过：${roadmap.length} 阶段、${trainingTracks.length} 训练路径、${knowledge.length} 知识点、${questions.length} 面试题、${projects.length} 项目、${resources.length} 资料、${journals.length} 日志、${career.capabilities.length} 求职能力、${careerJdSamples.length} 岗位样本`
+  `内容校验通过：${roadmap.length} 阶段、${trainingTracks.length} 训练路径、${knowledge.length} 知识点、${questions.length} 面试题、${projects.length} 项目、${resources.length} 资料、${journals.length} 日志、${career.capabilities.length} 求职能力、${careerJdSamples.length} 岗位样本；RAG 向量库 ${ragVectorStore.chunks.length} 块 + ${ragVectorStore.queries.length} 题（${ragVectorStore.model} · ${ragVectorStore.dimensions} 维）一致`
 )

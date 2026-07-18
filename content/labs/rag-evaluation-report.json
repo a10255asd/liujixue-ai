@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-07-18T02:15:48.946Z",
+  "model": "Xenova/multilingual-e5-small",
+  "dimensions": 384,
+  "caseCount": 13,
+  "reports": [
+    {
+      "mode": "keyword",
+      "label": "关键词基线",
+      "hitAt3": 1,
+      "mrr": 0.958,
+      "citationCoverage": 1,
+      "unknownRejectionRate": 1
+    },
+    {
+      "mode": "hybrid",
+      "label": "混合检索",
+      "hitAt3": 1,
+      "mrr": 1,
+      "citationCoverage": 1,
+      "unknownRejectionRate": 1
+    },
+    {
+      "mode": "vector",
+      "label": "向量（本地模型）",
+      "hitAt3": 1,
+      "mrr": 1,
+      "citationCoverage": 1,
+      "unknownRejectionRate": 1
+    }
+  ]
+}

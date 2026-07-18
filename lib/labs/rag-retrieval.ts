@@ -1,53 +1,37 @@
 import { z } from 'zod'
 
-import documentData from '@/content/labs/rag-documents.json'
-import evaluationData from '@/content/labs/rag-evaluation.json'
+import {
+  documentSchema,
+  evaluationCaseSchema,
+  ingestRagDocuments,
+  ragDocuments,
+  ragEvaluationCases,
+  type RagChunk
+} from './rag-documents'
+import { getChunkEmbedding, getStoredQueryEmbedding, ragVectorStore } from './rag-vectors'
 
-const sectionSchema = z.object({
-  id: z.string().min(1),
-  heading: z.string().min(1),
-  text: z.string().min(20),
-  tags: z.array(z.string().min(1)).min(1)
-})
+export { documentSchema, evaluationCaseSchema, ingestRagDocuments }
+export type { EvaluationCase, RagChunk, RagDocument } from './rag-documents'
 
-const documentSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  version: z.string().min(1),
-  updatedAt: z.string().date(),
-  sections: z.array(sectionSchema).min(1)
-})
+export type RetrievalMode = 'keyword' | 'hybrid' | 'vector'
 
-const evaluationCaseSchema = z.object({
-  id: z.string().min(1),
-  query: z.string().min(2),
-  relevantChunkIds: z.array(z.string().min(1))
-})
-
-export type RetrievalMode = 'keyword' | 'hybrid'
-export type RagDocument = z.infer<typeof documentSchema>
-export type EvaluationCase = z.infer<typeof evaluationCaseSchema>
-
-export type RagChunk = {
-  id: string
-  documentId: string
-  documentTitle: string
-  version: string
-  heading: string
-  text: string
-  tags: string[]
-  position: number
-}
+const documents = ragDocuments
+const evaluationCases = ragEvaluationCases
 
 export type RetrievalResult = RagChunk & {
   rank: number
   lexicalScore: number
   conceptScore: number
+  vectorScore: number
   score: number
 }
 
-const documents = z.array(documentSchema).min(1).parse(documentData)
-const evaluationCases = z.array(evaluationCaseSchema).min(10).parse(evaluationData)
+/**
+ * 向量模式证据阈值：按真实向量校准（e5-small 的相关/无关余弦分数压缩在 0.86–0.94 窄带内，
+ * 正例最低 top1 = 0.889、未知题最高 top1 = 0.871，取中间值 0.88）。
+ * 阈值脆弱（间隔不足 0.02）本身就是学习点：小模型分数区间窄，拒答边界不如词面规则稳健。
+ */
+export const RAG_VECTOR_EVIDENCE_THRESHOLD = 0.88
 
 const conceptAliases: Record<string, string[]> = {
   refund: ['退款', '退钱', '退回'],
@@ -131,43 +115,68 @@ function conceptOverlap(query: string, chunk: RagChunk) {
   return overlap(queryConcepts, chunkConcepts)
 }
 
-export function ingestRagDocuments(source: RagDocument[] = documents) {
-  return source.flatMap((document) => document.sections.map((section, index) => ({
-    id: section.id,
-    documentId: document.id,
-    documentTitle: document.title,
-    version: document.version,
-    heading: section.heading,
-    text: section.text,
-    tags: section.tags,
-    position: index + 1
-  })))
-}
-
 export const ragChunks = ingestRagDocuments()
 
-export function retrieveChunks(query: string, mode: RetrievalMode = 'hybrid', limit = 3) {
+export function cosineSimilarity(left: number[], right: number[]) {
+  if (left.length !== right.length) {
+    throw new Error(`余弦相似度要求维度一致：${left.length} vs ${right.length}`)
+  }
+  let dot = 0
+  let leftNorm = 0
+  let rightNorm = 0
+  for (let index = 0; index < left.length; index += 1) {
+    dot += left[index] * right[index]
+    leftNorm += left[index] * left[index]
+    rightNorm += right[index] * right[index]
+  }
+  if (!leftNorm || !rightNorm) return 0
+  return dot / (Math.sqrt(leftNorm) * Math.sqrt(rightNorm))
+}
+
+export type RetrievalOptions = {
+  /** vector 模式必需：与 rag-vectors.json 同一模型、同一 query 前缀生成的查询向量。 */
+  queryEmbedding?: number[]
+}
+
+export function retrieveChunks(query: string, mode: RetrievalMode = 'hybrid', limit = 3, options: RetrievalOptions = {}) {
+  if (mode === 'vector' && !options.queryEmbedding) {
+    throw new Error('vector 模式需要 queryEmbedding（浏览器端本地生成，或评估题的构建期向量）')
+  }
+
   const queryGrams = ngrams(query)
   const corpusGrams = ragChunks.map((chunk) => ngrams(`${chunk.heading}${chunk.text}${chunk.tags.join('')}`))
   const ranked = ragChunks.map((chunk, index) => {
-    const lexicalScore = mode === 'hybrid'
-      ? weightedLexicalOverlap(queryGrams, corpusGrams[index], corpusGrams)
-      : overlap(queryGrams, corpusGrams[index])
+    const lexicalScore = mode === 'keyword'
+      ? overlap(queryGrams, corpusGrams[index])
+      : weightedLexicalOverlap(queryGrams, corpusGrams[index], corpusGrams)
     const conceptScore = conceptOverlap(query, chunk)
-    const score = mode === 'hybrid'
-      ? lexicalScore * 0.58 + conceptScore * 0.42
-      : lexicalScore
+    const vectorScore = mode === 'vector'
+      ? cosineSimilarity(options.queryEmbedding as number[], getChunkEmbedding(chunk.id))
+      : 0
+    const score = mode === 'vector'
+      ? vectorScore
+      : mode === 'hybrid'
+        ? lexicalScore * 0.58 + conceptScore * 0.42
+        : lexicalScore
 
-    return { ...chunk, lexicalScore: round(lexicalScore), conceptScore: round(conceptScore), score: round(score) }
+    return {
+      ...chunk,
+      lexicalScore: round(lexicalScore),
+      conceptScore: round(conceptScore),
+      vectorScore: round(vectorScore),
+      score: round(score)
+    }
   }).sort((left, right) => right.score - left.score || left.id.localeCompare(right.id))
 
   return ranked.slice(0, Math.max(1, limit)).map((result, index) => ({ ...result, rank: index + 1 }))
 }
 
-export function answerWithCitations(query: string, mode: RetrievalMode = 'hybrid') {
-  const results = retrieveChunks(query, mode, 3)
+export function answerWithCitations(query: string, mode: RetrievalMode = 'hybrid', options: RetrievalOptions = {}) {
+  const results = retrieveChunks(query, mode, 3, options)
   const top = results[0]
-  const hasEvidence = Boolean(top && top.score >= 0.18 && (top.lexicalScore >= 0.08 || top.conceptScore >= 0.25))
+  const hasEvidence = mode === 'vector'
+    ? Boolean(top && top.score >= RAG_VECTOR_EVIDENCE_THRESHOLD)
+    : Boolean(top && top.score >= 0.18 && (top.lexicalScore >= 0.08 || top.conceptScore >= 0.25))
 
   if (!hasEvidence) {
     return {
@@ -188,11 +197,21 @@ export function answerWithCitations(query: string, mode: RetrievalMode = 'hybrid
   return { query, mode, hasEvidence: true, answer, citations, candidates: results }
 }
 
+const modeLabels: Record<RetrievalMode, string> = {
+  keyword: '关键词基线',
+  hybrid: '混合检索',
+  vector: '向量（本地模型）'
+}
+
 export function evaluateRetriever(mode: RetrievalMode) {
   const positiveCases = evaluationCases.filter((item) => item.relevantChunkIds.length > 0)
   const negativeCases = evaluationCases.filter((item) => item.relevantChunkIds.length === 0)
   const cases = evaluationCases.map((item) => {
-    const response = answerWithCitations(item.query, mode)
+    // vector 模式使用构建期为每条评估题固化的查询向量，保证评估完全离线可复现。
+    const options: RetrievalOptions = mode === 'vector'
+      ? { queryEmbedding: getStoredQueryEmbedding(item.id) }
+      : {}
+    const response = answerWithCitations(item.query, mode, options)
     const expected = new Set(item.relevantChunkIds)
     const firstRelevantIndex = response.candidates.findIndex((result) => expected.has(result.id))
     const hitAt3 = expected.size === 0 ? !response.hasEvidence : firstRelevantIndex >= 0 && firstRelevantIndex < 3
@@ -209,12 +228,12 @@ export function evaluateRetriever(mode: RetrievalMode) {
 
   return {
     mode,
-    label: mode === 'hybrid' ? '混合检索' : '关键词基线',
+    label: modeLabels[mode],
     hitAt3: round(positiveResults.filter((item) => item.hitAt3).length / positiveCases.length, 3),
     mrr: round(positiveResults.reduce((sum, item) => sum + item.reciprocalRank, 0) / positiveCases.length, 3),
     citationCoverage: round(positiveResults.filter((item) => item.citationHit).length / positiveCases.length, 3),
     unknownRejectionRate: negativeCases.length
-      ? round(negativeResults.filter((item) => item.hitAt3).length / negativeCases.length, 3)
+      ? round(negativeResults.filter((item) => item.hitAt3).length / negativeResults.length, 3)
       : 1,
     cases
   }
@@ -225,8 +244,56 @@ export function getRagPrototypeData() {
     documents,
     chunks: ragChunks,
     evaluationCases,
-    reports: [evaluateRetriever('keyword'), evaluateRetriever('hybrid')]
+    vectorModel: {
+      model: ragVectorStore.model,
+      dtype: ragVectorStore.dtype,
+      dimensions: ragVectorStore.dimensions,
+      generatedAt: ragVectorStore.generatedAt
+    },
+    reports: [evaluateRetriever('keyword'), evaluateRetriever('hybrid'), evaluateRetriever('vector')]
   }
 }
 
 export type RagEvaluationReport = ReturnType<typeof evaluateRetriever>
+
+export const ragEvaluationSnapshotSchema = z.object({
+  generatedAt: z.string().datetime({ offset: true }),
+  model: z.string().min(1),
+  dimensions: z.number().int().positive(),
+  caseCount: z.number().int().positive(),
+  reports: z.array(z.object({
+    mode: z.enum(['keyword', 'hybrid', 'vector']),
+    label: z.string().min(1),
+    hitAt3: z.number().min(0).max(1),
+    mrr: z.number().min(0).max(1),
+    citationCoverage: z.number().min(0).max(1),
+    unknownRejectionRate: z.number().min(0).max(1)
+  })).length(3)
+})
+
+export type RagEvaluationSnapshot = z.infer<typeof ragEvaluationSnapshotSchema>
+
+/**
+ * 对比固化快照与实时计算的三路评估报告，返回不一致项（空数组 = 一致）。
+ * 供 validate:content 与单测防止快照漂移。
+ */
+export function diffEvaluationSnapshot(snapshot: RagEvaluationSnapshot, reports: RagEvaluationReport[]): string[] {
+  const errors: string[] = []
+  const metrics = ['hitAt3', 'mrr', 'citationCoverage', 'unknownRejectionRate'] as const
+
+  for (const mode of ['keyword', 'hybrid', 'vector'] as const) {
+    const recorded = snapshot.reports.find((report) => report.mode === mode)
+    const live = reports.find((report) => report.mode === mode)
+    if (!recorded || !live) {
+      errors.push(`快照或实时报告缺少模式：${mode}`)
+      continue
+    }
+    for (const metric of metrics) {
+      if (recorded[metric] !== live[metric]) {
+        errors.push(`${mode}.${metric} 不一致：快照 ${recorded[metric]} vs 实时 ${live[metric]}`)
+      }
+    }
+  }
+
+  return errors
+}

@@ -20,9 +20,12 @@
     "verify:agent:live": "tsx scripts/verify-agent-baseline.ts",
     "smoke:agent:production": "tsx scripts/smoke-agent-production.ts",
     "smoke:agent:release": "AGENT_SMOKE_REQUIRE_READY=1 tsx scripts/smoke-agent-production.ts",
-    "smoke:agent:live": "AGENT_SMOKE_EXPECTATION=live-model-ready tsx scripts/smoke-agent-production.ts"
+    "smoke:agent:live": "AGENT_SMOKE_EXPECTATION=live-model-ready tsx scripts/smoke-agent-production.ts",
+    "build:rag-vectors": "tsx scripts/build-rag-vectors.ts",
+    "build:rag-evaluation": "tsx scripts/build-rag-evaluation.ts"
   },
   "dependencies": {
+    "@huggingface/transformers": "4.2.0",
     "@vercel/analytics": "^1.6.1",
     "lucide-react": "^0.468.0",
     "next": "^15.5.20",

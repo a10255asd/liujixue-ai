@@ -10,6 +10,20 @@
 
 ## 已完成
 
+### 2026-07-18：RAG 实验新增真实向量检索模式（本地开源 embedding，三路对比）
+
+- 模型选型：`Xenova/multilingual-e5-small`（q8 量化，384 维）。理由：中文语料必须用多语言模型；e5 系列在多语言检索基准（MTEB/CMTEB）上优于同尺寸 paraphrase-MiniLM；query:/passage: 前缀差异本身成为教学点。所有多语言候选（e5-small、paraphrase-MiniLM-L12、distiluse-v2）q8 体积同为约 113MB（25 万词表决定），体积不构成区分度。
+- 构建期向量：`scripts/build-rag-vectors.ts`（`npm run build:rag-vectors`）在 Node/tsx 下用 transformers.js 为 16 个章节块（`passage: {heading}\n{text}`）与 13 条评估题（`query: {query}`）生成向量，写入 `content/labs/rag-vectors.json`（模型标识、q8、维度、生成日期、query/passage 前缀、文本模板、两个内容 hash）。国内网络用 `HF_ENDPOINT=https://hf-mirror.com`。
+- 再生成门禁：`lib/labs/rag-vector-hash.ts` 对文档块（id/标题/正文/tags）与评估题（id/问题/答案章节）算 sha256；`validate:content` 校验维度一致、16 块 + 13 题全覆盖、双 hash 匹配，漂移时报错并提示重跑 `build:rag-vectors`。
+- 向量检索纯函数：`lib/labs/rag-retrieval.ts` 新增 `vector` 模式与 `cosineSimilarity`，复用现有引用/拒答/轨迹逻辑只换打分器；词面/概念分仍计算供 Top 3 轨迹对照。拒答阈值 0.88 按真实分数校准：正例最低 top1 余弦 0.889、未知题最高 0.871，间隔不足 0.02——阈值脆弱性如实写进页面与代码注释。
+- 浏览器端查询向量：`components/labs/rag-vector-embedder.ts` 动态 `import('@huggingface/transformers')`，不进 server bundle；config/tokenizer（约 16MB）随站点静态分发（`public/models/rag-embedder/`），113MB q8 ONNX 经同源 rewrite 代理（`/rag-model/*` → hf-mirror）下载，WASM 运行时自托管（`public/vendor/ort/`，asyncify + 标准变体共 34MB）。页面明确标注"本地量化多语言模型，非生产级 embedding 服务"，首次加载提示下载体积与逐文件进度。
+- 三个关键坑（均已解决并注释）：① hf-mirror 的 CORS 仅允许其自身源，浏览器必须走同源代理；② hf-mirror 反盗链对带外站 Referer 的请求返回 HTML 警告页——代理会透传 Referer，必须用 `env.fetch` 包装 `referrerPolicy: 'no-referrer'`；③ Next 代理默认 30s 超时（`experimental.proxyTimeout` 调至 600s），低速网络下会截断 113MB 响应。
+- 三路对比固化：`scripts/build-rag-evaluation.ts` 输出 `content/labs/rag-evaluation-report.json`（关键词/混合/向量 × Hit@3、MRR、引用覆盖、拒答正确率），页面新增对比表；`diffEvaluationSnapshot` 防快照漂移，validate:content 与单测双重强制。结果：Hit@3 三路均 1.000；MRR 关键词 0.958 / 混合 1.000 / 向量 1.000；引用覆盖三路 1.000；未知拒答三路 1.000——本固定题集上向量与混合打平，如实展示。
+- 重构：`lib/labs/rag-documents.ts` 拆出文档/评估题 schema 与摄取逻辑，避免构建脚本与向量文件解析的循环依赖。
+- 新增 9 项单测（`tests/rag-vector-retrieval.test.ts`）：余弦正确性与维度守卫、真实向量排序、vector 模式引用/拒答集成、rag-vectors.json schema 与覆盖校验、hash 一致性、覆盖校验器故障注入、快照防漂移、窄分数带断言。
+- 验证记录：`npm run validate:content`、`npm run typecheck`、`npm run lint`、`npm run test:unit`（109 项通过）全部通过；webpack 构建仍死锁（已知环境问题），`npx next build --turbopack` 通过（152 个静态页面）；server bundle 不含 transformers 代码（nft 追踪已用 `outputFileTracingExcludes` 排除，页面为静态页不产生 serverless 函数）。
+- 实测记录（`next start` + 生产构建，Playwright 持久化 profile）：Chromium 与 WebKit 均端到端通过——切到"向量（本地模型）"后加载面板出现，模型就绪后默认样例返回 2 条引用，未知问题正确拒答 0 引用，390px 无横向溢出，外部直连 huggingface.co/jsdelivr 均为 0（WASM 本地、模型经同源代理），无控制台错误；首次全量下载 6.8s（本机网络），缓存后 1.6s。server 已关闭，无后台进程残留。
+
 ### 2026-07-18：Agent 运行轨迹对齐 OTel GenAI 语义约定导出
 
 - 新增 `lib/agent-runtime/otel.ts`：纯函数 `mapRunToOtelTrace(run, { startedAtUnixMs })`，把一次 run 的 trace + usage 映射为对齐 OpenTelemetry GenAI 语义约定的 span 树 JSON。结构为 OTLP-ish 的 resourceSpans/scopeSpans/spans（traceId/spanId/parentSpanId/startTimeUnixNano/endTimeUnixNano/attributes/events/status），明确文档化为“结构对齐的 JSON 导出”，非完整 OTLP wire format，零新依赖、不引 @opentelemetry/sdk。

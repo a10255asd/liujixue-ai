@@ -4043,7 +4043,7 @@ strong {
 
 .rag-mode-switch {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 32px;
   border-top: 1px solid var(--line);
   border-left: 1px solid var(--line);
@@ -4075,6 +4075,96 @@ strong {
 .rag-mode-switch small {
   color: var(--quiet);
   font-size: 9px;
+}
+
+.rag-mode-note {
+  margin: 12px 0 0;
+  color: var(--quiet);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.rag-answer-panel--loading {
+  border-left-color: var(--copper);
+  gap: 22px;
+}
+
+.rag-answer-panel--loading > p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.rag-model-progress {
+  height: 5px;
+  overflow: hidden;
+  background: var(--line);
+  border-radius: 999px;
+}
+
+.rag-model-progress > div {
+  height: 100%;
+  background: var(--copper);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.rag-model-progress__meta {
+  color: var(--quiet);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.rag-comparison {
+  display: grid;
+  overflow-x: auto;
+  gap: 14px;
+}
+
+.rag-comparison table {
+  width: 100%;
+  border-top: 1px solid var(--line-strong);
+  border-left: 1px solid var(--line);
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.rag-comparison th,
+.rag-comparison td {
+  padding: 12px 14px;
+  text-align: left;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.rag-comparison thead th {
+  color: var(--muted);
+  background: #f0f2f1;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.rag-comparison tbody th {
+  color: var(--quiet);
+  font-weight: 600;
+}
+
+.rag-comparison td {
+  color: var(--ink-soft);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.rag-comparison td.is-best {
+  color: var(--steel);
+  font-weight: 800;
+}
+
+.rag-comparison > p {
+  margin: 0;
+  color: var(--quiet);
+  font-size: 10px;
+  line-height: 1.8;
 }
 
 .rag-query-panel form {
@@ -4255,7 +4345,7 @@ strong {
 
 .rag-evaluation__reports {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   border-top: 1px solid var(--line-strong);
   border-left: 1px solid var(--line);
 }

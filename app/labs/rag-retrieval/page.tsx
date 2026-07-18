@@ -30,6 +30,7 @@ export default function RagRetrievalLabPage() {
         documentCount={data.documents.length}
         evaluationCases={data.evaluationCases}
         reports={data.reports}
+        vectorModel={data.vectorModel}
       />
       <LabRelatedContent lab="rag-retrieval" />
     </div>
