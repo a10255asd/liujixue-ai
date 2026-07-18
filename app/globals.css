@@ -7456,10 +7456,14 @@ strong {
    ============================================================ */
 
 :root {
-  --display: var(--font-display), 'Songti SC', 'STSong', 'Noto Serif CJK SC', 'SimSun', serif;
   --gold-ink: #a98336;
   --gold-deep: #7c5f22;
   --gold-champagne: #dfc68f;
+}
+
+/* --font-display 由 next/font 挂在 body 上，--display 必须定义在 body 才能解析 */
+body {
+  --display: var(--font-display), 'Songti SC', 'STSong', 'Noto Serif CJK SC', 'SimSun', serif;
 }
 
 /* ---------- 纸张噪点 ---------- */
