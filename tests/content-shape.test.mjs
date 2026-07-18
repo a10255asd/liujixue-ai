@@ -34,11 +34,52 @@ test('stage-0 beginner track wires ordered knowledge and self-check refs', () =>
     'why-rag'
   ])
   assert.ok(Array.isArray(stage0.questionRefs) && stage0.questionRefs.length >= 6)
+})
+
+test('every roadmap stage wires non-empty knowledge and question refs', () => {
+  const stages = readJson('../content/roadmap.json')
+  const knowledge = readJson('../content/knowledge-points.json')
+  const questions = readJson('../content/interview-questions.json')
+  const knowledgeBySlug = new Map(knowledge.map((item) => [item.slug, item]))
+  const questionById = new Map(questions.map((item) => [item.id, item]))
+
   for (const stage of stages) {
-    if (stage.slug === 'stage-0-beginner-foundations') continue
-    assert.equal(stage.knowledgeRefs, undefined, `${stage.slug} 不应携带 knowledgeRefs`)
-    assert.equal(stage.questionRefs, undefined, `${stage.slug} 不应携带 questionRefs`)
+    assert.ok(
+      Array.isArray(stage.knowledgeRefs) && stage.knowledgeRefs.length >= 3,
+      `${stage.slug} 至少需要 3 个 knowledgeRefs`
+    )
+    assert.ok(
+      Array.isArray(stage.questionRefs) && stage.questionRefs.length >= 4,
+      `${stage.slug} 至少需要 4 个 questionRefs`
+    )
+    for (const ref of stage.knowledgeRefs) {
+      const item = knowledgeBySlug.get(ref)
+      assert.ok(item, `${stage.slug} 引用了不存在的知识点 ${ref}`)
+      assert.equal(item.status, 'published', `${stage.slug} 引用了未发布的知识点 ${ref}`)
+    }
+    for (const ref of stage.questionRefs) {
+      const item = questionById.get(ref)
+      assert.ok(item, `${stage.slug} 引用了不存在的面试题 ${ref}`)
+      assert.equal(item.status, 'published', `${stage.slug} 引用了未发布的面试题 ${ref}`)
+    }
   }
+})
+
+test('non-stage-0 knowledge points reach at least 85% roadmap coverage', () => {
+  const stages = readJson('../content/roadmap.json')
+  const knowledge = readJson('../content/knowledge-points.json')
+  const stage0 = stages.find((stage) => stage.slug === 'stage-0-beginner-foundations')
+  const stage0Refs = new Set(stage0.knowledgeRefs)
+  const pool = knowledge.map((item) => item.slug).filter((slug) => !stage0Refs.has(slug))
+  assert.equal(pool.length, 33, '非第 0 阶段知识点池应为 33 个')
+
+  const referenced = new Set(stages.flatMap((stage) => stage.knowledgeRefs ?? []))
+  const covered = pool.filter((slug) => referenced.has(slug))
+  const ratio = covered.length / pool.length
+  assert.ok(
+    ratio >= 0.85,
+    `非第 0 阶段知识点覆盖率 ${(ratio * 100).toFixed(1)}% 低于 85%，未覆盖：${pool.filter((slug) => !referenced.has(slug)).join(', ')}`
+  )
 })
 
 test('batch 2 reaches the reviewed content baseline', () => {

@@ -194,3 +194,11 @@ npm run build
 - 未改动项及原因：`roadmap.json` 模型无知识点引用字段且 7 阶段被测试固定，未挂"第 0 阶段"；`lib/content/lab-relations.ts` 主题匹配的 lab 已达 2-4 个引用上限，未置换现有进阶条目；`tests/content-shape.test.mjs` 面试题总数断言 80 → 95 属内容增长的必要基线更新。
 - 验证：内容校验、类型检查、Lint、109 项单元测试通过；webpack 构建死锁未恢复（已知环境问题），`next build --turbopack` 通过（175 个静态页面）。
 - 注意：本批工作期间检测到另一进程并发修改了 `app/globals.css`、`app/layout.tsx` 并新增 `app/fonts/`（视觉改版，非本批内容），本批提交未包含这些文件。
+
+2026-07-18（路线图全阶段挂载引用）：
+
+- 为 `content/roadmap.json` 原 7 个阶段（order 2-8）补齐 `knowledgeRefs` / `questionRefs`，只新增这两个字段，既有 title/topics/projectRefs/resourceRefs/order 均未动；第 0 阶段 8 个入门知识点未重复引用。
+- 匹配严格按各阶段既有 topics：RAG 阶段收编全部 7 个 RAG 知识点，Agent 工程阶段收编全部 7 个 Agent 进阶/高级知识点，MCP 阶段收编全部 3 个 MCP 知识点；33 个非第 0 阶段知识点覆盖率 100%（测试阈值 ≥85%），无知识点跨阶段重复引用。
+- 内容缺口（如实记录，未硬凑）：`mcp-ecosystem` 仅 3 个知识点可挂（内容库 MCP 类共 3 个，无 Transport 独立知识点）；`ai-user-basics` 的"非确定性"主题无专属知识点，由自测题 `temperature-and-determinism` 覆盖。
+- 测试更新：`tests/content-shape.test.mjs` 删除"其余阶段不应携带 ref"的过期断言，新增"每阶段 knowledgeRefs ≥ 3 / questionRefs ≥ 4 且全部 published"与"33 个非第 0 阶段知识点覆盖率 ≥85%"两个用例，单测总数 113。
+- 验证：内容校验、类型检查、Lint、113 项单元测试通过；webpack 构建死锁未恢复（已知环境问题），`next build --turbopack` 通过；`next start` 抽查 `/roadmap`，8 个阶段均渲染 `stage-refs` 区块，抽查知识点/面试题详情链接均 200，server 已关闭无后台进程残留。

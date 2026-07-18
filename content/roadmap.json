@@ -93,6 +93,20 @@
     "resourceRefs": [
       "openai-platform-docs"
     ],
+    "knowledgeRefs": [
+      "what-is-token",
+      "context-window",
+      "model-selection",
+      "secrets-and-data-boundaries"
+    ],
+    "questionRefs": [
+      "token-basics",
+      "context-window-management",
+      "token-estimation-basics",
+      "temperature-and-determinism",
+      "context-window-overflow",
+      "model-selection-strategy"
+    ],
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -135,6 +149,21 @@
       "openai-responses-api",
       "openai-structured-outputs"
     ],
+    "knowledgeRefs": [
+      "responses-api-lifecycle",
+      "structured-outputs",
+      "function-calling",
+      "streaming-responses"
+    ],
+    "questionRefs": [
+      "streaming-vs-batch",
+      "structured-output-vs-json-mode",
+      "function-calling-loop",
+      "responses-api-lifecycle",
+      "llm-api-retry",
+      "rate-limit-control",
+      "parallel-tool-calls"
+    ],
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -175,6 +204,21 @@
     ],
     "resourceRefs": [
       "openai-platform-docs"
+    ],
+    "knowledgeRefs": [
+      "prompt-contract",
+      "few-shot-prompting",
+      "context-engineering",
+      "prompt-injection-defense"
+    ],
+    "questionRefs": [
+      "prompt-contract-design",
+      "few-shot-selection",
+      "conversation-summarization",
+      "instruction-precedence",
+      "context-engineering-vs-prompt",
+      "untrusted-context-delimiters",
+      "prompt-injection-defense"
     ],
     "status": "published",
     "lastReviewedAt": "2026-07-15",
@@ -220,6 +264,25 @@
       "pgvector-docs",
       "openai-evals"
     ],
+    "knowledgeRefs": [
+      "embedding-basics",
+      "chunking-strategy",
+      "vector-search",
+      "hybrid-search",
+      "reranking",
+      "rag-citations",
+      "rag-evaluation"
+    ],
+    "questionRefs": [
+      "what-is-embedding",
+      "embedding-and-vector-search",
+      "rag-chunking",
+      "vector-search-similarity",
+      "hybrid-search-design",
+      "rag-reranking",
+      "rag-citation-fidelity",
+      "rag-evaluation"
+    ],
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -263,6 +326,25 @@
     "resourceRefs": [
       "openai-agents-sdk"
     ],
+    "knowledgeRefs": [
+      "agent-loop",
+      "tool-contract-design",
+      "agent-state-memory",
+      "planning-routing",
+      "agent-stop-conditions",
+      "human-in-the-loop",
+      "multi-agent-patterns"
+    ],
+    "questionRefs": [
+      "agent-vs-chatbot",
+      "agent-loop-control",
+      "agent-tool-schema",
+      "agent-state-vs-memory",
+      "agent-planning-routing",
+      "agent-stop-conditions",
+      "human-in-the-loop",
+      "agent-tool-permissions"
+    ],
     "status": "published",
     "lastReviewedAt": "2026-07-15",
     "authors": [
@@ -304,6 +386,21 @@
     "resourceRefs": [
       "mcp-docs",
       "mcp-architecture"
+    ],
+    "knowledgeRefs": [
+      "mcp-architecture",
+      "mcp-primitives",
+      "mcp-security"
+    ],
+    "questionRefs": [
+      "what-is-mcp",
+      "mcp-architecture-question",
+      "mcp-primitives",
+      "mcp-transports",
+      "mcp-debugging",
+      "mcp-capability-negotiation",
+      "mcp-security",
+      "mcp-server-design"
     ],
     "status": "published",
     "lastReviewedAt": "2026-07-15",
@@ -349,6 +446,22 @@
       "openai-evals",
       "openai-agents-tracing",
       "openai-production-best-practices"
+    ],
+    "knowledgeRefs": [
+      "agent-tracing",
+      "cost-latency-budget",
+      "agent-evaluation",
+      "production-reliability"
+    ],
+    "questionRefs": [
+      "agent-tracing",
+      "agent-evaluation",
+      "eval-dataset-design",
+      "llm-cost-control",
+      "online-ai-monitoring",
+      "llm-as-judge",
+      "tool-call-evaluation",
+      "design-production-rag"
     ],
     "status": "published",
     "lastReviewedAt": "2026-07-15",

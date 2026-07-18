@@ -10,6 +10,22 @@
 
 ## 已完成
 
+### 2026-07-18：路线图全部 8 个阶段挂载知识点引用与自测题引用
+
+- 背景：上一里程碑只给第 0 阶段挂了 `knowledgeRefs` / `questionRefs`，原 7 个阶段（order 2-8）仍只有自由文本 topics，路线体验不连续。本次为 7 个阶段全部补齐两个字段，仅新增字段，不改 title/topics/projectRefs/resourceRefs/order 等既有字段。
+- 匹配原则：严格按各阶段既有 topics 与 interviewFocus 选题，数组顺序即学习顺序（由浅入深），不硬凑；33 个非第 0 阶段知识点全部被覆盖（覆盖率 100%，阈值 ≥85%），无知识点跨阶段重复引用；第 0 阶段 8 个入门知识点未被重复引用。
+- 各阶段挂载：
+  - `ai-user-basics`（模型与 Token / 上下文窗口 / 非确定性）：知识点 `what-is-token`、`context-window`、`model-selection`、`secrets-and-data-boundaries`（对应"AI 应用边界"）；自测 `token-basics`、`context-window-management`、`token-estimation-basics`、`temperature-and-determinism`、`context-window-overflow`、`model-selection-strategy`。
+  - `llm-api`（Responses API / 结构化输出 / 工具调用 / 错误处理）：知识点 `responses-api-lifecycle`、`structured-outputs`、`function-calling`、`streaming-responses`；自测 `streaming-vs-batch`、`structured-output-vs-json-mode`、`function-calling-loop`、`responses-api-lifecycle`、`llm-api-retry`、`rate-limit-control`、`parallel-tool-calls`。
+  - `prompt-context`（Prompt 契约 / Few-shot / 上下文压缩 / Prompt Injection）：知识点 `prompt-contract`、`few-shot-prompting`、`context-engineering`、`prompt-injection-defense`；自测 `prompt-contract-design`、`few-shot-selection`、`conversation-summarization`、`instruction-precedence`、`context-engineering-vs-prompt`、`untrusted-context-delimiters`、`prompt-injection-defense`。
+  - `rag`（Embedding / Chunking / 混合检索 / Rerank / 引用 / Eval）：知识点 `embedding-basics`、`chunking-strategy`、`vector-search`、`hybrid-search`、`reranking`、`rag-citations`、`rag-evaluation`（7 个 RAG 知识点全部归属本阶段）；自测 `what-is-embedding`、`embedding-and-vector-search`、`rag-chunking`、`vector-search-similarity`、`hybrid-search-design`、`rag-reranking`、`rag-citation-fidelity`、`rag-evaluation`。
+  - `agent-engineering`（Agent Loop / Tools / State / Planning / HITL）：知识点 `agent-loop`、`tool-contract-design`、`agent-state-memory`、`planning-routing`、`agent-stop-conditions`、`human-in-the-loop`、`multi-agent-patterns`；自测 `agent-vs-chatbot`、`agent-loop-control`、`agent-tool-schema`、`agent-state-vs-memory`、`agent-planning-routing`、`agent-stop-conditions`、`human-in-the-loop`、`agent-tool-permissions`。
+  - `mcp-ecosystem`（Host/Client/Server / 原语 / Transport / Security）：知识点 `mcp-architecture`、`mcp-primitives`、`mcp-security`（内容库现有 MCP 知识点共 3 个，全部归属本阶段，数量偏少但如实挂载）；自测 `what-is-mcp`、`mcp-architecture-question`、`mcp-primitives`、`mcp-transports`、`mcp-debugging`、`mcp-capability-negotiation`、`mcp-security`、`mcp-server-design`。
+  - `production-career`（Eval / Tracing / 成本 / 稳定性 / 系统设计）：知识点 `agent-tracing`、`cost-latency-budget`、`agent-evaluation`、`production-reliability`；自测 `agent-tracing`、`agent-evaluation`、`eval-dataset-design`、`llm-cost-control`、`online-ai-monitoring`、`llm-as-judge`、`tool-call-evaluation`、`design-production-rag`。
+- 内容缺口说明：`mcp-ecosystem` 仅 3 个知识点可挂（内容库 MCP 类知识点总共 3 个），无 Transport 独立知识点；`ai-user-basics` 的"非确定性"主题无专属知识点，靠自测题 `temperature-and-determinism` 覆盖。两处均未硬凑不相关内容。
+- 测试：`tests/content-shape.test.mjs` 移除"其余 7 个阶段不应携带 knowledgeRefs/questionRefs"的过期断言，新增两个用例——"每个阶段 knowledgeRefs ≥ 3 且 questionRefs ≥ 4 且全部指向 published 记录"、"非第 0 阶段 33 个知识点路线覆盖率 ≥ 85%"（当前 100%）。单测总数 111 → 113。
+- 验证记录：`npm run validate:content`（8 阶段、41 知识点、95 面试题）、`npm run typecheck`、`npm run lint`、`npm run test:unit`（113 项通过）全部通过；webpack 构建仍死锁（已知环境问题），`npx next build --turbopack` 通过；`next start` 抽查 `/roadmap` 静态 HTML，8 个阶段均渲染 `stage-refs` 区块（知识点 8 块 + 自测题 8 块），抽查 `/knowledge/hybrid-search`、`/interview/rag-evaluation` 链接目标均 200；桌面两列 / 960px 单列样式沿用上一里程碑已验证的 `.stage-refs` 响应式规则，未改动。server 已关闭，无后台进程残留。
+
 ### 2026-07-18：路线图接入第 0 阶段零基础先导入口
 
 - Schema 扩展：`roadmapStageSchema`（`lib/content/schemas.ts`）新增可选 `knowledgeRefs`（知识点 slug 数组）与 `questionRefs`（面试题 id 数组），向后兼容——现有 7 个阶段不填写仍合法。命名对齐 `careerCapabilitySchema` / `trainingTaskSchema` 已有的同名字段。
