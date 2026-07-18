@@ -1,26 +1,26 @@
 :root {
-  --bg: #f2f4f2;
-  --surface: #fafbf9;
+  --bg: #f6f1e7;
+  --surface: #fffdf6;
   --surface-strong: #ffffff;
-  --ink: #191d20;
-  --ink-soft: #333a3d;
-  --muted: #68716f;
-  --quiet: #8c9491;
-  --line: #d9dedb;
-  --line-strong: #b9c1bd;
-  --charcoal: #2b3034;
-  --charcoal-hover: #3a4045;
-  --action: #465d69;
-  --action-hover: #3b515d;
+  --ink: #1a1712;
+  --ink-soft: #342f26;
+  --muted: #6b665a;
+  --quiet: #8f887b;
+  --line: #ddd4c2;
+  --line-strong: #c8bda6;
+  --charcoal: #29231a;
+  --charcoal-hover: #3a3122;
+  --action: #a98336;
+  --action-hover: #7c5f22;
   --copper: #9a6b42;
   --copper-soft: #eee3d8;
-  --steel: #536a77;
-  --steel-soft: #e3e9ec;
+  --steel: #7c5f22;
+  --steel-soft: #f3ead7;
   --success: #557a70;
   --warning: #a76435;
-  --radius-sm: 4px;
-  --radius-md: 7px;
-  --shadow-soft: 0 18px 48px rgba(36, 43, 40, 0.07);
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --shadow-soft: 0 18px 48px rgba(35, 30, 20, 0.07);
   --page-width: 1240px;
   --reading-width: 760px;
 }
@@ -150,7 +150,7 @@ strong {
   z-index: 100;
   top: 0;
   background: rgba(250, 251, 249, 0.92);
-  border-bottom: 1px solid rgba(185, 193, 189, 0.7);
+  border-bottom: 1px solid rgba(200, 189, 166, 0.7);
   backdrop-filter: blur(18px);
 }
 
@@ -329,7 +329,7 @@ strong {
   color: #f8f9f7;
   background: var(--action);
   border-color: var(--action);
-  box-shadow: 0 9px 22px rgba(70, 93, 105, 0.18);
+  box-shadow: 0 9px 22px rgba(169, 131, 54, 0.18);
 }
 
 .button--primary:hover {
@@ -404,7 +404,7 @@ strong {
   width: fit-content;
   margin-bottom: 54px;
   padding: 7px 12px 7px 7px;
-  background: #ecefec;
+  background: #f0e9d8;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   gap: 11px;
@@ -770,7 +770,7 @@ strong {
   background: var(--surface-strong);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  box-shadow: 0 8px 24px rgba(36, 43, 40, 0.035);
+  box-shadow: 0 8px 24px rgba(35, 30, 20, 0.035);
 }
 
 .project-card:hover {
@@ -1376,7 +1376,7 @@ strong {
   background: rgba(255, 255, 255, 0.68);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  box-shadow: 0 10px 28px rgba(36, 43, 40, 0.035);
+  box-shadow: 0 10px 28px rgba(35, 30, 20, 0.035);
   gap: 16px;
 }
 
@@ -1403,7 +1403,7 @@ strong {
 
 .catalog-search:focus-within {
   border-color: var(--steel);
-  box-shadow: 0 0 0 3px rgba(83, 106, 119, 0.11);
+  box-shadow: 0 0 0 3px rgba(124, 95, 34, 0.11);
 }
 
 .catalog-search input {
@@ -7392,5 +7392,99 @@ strong {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   2026-07-18 视觉系统批次：玄墨 · 香槟金（与鸡血玄策/主站同族）
+   宋体展示字 / 发丝线 / 纸张噪点 / 克制动效
+   ============================================================ */
+
+:root {
+  --display: var(--font-display), 'Songti SC', 'STSong', 'Noto Serif CJK SC', 'SimSun', serif;
+  --gold-ink: #a98336;
+  --gold-deep: #7c5f22;
+  --gold-champagne: #dfc68f;
+}
+
+/* ---------- 纸张噪点 ---------- */
+
+body::before {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  content: '';
+  mix-blend-mode: multiply;
+  opacity: 0.045;
+  pointer-events: none;
+}
+
+::selection {
+  background: rgba(169, 131, 54, 0.26);
+}
+
+/* ---------- 宋体展示层级 ---------- */
+
+h1,
+h2,
+h3,
+.hero-copy h1 {
+  font-family: var(--display);
+}
+
+h1,
+h2 {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.hero-copy h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- eyebrow：金 + 宽字距 ---------- */
+
+.eyebrow {
+  color: var(--gold-deep);
+  font-weight: 600;
+  letter-spacing: 0.35em;
+}
+
+/* ---------- 动效 ---------- */
+
+@keyframes ai-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-copy > * {
+  animation: ai-rise 0.9s cubic-bezier(0.22, 0.61, 0.21, 1) both;
+}
+
+.hero-copy > *:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.hero-copy > *:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.hero-copy > *:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy > * {
+    animation: none !important;
   }
 }
