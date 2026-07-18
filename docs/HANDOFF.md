@@ -186,3 +186,11 @@ npm run build
 - 新增 11 项单测（`tests/agent-runtime-otel.test.ts`），单测总数 100 全部通过；validate:content、typecheck、lint 通过；webpack 构建死锁未恢复，继续 `next build --turbopack`（152 静态页）。
 - 实测证据：`next start`（需显式 `AGENT_SESSION_SECRET`，production 模式无回退密钥）下完成 fixture 2 工具 run → 同会话回放 200 → `format=otel` 200（6 span 结构校验通过）→ 跨会话回放/导出 404 → 未知 format 400；390px 无横向溢出；3 个测试 run 的 6 个 Redis 键已删除，无后台进程残留。
 - 遗留：GenAI 语义约定仍为 Development 状态，`gen_ai.*` 属性名未来可能调整，升级时以 otel.ts 文件头注释的对齐清单为准逐条核对；导出的 JSON 不能被 OTel collector 直接 ingest，接生产后端需用官方 SDK 重新仪表化。
+
+2026-07-18（第 0 阶段入门内容层）：
+
+- 新增 8 个入门知识点（大模型是什么、API 与 API Key、解剖一次模型调用、Prompt 是什么、温度与采样、什么是 Agent、为什么需要 RAG、跑通第一个 AI 应用）与 15 道初级面试题（ai-basic 4、llm-api 6、prompt-context 1、agent 2、rag 2），全部 published，面向完全没碰过 AI API 的读者；术语首次出现均带人话解释，example 字段的最小 JSON/脚本示例经 RichText 代码块渲染。
+- 内容关联：知识点经 `relatedQuestions` 同时挂新初级题与现有进阶题（如 `what-is-an-llm` → `token-basics`，`what-is-an-agent` → `agent-loop-control`），`relatedProjects` 只指真实项目；面试题 `projectConnection` 关联到 `/labs/*` 实验或如实标注暂无直接项目关联。
+- 未改动项及原因：`roadmap.json` 模型无知识点引用字段且 7 阶段被测试固定，未挂"第 0 阶段"；`lib/content/lab-relations.ts` 主题匹配的 lab 已达 2-4 个引用上限，未置换现有进阶条目；`tests/content-shape.test.mjs` 面试题总数断言 80 → 95 属内容增长的必要基线更新。
+- 验证：内容校验、类型检查、Lint、109 项单元测试通过；webpack 构建死锁未恢复（已知环境问题），`next build --turbopack` 通过（175 个静态页面）。
+- 注意：本批工作期间检测到另一进程并发修改了 `app/globals.css`、`app/layout.tsx` 并新增 `app/fonts/`（视觉改版，非本批内容），本批提交未包含这些文件。

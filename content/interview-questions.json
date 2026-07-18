@@ -1,5 +1,610 @@
 [
   {
+    "id": "what-is-an-llm",
+    "question": "什么是大语言模型？它是怎么生成文本的？",
+    "category": "ai-basic",
+    "level": "初级",
+    "tags": [
+      "LLM"
+    ],
+    "whatItTests": [
+      "能否用直觉语言讲清预训练与逐词生成",
+      "是否知道模型无状态的工程含义"
+    ],
+    "shortAnswer": "大语言模型是用海量文本预训练的参数化概率模型：对输入计算下一个词的概率分布，采样一个词接回输入，循环生成完整文本。",
+    "fullAnswer": "两个工程推论更重要。第一，模型无状态，每次调用独立，记忆来自你传给它的消息历史；第二，输出是概率采样而不是查表，同一输入可能得到不同输出，稳定性要靠采样参数、结构化输出和评估集在应用层保证。",
+    "bonusPoints": [
+      "主动指出无状态意味着记忆要在应用层实现",
+      "能用概率采样解释输出波动而不是玄学化"
+    ],
+    "commonMistakes": [
+      "把模型当成会记忆、会思考的数据库",
+      "只会背“预测下一个词”，讲不出任何工程推论"
+    ],
+    "followUps": [
+      "既然模型无状态，多轮对话的记忆是怎么实现的？",
+      "为什么同一句话问两次，答案可能不一样？"
+    ],
+    "projectConnection": "暂无直接项目关联；可在 Prompt 调试与回归台（/labs/prompt-regression）观察同一输入多次运行的通过率差异。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "hallucination-and-mitigation",
+    "question": "什么是幻觉？工程上有哪些降低幻觉的手段？",
+    "category": "ai-basic",
+    "level": "初级",
+    "tags": [
+      "Hallucination",
+      "RAG"
+    ],
+    "whatItTests": [
+      "是否理解幻觉是概率生成的固有现象而不是 bug",
+      "能否给出分层的缓解手段"
+    ],
+    "shortAnswer": "幻觉是模型生成看似合理但没有依据的内容。手段：RAG 提供证据并要求引用、明确允许回答不知道、结构化输出加校验、关键事实由人或规则复核。",
+    "fullAnswer": "幻觉来自概率生成的本质：模型优化的是像训练文本那样续写，不是说真话。工程上按链路分层缓解：输入侧用 RAG 注入证据并要求标注出处；指令侧明确证据不足就回答不知道；输出侧用 Schema 和规则校验关键字段；流程侧对高风险内容加人工复核。没有单一手段能根除幻觉，只能叠加降低。",
+    "bonusPoints": [
+      "强调没有银弹，只能分层叠加",
+      "提到用评估集量化幻觉率而不是凭感觉"
+    ],
+    "commonMistakes": [
+      "以为调低 temperature 或换更强模型就能根除幻觉",
+      "只在 Prompt 里写不要编造，却没有校验和拒答机制"
+    ],
+    "followUps": [
+      "接入 RAG 之后为什么还会有幻觉？",
+      "怎么度量幻觉有没有真的降低？"
+    ],
+    "projectConnection": "结合 RAG 知识库项目（/labs/rag-retrieval）：引用抽取与证据不足拒答是降低幻觉的两个落地机制。",
+    "references": [
+      "openai-platform-docs",
+      "openai-evals"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "training-data-vs-parameters",
+    "question": "模型的训练数据和参数有什么区别？",
+    "category": "ai-basic",
+    "level": "初级",
+    "tags": [
+      "LLM"
+    ],
+    "whatItTests": [
+      "是否理解参数是训练后固化的权重、数据不随模型分发",
+      "能否推出更新知识的正确路径"
+    ],
+    "shortAnswer": "训练数据是喂给模型的文本语料，参数是训练完成后学到的数值权重；使用模型时你接触的是参数，不是原始数据。",
+    "fullAnswer": "直觉：数据是教材，参数是学完后的大脑，模型发布的是参数。两个工程推论：想让模型知道新信息，优先在调用时通过上下文或 RAG 注入，而不是假设它学过；微调是继续训练改变参数，成本高、生效慢，也不会让旧知识自动过期。",
+    "bonusPoints": [
+      "能对比上下文注入与微调的成本和生效速度",
+      "指出参数规模与能力相关但不是唯一因素"
+    ],
+    "commonMistakes": [
+      "以为模型能直接查到训练时的某篇原文",
+      "把加知识等同于微调，忽略 RAG 这条更轻的路径"
+    ],
+    "followUps": [
+      "要让模型回答公司内部制度，选微调还是 RAG，为什么？"
+    ],
+    "projectConnection": "结合 RAG 知识库项目：企业内部知识走检索注入（改数据），而不是重新训练改参数。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "open-source-vs-api-models",
+    "question": "开源模型自部署和闭源 API 各适合什么场景？",
+    "category": "ai-basic",
+    "level": "初级",
+    "tags": [
+      "LLM",
+      "Deployment",
+      "Cost"
+    ],
+    "whatItTests": [
+      "能否从数据合规、成本结构、运维能力三个维度取舍",
+      "是否知道这不是纯粹的能力对比"
+    ],
+    "shortAnswer": "闭源 API 适合快速验证、流量波动大、追求最强通用能力的场景；自部署开源模型适合数据不能出内网、调用量稳定且大、需要深度定制的场景。",
+    "fullAnswer": "取舍维度：数据边界（敏感数据不能出内网选自部署）、成本结构（低量波动用按 token 计费的 API 更省，高量稳定时自建可能更划算）、运维能力（自部署要管 GPU、扩缩容、升级和监控，是长期人力成本）、能力需求（前沿通用能力目前多由闭源旗舰提供）。工程上常见答案是混合：常规请求走低成本通道，难任务路由到强模型。",
+    "bonusPoints": [
+      "提到按任务路由的混合架构",
+      "把运维人力计入自部署总成本"
+    ],
+    "commonMistakes": [
+      "只比 token 单价，不算 GPU 闲置与运维人力",
+      "默认自部署就等于合规，忽略日志与访问控制仍要治理"
+    ],
+    "followUps": [
+      "出现什么信号时，你会从纯 API 切换到混合部署？"
+    ],
+    "projectConnection": "暂无直接项目关联；可说明自己会先把模型调用封装成可替换接口，让后端切换不改业务代码。",
+    "references": [
+      "openai-production-best-practices",
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "what-is-api-key",
+    "question": "API Key 是什么？为什么不能写在前端代码里？",
+    "category": "llm-api",
+    "level": "初级",
+    "tags": [
+      "API Key",
+      "Security"
+    ],
+    "whatItTests": [
+      "是否理解 Key 是鉴权与计费凭证",
+      "是否知道前端的可见性边界与泄露后果"
+    ],
+    "shortAnswer": "API Key 是调用方身份的密钥凭证，服务端用它鉴权、限流和计费；前端代码和网络请求对任何用户可见，Key 写进去等于公开账户密码，会被扫描盗刷。",
+    "fullAnswer": "正确架构是浏览器只请求自己的后端，后端从环境变量读 Key 再调模型，顺便做鉴权、限流和日志脱敏。本地开发用 .env 并加入 .gitignore，生产用部署平台的环境变量或密钥管理，不同环境用独立、最小权限的 Key。一旦泄露，立即在平台后台吊销换新并核对用量账单。",
+    "bonusPoints": [
+      "能说出泄露后的处置顺序：吊销、轮换、查账单",
+      "指出 NEXT_PUBLIC_ 变量会被打进浏览器 bundle"
+    ],
+    "commonMistakes": [
+      "以为 NEXT_PUBLIC_ 前缀的变量是后端变量",
+      "Key 提交到 Git 后只删最新提交，忽略历史仍可恢复"
+    ],
+    "followUps": [
+      "本地 .env 和生产环境变量分别怎么管？",
+      "Key 疑似泄露后的第一步是什么？"
+    ],
+    "projectConnection": "结合 Prompt 调试与回归台：模型调用只发生在服务端，Key 存环境变量，前端不出现任何凭证。",
+    "references": [
+      "openai-production-best-practices",
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "message-roles",
+    "question": "system、user、assistant 三种消息角色各起什么作用？",
+    "category": "llm-api",
+    "level": "初级",
+    "tags": [
+      "LLM",
+      "Prompt"
+    ],
+    "whatItTests": [
+      "是否理解角色分工与指令优先级",
+      "能否正确组织多轮对话历史"
+    ],
+    "shortAnswer": "system 定义行为边界和稳定规则，user 是用户输入，assistant 是模型此前的回复；多轮对话就是把这三类消息按顺序组成数组发给模型。",
+    "fullAnswer": "工程要点：稳定、高优先级的规则放 system（身份、输出格式、禁止事项），本次任务和材料放 user，历史轮次按 user 与 assistant 交替保留，不要把 system 规则复制进每条 user。指令冲突时模型一般更服从高优先级角色（具体层级以所用模型文档为准），但安全底线不能只靠角色顺序，还要配合输入隔离和输出校验。",
+    "bonusPoints": [
+      "提到角色优先级，并指出不能单靠它防注入",
+      "知道历史消息同样占用 token 预算"
+    ],
+    "commonMistakes": [
+      "把所有内容塞进一条 user 消息",
+      "把上一轮 assistant 回复改写成 user 角色，破坏对话结构"
+    ],
+    "followUps": [
+      "上下文快超限时，三类消息你优先裁剪哪一类？",
+      "system 和用户指令冲突时会发生什么？"
+    ],
+    "projectConnection": "结合 Prompt 调试与回归台：system 契约与 user 输入分离，回归时只替换 user 样例。",
+    "references": [
+      "openai-platform-docs",
+      "openai-responses-api"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "temperature-basics",
+    "question": "temperature 是什么？设为 0 和接近 1 分别什么效果？",
+    "category": "llm-api",
+    "level": "初级",
+    "tags": [
+      "Temperature",
+      "LLM"
+    ],
+    "whatItTests": [
+      "是否理解采样随机性的直觉",
+      "能否按任务选择合适档位"
+    ],
+    "shortAnswer": "temperature 控制生成的随机性：接近 0 时输出集中、稳定、保守；接近 1 时更发散、多样，也更容易跑偏。",
+    "fullAnswer": "机制上它调整下一个词概率分布的平坦度。按任务选档位：分类、抽取、结构化输出、工具调用调低（0 到 0.3），创意和头脑风暴可调高。注意 temperature 0 只是尽量走最高概率路径，平台实现和输入变化仍可能带来差异，关键业务用 Schema 校验和评估集兜底，而不是赌一个参数。",
+    "bonusPoints": [
+      "主动说明 0 不等于数学上的完全确定",
+      "能给出具体任务的档位建议"
+    ],
+    "commonMistakes": [
+      "所有任务都用默认值，又抱怨分类结果飘",
+      "以为调到 0 就可以省掉输出校验"
+    ],
+    "followUps": [
+      "top_p 和 temperature 应该一起调吗？",
+      "怎么验证调参真的提升了稳定性？"
+    ],
+    "projectConnection": "结合 Prompt 调试与回归台：固定样例在不同 temperature 下多次运行，对比通过率。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "token-estimation-basics",
+    "question": "什么是 token？中文文本怎么粗略估算 token 数？",
+    "category": "llm-api",
+    "level": "初级",
+    "tags": [
+      "Token",
+      "Cost"
+    ],
+    "whatItTests": [
+      "是否理解 token 与字符不是一一对应",
+      "是否会用保守口径粗估并用实测校准"
+    ],
+    "shortAnswer": "token 是模型分词器切出的计量单位，输入输出都按它计费和占上下文。中文可按 1 个汉字约 1 到 2 个 token 粗估（因分词器和模型而异），正式预算要用官方 tokenizer 或 API 返回的 usage 实测。",
+    "fullAnswer": "字数不等于 token 数：英文常见词往往不到 1 个 token，中文一个汉字常见在 1 个 token 上下，标点、英文、数字混排都会改变比例。工程流程：设计期用保守比例粗估上下文与成本，上线后以响应里 usage 的真实统计为准；长文本先检索再喂模型，而不是全文塞入。",
+    "bonusPoints": [
+      "强调以 API usage 为最终口径",
+      "提到不同模型分词器不同，估算值不能跨模型套用"
+    ],
+    "commonMistakes": [
+      "用字符数当 token 数做预算",
+      "只算输入，不算输出和历史消息"
+    ],
+    "followUps": [
+      "输入 token 和输出 token 的价格一样吗，怎么查？",
+      "超长文档怎么做成本预估？"
+    ],
+    "projectConnection": "结合 Prompt 调试与回归台：评估报表按输入与输出 token 估算每条样例成本。",
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "context-window-overflow",
+    "question": "上下文窗口超限会发生什么？有哪些处理策略？",
+    "category": "llm-api",
+    "level": "初级",
+    "tags": [
+      "Context",
+      "LLM"
+    ],
+    "whatItTests": [
+      "是否知道超限的直接后果是请求报错而不是静默截断",
+      "能否给出分层处理策略"
+    ],
+    "shortAnswer": "输入、历史、输出预算加起来超过窗口，API 通常会直接报错拒绝请求，而不是悄悄帮你截断。策略：裁剪低价值历史、摘要压缩旧轮次、检索注入代替全文、限制输出 token、必要时换大窗口模型。",
+    "fullAnswer": "处理按优先级：先算清账，system、历史、工具结果、本次输入、输出预留都占窗口；再分层减负，保留当前任务和关键约束，旧轮次压缩成摘要，长文档走检索只放相关片段；最后留保险，为输出预留空间并监控 usage，接近上限时主动摘要或提示开新会话。注意摘要是有损压缩，关键事实要留在原文或结构化状态里。",
+    "bonusPoints": [
+      "区分超限报错与静默截断取决于 API 和参数",
+      "知道摘要是有损的，关键事实要结构化保留"
+    ],
+    "commonMistakes": [
+      "默认平台会帮忙截断，直到线上报错才发现",
+      "无脑截尾，把任务约束和输出格式说明一起截掉"
+    ],
+    "followUps": [
+      "摘要旧轮次时哪些信息必须保留？",
+      "怎么在代码里提前发现快要超限？"
+    ],
+    "projectConnection": "结合 Prompt 调试与回归台：按优先级保留消息、为输出预留 token 预算。",
+    "references": [
+      "openai-platform-docs",
+      "openai-responses-api"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "streaming-vs-batch",
+    "question": "流式响应和非流式响应的区别？什么场景必须用流式？",
+    "category": "llm-api",
+    "level": "初级",
+    "tags": [
+      "Streaming",
+      "LLM"
+    ],
+    "whatItTests": [
+      "是否理解首 token 延迟与总耗时的区别",
+      "能否识别流式的必要场景与工程代价"
+    ],
+    "shortAnswer": "非流式等模型生成完一次性返回；流式按增量分块推送，用户很快就能看到开头。长输出和聊天界面必须用流式改善感知延迟；短输出、批处理、需要整体校验 JSON 的场景用非流式更简单。",
+    "fullAnswer": "流式改变的是体验不是总时长：总生成时间差不多，但首个 token 到达时间大幅提前。代价是工程复杂度：增量解析、断线重连、中途取消，内容审核从一次性变成滚动式，结构化输出要拼接完整后再校验。判断标准：用户盯着等的输出用流式，机器消费、需要完整校验后落库的输出用非流式。",
+    "bonusPoints": [
+      "指出流式不减少总 token 与总耗时",
+      "提到增量解析、取消与重连的复杂度"
+    ],
+    "commonMistakes": [
+      "为了显得高级，给批处理任务也上流式",
+      "流式拼接到一半就当成完整 JSON 解析"
+    ],
+    "followUps": [
+      "流式传输中连接断了怎么恢复？",
+      "结构化输出场景怎么兼顾流式体验与整体校验？"
+    ],
+    "projectConnection": "暂无直接项目关联；本站实验均为非流式一次性校验，可作为机器消费选非流式的实例。",
+    "references": [
+      "openai-platform-docs",
+      "openai-responses-api"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "prompt-anatomy",
+    "question": "一段工程化的 Prompt 通常由哪几部分组成？",
+    "category": "prompt-context",
+    "level": "初级",
+    "tags": [
+      "Prompt",
+      "Context"
+    ],
+    "whatItTests": [
+      "能否把 Prompt 拆成可维护的结构",
+      "是否理解输出契约与失败路径是必备件"
+    ],
+    "shortAnswer": "常见组成：角色与目标、任务指令、输出格式契约、明确分隔的上下文或数据、必要的示例，以及约束与失败行为（信息不足时怎么办）。",
+    "fullAnswer": "把 Prompt 当接口文档写：角色和目标是签名，输出格式（字段、类型、JSON Schema）是返回类型，分隔开的上下文是参数，示例是用法样例，失败协议（信息不足返回什么、拒绝什么）是异常路径。少任何一块，线上都会以意外形式暴露。写完要版本化并用固定样例回归，这是它和普通聊天的分水岭。",
+    "bonusPoints": [
+      "主动包含失败协议与版本回归",
+      "能区分规则、数据、示例三类内容的位置"
+    ],
+    "commonMistakes": [
+      "只写要做什么，不写输出格式和不知道时怎么办",
+      "规则、数据、示例混在一起，改一处全乱"
+    ],
+    "followUps": [
+      "输出契约用什么手段强制，光靠文字够吗？",
+      "哪些部分该放 system，哪些该放 user？"
+    ],
+    "projectConnection": "结合 Prompt 调试与回归台：两版 Prompt 的回归对比展示契约化前后的通过率差异。",
+    "references": [
+      "openai-platform-docs",
+      "openai-structured-outputs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "agent-vs-chatbot-essence",
+    "question": "Agent 和普通聊天机器人的本质区别是什么？",
+    "category": "agent",
+    "level": "初级",
+    "tags": [
+      "Agent",
+      "Tool Calling"
+    ],
+    "whatItTests": [
+      "是否抓住能行动、有副作用这一本质",
+      "是否知道循环需要预算与终止条件"
+    ],
+    "shortAnswer": "聊天机器人生成回复，Agent 达成目标：它在循环里调用工具、观察结果、再决策，直到任务完成或触发停止。本质区别是能对世界产生行动，而不只是会说。",
+    "fullAnswer": "结构上 Agent 等于模型加工具加状态加控制循环。它带来聊天机器人没有的新问题：权限（能调什么工具）、预算（最多几步、花多少钱）、终止（什么时候停）、审计（每步做了什么）。判断一个系统是不是 Agent 不看名字，看是否存在模型自主决定下一步动作的循环；能用确定性工作流解决的问题，不必强行上 Agent。",
+    "bonusPoints": [
+      "用模型自主决定下一步作为判据，而不是营销名词",
+      "提到权限、预算、终止、审计四类新工程问题"
+    ],
+    "commonMistakes": [
+      "把能调用一个固定工具就当 Agent",
+      "忽视副作用：Agent 的每次行动都可能改动真实数据"
+    ],
+    "followUps": [
+      "循环失控最常见的形式是什么，怎么防？",
+      "什么任务你反而不会用 Agent 做？"
+    ],
+    "projectConnection": "结合受控任务执行 Agent（/labs/controlled-agent）：五类轨迹展示工具、预算与审批如何构成行动。",
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "function-calling-basics",
+    "question": "什么是工具调用（function calling）？为什么 Agent 离不开它？",
+    "category": "agent",
+    "level": "初级",
+    "tags": [
+      "Tool Calling",
+      "Agent"
+    ],
+    "whatItTests": [
+      "是否理解模型只输出调用意图、由应用真正执行",
+      "是否理解工具是模型与真实系统之间的桥梁"
+    ],
+    "shortAnswer": "function calling 是模型按你提供的工具 Schema 输出结构化调用请求（调哪个工具、参数是什么），由你的代码真正执行，再把结果喂回模型。没有它，模型只能说，不能做。",
+    "fullAnswer": "关键边界：模型不直接执行任何函数，它只生成符合 Schema 的参数；执行、鉴权、超时、重试都在应用层。Agent 的感知（查数据）和行动（写数据）都经工具完成，所以工具契约（名称、参数 Schema、权限、失败返回）决定 Agent 的能力上限和安全边界；Schema 写不好，模型就会填错参数或选错工具。",
+    "bonusPoints": [
+      "强调模型给意图、应用做执行的信任边界",
+      "提到工具 Schema 质量直接影响调用正确率"
+    ],
+    "commonMistakes": [
+      "以为模型自己在执行函数，忽略应用层要校验参数",
+      "工具返回一大段非结构化文本，模型难以使用"
+    ],
+    "followUps": [
+      "模型填错参数时怎么办？",
+      "哪些工具必须加人工确认才允许执行？"
+    ],
+    "projectConnection": "结合受控任务执行 Agent（/labs/controlled-agent）展示工具 Schema、权限守卫与执行结果的完整回路；/labs/mcp-tools 可对照协议层视角。",
+    "references": [
+      "openai-function-calling",
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "what-is-rag",
+    "question": "什么是 RAG？它解决什么问题？",
+    "category": "rag",
+    "level": "初级",
+    "tags": [
+      "RAG"
+    ],
+    "whatItTests": [
+      "能否说清先检索后生成的流程",
+      "是否知道它解决什么、不解决什么"
+    ],
+    "shortAnswer": "RAG 是检索增强生成：回答问题前先从外部知识库检索相关内容，把内容和问题一起交给模型，并要求基于内容回答。它解决知识截止、企业内部知识和减少幻觉三类问题。",
+    "fullAnswer": "链路分两段：离线把文档切块、建索引（常用向量检索）；在线把用户问题转成检索请求，取回相关片段注入上下文，模型基于片段生成并附引用。它不能自动保证正确：检索漏了、切块坏了、模型不忠于证据都会出错，所以生产 RAG 要引用可核对、证据不足可拒答，并对检索与生成分别评估。",
+    "bonusPoints": [
+      "主动说出 RAG 的三类失效环节",
+      "提到引用与拒答机制"
+    ],
+    "commonMistakes": [
+      "以为 RAG 就是接个向量数据库",
+      "不做评估就上线，坏了分不清坏在检索还是生成"
+    ],
+    "followUps": [
+      "RAG 和直接把文档塞进上下文比，赢在哪？",
+      "知识库更新后，线上多久能生效？"
+    ],
+    "projectConnection": "结合 RAG 知识库项目（/labs/rag-retrieval）：离线入库、在线检索、引用与拒答完整可见。",
+    "references": [
+      "pgvector-docs",
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "id": "what-is-embedding",
+    "question": "什么是 embedding？用一句话说明它在检索中的作用。",
+    "category": "rag",
+    "level": "初级",
+    "tags": [
+      "Embedding",
+      "RAG"
+    ],
+    "whatItTests": [
+      "能否用一句话给出准确定义",
+      "是否理解语义相似不同于字面匹配"
+    ],
+    "shortAnswer": "embedding 是把文本映射成一组可计算距离的数字向量；在检索中，它让意思相近的内容即使字面不同也能被找出来，例如“退款时间”能匹配到“退货后多久到账”。",
+    "fullAnswer": "工程要点：入库和查询必须用同一个或兼容的 embedding 模型，否则向量不在同一坐标系；向量要和原文、版本、元数据一起存，便于引用与重建；相似度高只代表语义近，不代表事实正确，检索结果仍需生成环节忠实化。它不是数据库本身，而是让数据库具备语义搜索能力的索引方式。",
+    "bonusPoints": [
+      "指出入库与查询模型必须一致",
+      "区分语义相似与事实正确"
+    ],
+    "commonMistakes": [
+      "混用不同模型或维度的向量",
+      "只存向量不存原文与来源，无法展示引用"
+    ],
+    "followUps": [
+      "为什么换 embedding 模型意味着重建整个索引？",
+      "向量检索和关键词检索各自适合什么？"
+    ],
+    "projectConnection": "结合 RAG 知识库项目（/labs/rag-retrieval）：关键词、混合、向量三路对比，向量模式即 embedding 检索。",
+    "references": [
+      "pgvector-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
     "id": "token-basics",
     "question": "Token 是什么，它为什么影响成本和上下文？",
     "category": "ai-basic",

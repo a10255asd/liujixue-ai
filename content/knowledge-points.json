@@ -1,5 +1,317 @@
 [
   {
+    "slug": "what-is-an-llm",
+    "title": "大模型是什么",
+    "category": "llm",
+    "level": "入门",
+    "summary": "大语言模型（LLM）是用海量文本预训练的参数化概率模型，逐词生成文本。",
+    "whyItMatters": "理解它在算概率而不是在查答案，才能解释输出波动、幻觉，以及为什么对话历史要自己传。",
+    "explanation": "预训练把语言统计规律压进参数（模型里的数值权重）；推理时对输入计算下一个词的概率分布，采样一个词接回输入再重复。模型无状态：每次调用互相独立，它只知道你这次发给它的内容。",
+    "engineeringNotes": [
+      "记忆靠应用层传历史，模型自己不存",
+      "同一输入可能给出不同输出，用评估集兜底",
+      "把模型当无状态函数设计系统"
+    ],
+    "example": "让它续写“巴黎是法国的”，它倾向生成“首都”，因为训练文本中这个位置该词概率最高，而不是它查了一张事实表。",
+    "commonMistakes": [
+      "以为模型记得上一次对话",
+      "把输出当数据库查询结果，期待永远一致"
+    ],
+    "interviewAnswer": "LLM 是预训练得到的参数化概率模型，逐词采样生成；工程上按无状态服务对待，记忆、稳定性和正确性都在应用层补。",
+    "relatedQuestions": [
+      "what-is-an-llm",
+      "training-data-vs-parameters",
+      "token-basics"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "api-and-api-keys",
+    "title": "API 与 API Key",
+    "category": "llm",
+    "level": "入门",
+    "summary": "API 是程序之间约定好的调用入口；API Key 是调用时证明身份和计费主体的密钥凭证。",
+    "whyItMatters": "不会配 Key 就发不出第一个请求；Key 放错位置会被盗刷成真实账单，是新人最常见的事故。",
+    "explanation": "调模型就是向服务商的 HTTPS 端点发请求，请求头带 Authorization: Bearer <Key>，服务端据此鉴权、限流、计费。浏览器代码和用户设备对任何人可见，所以 Key 只能放服务端环境变量，前端永远只调自己的后端。",
+    "engineeringNotes": [
+      "Key 放 .env 并加入 .gitignore",
+      "前端调自有后端，由后端附 Key 转发",
+      "泄露后立即吊销换新并核对账单"
+    ],
+    "example": "把 Key 写进 NEXT_PUBLIC_ 开头的变量，它会被打包进浏览器代码，任何人打开开发者工具就能拿走；公开仓库里的 Key 会被扫描脚本在很短时间内盗用。",
+    "commonMistakes": [
+      "Key 提交进 Git 后只删最新提交，忽略历史仍可恢复",
+      "所有环境共用一个不限额度的 Key"
+    ],
+    "interviewAnswer": "API Key 是鉴权与计费凭证，等同账户密码；只能存服务端，前端出现即事故，处置顺序是吊销、轮换、查用量。",
+    "relatedQuestions": [
+      "what-is-api-key",
+      "api-key-security"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs",
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "anatomy-of-an-llm-call",
+    "title": "解剖一次模型调用",
+    "category": "llm",
+    "level": "入门",
+    "summary": "一次模型调用就是一次 HTTP 请求：发 messages 和参数，收 content、finish_reason 和 usage。",
+    "whyItMatters": "看懂请求响应结构，才能排查没答完（finish_reason 为 length）、花了多少（usage）和指令放错角色这三类日常问题。",
+    "explanation": "messages 按顺序装对话：system 放稳定规则，user 放本次输入，assistant 是模型的历史回复；model 参数选择模型。响应里 content 是生成文本，finish_reason 标记停止原因（stop 为完整结束、length 为被输出上限截断），usage 给出输入输出 token 数。",
+    "engineeringNotes": [
+      "规则放 system，输入放 user，不混写",
+      "先查 finish_reason 再使用 content",
+      "记录 usage 的输入输出 token 做成本核算"
+    ],
+    "example": "最小请求与响应（字段名为示意，以官方文档为准）：\n```json\n{ \"model\": \"gpt-4o-mini\", \"messages\": [{ \"role\": \"system\", \"content\": \"你是简洁的助手\" }, { \"role\": \"user\", \"content\": \"用一句话解释 API\" }] }\n```\n```json\n{ \"content\": \"API 是程序之间约定好的调用入口。\", \"finish_reason\": \"stop\", \"usage\": { \"input_tokens\": 24, \"output_tokens\": 15 } }\n```",
+    "commonMistakes": [
+      "所有指令塞进 user，放弃 system 的优先级",
+      "不读 finish_reason，把截断输出当完整结果"
+    ],
+    "interviewAnswer": "调用等于 messages（system/user/assistant）加 model 参数进，content、finish_reason、usage 出；按 finish_reason 判完整性，按 usage 算成本。",
+    "relatedQuestions": [
+      "message-roles",
+      "streaming-vs-batch",
+      "responses-api-lifecycle"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-responses-api",
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "what-is-a-prompt",
+    "title": "Prompt 是什么",
+    "category": "prompt",
+    "level": "入门",
+    "summary": "Prompt 是发给模型的全部输入：指令、角色、上下文、示例的组合。",
+    "whyItMatters": "模型没有默认任务，输出上限由输入决定；工程化 Prompt 才稳定可测，随便问做不到。",
+    "explanation": "四要素：指令（做什么）、角色（以什么身份和风格）、上下文（完成任务所需材料，与规则分隔放）、示例（输入输出样例）。把 Prompt 当代码对待：版本化、评审、用固定样例回归；再进一步就是 Prompt 契约设计。",
+    "engineeringNotes": [
+      "先写清任务和输出格式，再调措辞",
+      "规则与数据分开，外部内容加分隔符",
+      "改动后跑固定样例回归"
+    ],
+    "example": "“总结这段话”是随便问；“你是技术编辑，把以下发布说明压缩成 3 条要点，每条不超过 20 字，输出 JSON 数组”是工程化 Prompt。",
+    "commonMistakes": [
+      "需求模糊就怪模型不行",
+      "反复改 Prompt 不留版本，出问题无法回滚"
+    ],
+    "interviewAnswer": "Prompt 是模型的全部输入；工程上按契约写全指令、角色、上下文、示例，版本化管理并用样例回归，进阶形态就是 Prompt 契约。",
+    "relatedQuestions": [
+      "prompt-anatomy",
+      "prompt-contract-design"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "temperature-and-sampling",
+    "title": "温度与采样",
+    "category": "llm",
+    "level": "入门",
+    "summary": "temperature 和 top_p 控制生成的随机程度：越低越稳定保守，越高越多样发散。",
+    "whyItMatters": "同一个 Prompt 换一组采样参数，输出稳定性完全不同；结构化输出要稳，创意任务要活，参数必须跟任务走。",
+    "explanation": "每一步模型输出词表上的概率分布，temperature 调整分布的平坦度，top_p 只在累计概率前 p 的词里采样。temperature 0 是尽量取最高概率路径，但不是数学上的完全确定：服务端实现和输入变化仍可能带来差异。",
+    "engineeringNotes": [
+      "分类、抽取、工具调用：调低（0 到 0.3）",
+      "创意、头脑风暴：可以调高",
+      "关键输出靠 Schema 和评估兜底，不赌单个参数"
+    ],
+    "example": "固定标签的分类任务，temperature 0.8 时同一条输入跑 10 次可能出现 3 种标签；调到 0 后结果基本收敛，但仍要用评估集验证而不是默认它永远一致。",
+    "commonMistakes": [
+      "以为 temperature 0 就绝对不会变",
+      "所有场景都用默认值，分类任务也开高随机性"
+    ],
+    "interviewAnswer": "temperature 与 top_p 管采样随机性：确定性任务调低、创意任务调高；0 只减少随机性，稳定性最终靠结构化输出和评估保证。",
+    "relatedQuestions": [
+      "temperature-basics",
+      "temperature-and-determinism"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "what-is-an-agent",
+    "title": "什么是 Agent",
+    "category": "agent",
+    "level": "入门",
+    "summary": "Agent = 模型 + 工具 + 循环：模型决定下一步做什么，工具去执行，结果喂回模型，直到任务完成。",
+    "whyItMatters": "这是聊天与做事的分界线；不理解这个最小定义，就设计不出权限、预算和终止条件，Agent 必然失控。",
+    "explanation": "聊天机器人把输入映射成回复；Agent 围绕目标行动：每一轮模型决定调哪个工具，拿到结果继续决策。循环必须带刹车：步数与成本预算、工具权限边界、高风险动作人工确认、明确的终止条件。",
+    "engineeringNotes": [
+      "先定义目标和允许的工具清单，再谈智能",
+      "每个工具声明权限和风险级别",
+      "设最大步数、最大成本和超时"
+    ],
+    "example": "订票直觉走查：用户说“订明天去上海最便宜的票”→ 模型决定查票（工具调用）→ 拿到 3 个班次 → 比价后请求用户确认 → 确认后调用下单工具 → 返回订单号。每一步都是模型决策加工具执行的一轮循环。",
+    "commonMistakes": [
+      "把调了一次工具的聊天机器人就叫 Agent",
+      "不给循环设预算和终止条件，放任它跑到欠费"
+    ],
+    "interviewAnswer": "Agent 的最小定义是模型加工具加控制循环，本质区别是能行动；工程上先有权限、预算、终止，再让模型自主决策，深入就是 Agent Loop。",
+    "relatedQuestions": [
+      "agent-vs-chatbot-essence",
+      "function-calling-basics",
+      "agent-loop-control"
+    ],
+    "relatedProjects": [
+      "task-planning-agent"
+    ],
+    "references": [
+      "openai-agents-sdk"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "why-rag",
+    "title": "为什么需要 RAG",
+    "category": "rag",
+    "level": "入门",
+    "summary": "RAG（检索增强生成）= 先从你的知识库查出相关内容，再让模型基于这些内容回答。",
+    "whyItMatters": "模型有三个硬伤：知识有截止日期、会一本正经地编造（幻觉）、不知道你的企业内部资料；RAG 的先查后答正好补上这三块。",
+    "explanation": "离线把文档切成小块并建立可搜索的索引；在线时先检索出最相关的几块，连同问题发给模型，要求基于这些内容回答并附引用。RAG 不自动正确：检索漏了、切块坏了、模型不忠于证据都会出错，检索与生成要分别评估。",
+    "engineeringNotes": [
+      "回答附引用，证据不足就明说不知道",
+      "检索和生成分层评估，不只看最终答案",
+      "文档更新后重建索引"
+    ],
+    "example": "员工问“年假怎么休”：不接 RAG，模型按公开常识猜；接 RAG，系统先检索公司考勤制度相关条款，模型按条款回答并标注出处。",
+    "commonMistakes": [
+      "以为接了向量数据库就不会再幻觉",
+      "把整本文档塞进上下文，又贵又稀释重点"
+    ],
+    "interviewAnswer": "RAG 用外部检索解决知识截止、幻觉和内部知识三个问题，核心是先查后答加引用可核；深入就是 Embedding 与语义表示和分层评估。",
+    "relatedQuestions": [
+      "what-is-rag",
+      "what-is-embedding",
+      "embedding-and-vector-search"
+    ],
+    "relatedProjects": [
+      "rag-knowledge-base"
+    ],
+    "references": [
+      "pgvector-docs",
+      "openai-platform-docs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "first-ai-app-locally",
+    "title": "跑通第一个 AI 应用",
+    "category": "deploy",
+    "level": "入门",
+    "summary": "第一个 AI 应用只需要四步：装 SDK、配环境变量、发一个请求、看懂返回。",
+    "whyItMatters": "这是把前面所有概念变成手感的最小闭环：跑通一次真实调用，比读十篇概念文章更有用，也是后续所有项目的起点。",
+    "explanation": "装官方 SDK，在 .env 写 Key 并把 .env 加进 .gitignore，写一个十行脚本发请求，打印 content、finish_reason、usage。报错按状态码分类：401 是鉴权失败（Key 错或没传），429 是限流或额度不足（要退避重试），超时要设 deadline 并重试。",
+    "engineeringNotes": [
+      "Key 只放 .env，绝不提交进仓库",
+      "脚本里打印 content、finish_reason、usage",
+      "设超时；429 用指数退避重试"
+    ],
+    "example": "最小脚本（Node.js，以所用 SDK 最新文档为准）：\n```ts\nimport OpenAI from 'openai'\nconst client = new OpenAI() // 自动读取 OPENAI_API_KEY\nconst res = await client.responses.create({ model: 'gpt-4o-mini', input: '用一句话介绍你自己' })\nconsole.log(res.output_text, res.usage)\n```",
+    "commonMistakes": [
+      "Key 硬编码进源码并提交到仓库",
+      "看到 429 就立刻猛重试，越试越被限"
+    ],
+    "interviewAnswer": "最小闭环是 SDK 加环境变量 Key 加一次请求加读懂 content 与 usage；排错按 401 鉴权、429 限流退避、超时设 deadline 分类。",
+    "relatedQuestions": [
+      "what-is-api-key",
+      "llm-api-retry"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs",
+      "openai-production-best-practices"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
     "slug": "what-is-token",
     "title": "Token、上下文与计费",
     "category": "llm",

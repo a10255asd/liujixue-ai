@@ -10,6 +10,17 @@
 
 ## 已完成
 
+### 2026-07-18：第 0 阶段入门内容层（8 个知识点 + 15 道初级面试题）
+
+- 针对"33 个知识点里入门只有 7 个、80 道面试题里初级只有 13 道、默认读者已见过 API Key"的缺口，补齐纯 0 基础导向的先导层：新增 8 个入门知识点（`what-is-an-llm`、`api-and-api-keys`、`anatomy-of-an-llm-call`、`what-is-a-prompt`、`temperature-and-sampling`、`what-is-an-agent`、`why-rag`、`first-ai-app-locally`）和 15 道初级面试题，全部 `status: published`，`lastReviewedAt: 2026-07-18`。
+- 写作口径：工程手册风格，专业术语首次出现给一句人话解释；数字用保守表述并标注"约/因分词器而异"；references 只引 `resources.json` 中已有的官方文档条目；`anatomy-of-an-llm-call` 与 `first-ai-app-locally` 的 example 含最小 JSON/脚本示例（经 RichText 代码块渲染，并标注"以官方文档为准"）。
+- 关联策略：schema 无知识点→知识点字段，"关联进阶"通过共享 `relatedQuestions` 表达（如 `what-is-an-llm` 关联进阶条目"Token、上下文与计费"的 `token-basics`；`what-is-an-agent` 关联 `agent-loop-control`；`why-rag` 关联 `embedding-and-vector-search`）；`relatedProjects` 只关联真实项目 slug（`prompt-debugger`、`task-planning-agent`、`rag-knowledge-base`）。
+- roadmap 集成结论：`roadmapStageSchema` 没有知识点引用字段（只有 projectRefs/resourceRefs/自由文本 topics），且 `content-shape.test.mjs` 固定 7 阶段，故未改动 `roadmap.json`，不硬改模型。
+- lab 关联映射结论：`prompt-regression`、`rag-retrieval`、`controlled-agent` 三个主题匹配的 lab 知识点引用已满 4 个上限，`agent-evaluation`、`mcp-tools` 有余量但主题不匹配入门内容，置换会挤掉更相关的进阶条目，故 `lib/content/lab-relations.ts` 未改动，2-4 个约束继续通过。
+- 测试基线更新：`tests/content-shape.test.mjs` 两处面试题总数断言从 80 更新为 95（内容增长的必要基线调整），其余断言不变。
+- 入门内容规模：知识点入门 7 → 15，面试题初级 13 → 28。
+- 验证记录：`npm run validate:content`（41 知识点、95 面试题）、`npm run typecheck`、`npm run lint`、`npm run test:unit`（109 项通过）全部通过；webpack 构建仍死锁（已知环境问题），`npx next build --turbopack` 通过，生成 175 个静态页面（152 + 8 知识点详情 + 15 面试题详情）；抽查新页面 HTML 内容渲染正常。
+
 ### 2026-07-18：RAG 实验新增真实向量检索模式（本地开源 embedding，三路对比）
 
 - 模型选型：`Xenova/multilingual-e5-small`（q8 量化，384 维）。理由：中文语料必须用多语言模型；e5 系列在多语言检索基准（MTEB/CMTEB）上优于同尺寸 paraphrase-MiniLM；query:/passage: 前缀差异本身成为教学点。所有多语言候选（e5-small、paraphrase-MiniLM-L12、distiluse-v2）q8 体积同为约 113MB（25 万词表决定），体积不构成区分度。
@@ -242,12 +253,13 @@
 - 本机 `npm run build`（webpack 编译）因机器级故障无法完成：所有 Next 项目的 webpack 构建（含未改动的 liujixue-xuan、liujixue-main）都死锁在一个永不返回的 `open()` 系统调用上，与本批改动无关；改用 `next build --turbopack` 完整构建通过，生成 152 个静态页面（新增 `/labs/mcp-tools`）。需在 Vercel 或 CI 上确认 webpack 构建恢复正常。
 - MCP 生产服务器 curl 实测：initialize 返回 protocolVersion、capabilities 与 serverInfo；notifications/initialized 返回 202 空响应；tools/list 返回 2 个只读工具及其严格 Schema；tools/call 两个工具均 `isError: false`；save_learning_note 返回 -32602；未知 method 返回 -32601；非法 JSON 返回 -32700；GET 返回 405。
 - Playwright 桌面与手机共 53 项通过、1 项按设备条件跳过（生产服务器 + 签名会话）；`/labs/mcp-tools` 在 1440px 与 390px 均无横向溢出，完整协议会话真实往返可见。
+- 第 0 阶段内容层验证：`validate:content`（41 知识点、95 面试题）、`typecheck`、`lint`、109 项单元测试全部通过；`next build --turbopack` 通过，生成 175 个静态页面；新知识点与新面试题详情页 HTML 抽查渲染正常。
 
 ## 当前数据规模
 
 - 路线阶段：7。
-- 知识点：本地 33，线上合并服务器内容后 37。
-- 面试题：本地 80，线上合并服务器内容后 88。
+- 知识点：本地 41（入门 15），线上合并服务器内容后 45。
+- 面试题：本地 95（初级 28），线上合并服务器内容后 103。
 - 服务器学习路径集合：3。
 - 学习路径集合条目：10。
 - 服务器面试题组：3。
@@ -261,7 +273,7 @@
 - 核心训练路径：3。
 - 交付任务：7。
 - 真实 JD 样本：6。
-- 生产构建静态页面：152（历史验证记录中的更小数字为当时 Batch 事实，不 retroactive 修改）。
+- 生产构建静态页面：175（历史验证记录中的更小数字为当时 Batch 事实，不 retroactive 修改）。
 
 ## 下一步推荐
 
