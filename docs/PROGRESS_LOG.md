@@ -10,6 +10,18 @@
 
 ## 已完成
 
+### 2026-07-18：Agent 运行轨迹对齐 OTel GenAI 语义约定导出
+
+- 新增 `lib/agent-runtime/otel.ts`：纯函数 `mapRunToOtelTrace(run, { startedAtUnixMs })`，把一次 run 的 trace + usage 映射为对齐 OpenTelemetry GenAI 语义约定的 span 树 JSON。结构为 OTLP-ish 的 resourceSpans/scopeSpans/spans（traceId/spanId/parentSpanId/startTimeUnixNano/endTimeUnixNano/attributes/events/status），明确文档化为“结构对齐的 JSON 导出”，非完整 OTLP wire format，零新依赖、不引 @opentelemetry/sdk。
+- span 树：根 `invoke_agent liujixue-controlled-agent`（INTERNAL）→ 每个规划轮次一个子 span（真实模型 `chat <model>` CLIENT；确定性 planner `plan` INTERNAL）→ 每次工具调用 `execute_tool <tool>` 子 span。属性用 `gen_ai.*` 命名空间（gen_ai.operation.name、gen_ai.provider.name、gen_ai.request.model、gen_ai.agent.name、gen_ai.tool.name/call.id/call.arguments/call.result、gen_ai.usage.input_tokens/output_tokens/cache_read/cache_creation）；平台事实放 `liujixue.runtime.*`（run.id、turn、permission、idempotency_key 等）。
+- 映射语义：token usage 只聚合在根 span（逐轮拆分属于伪造）；确定性模式省略全部模型/usage 属性；守卫、审批等待、审批结果记录为 span event（guard_check/approval_requested/approval_approved/approval_rejected）；status 规则为 completed→OK、failed→ERROR(_OTHER)、budget_exceeded→ERROR(budget_exceeded)、waiting_approval/rejected→UNSET；跨检查点恢复的调用按 callId 归并到同一 span。
+- traceId/spanId 由 runId 经 SHA-256 确定性派生（32/16 位 hex），同一 run 导出稳定；纳秒换算用 BigInt 避免 2^53 溢出；路由侧用 `storedAt - 最后事件 elapsedMs` 锚定近似绝对起点。
+- 导出通道：`GET /api/agent/run?id=<runId>&format=otel`，复用签名会话授权与回放限流，actor 隔离不变，未知 format 返回 400，普通回放行为不变。
+- 前端：`server-agent-runtime-lab` 轨迹区新增“导出 OTel JSON”按钮（有 runId 且仓储可用时），点击下载 `agent-run-<runId>.otel.json`；仅响应模式显示降级说明。受控 Agent 页新增工程手册风讲解区块：trace → OTel 映射表 + 生产 agent 为什么需要标准可观测性（可接 Jaeger/Grafana/Datadog）。
+- 新增 11 项单测（`tests/agent-runtime-otel.test.ts`）：span 树层级与命名、ID 稳定性与父子关系、时间戳换算、token usage 聚合与省略、审批等待/拒绝/批准的 status 与事件、工具失败与预算拦截的 error.type、OTLP-ish 封装与属性编码。
+- 验证记录：`npm run validate:content`、`npm run typecheck`、`npm run lint`、`npm run test:unit`（100 项通过）全部通过；webpack 构建仍死锁（已知环境问题），`npx next build --turbopack` 通过（152 个静态页面）。
+- 实测记录（`next start` + 生产构建，fixture planner 完整 2 工具 run）：同会话回放 200、`format=otel` 200 且 6 span 结构/父子关系/status 校验通过、跨会话回放与导出均 404、未知 format 400；390px 真实浏览器无横向溢出，导出按钮与讲解区块可见；3 个测试 run 的 6 个 Redis 键已清理，无后台进程残留。注意：本地 `next start` 为 production 模式，需显式设置 `AGENT_SESSION_SECRET` 才能回放/导出（预期门禁）。
+
 ### 2026-07-18：学习闭环改造——Agent 笔记可见、lab 关联自测
 
 - `/journal` 新增“Agent 学习笔记”客户端区块：`save_learning_note` 经审批写入的笔记现在可以在日志页看到，不再只停留在运行响应里。

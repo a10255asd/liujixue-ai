@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { runtimeGoalSchema } from '@/lib/agent-runtime/contracts'
 import { resolveRuntimeIdentity, type RuntimeIdentity } from '@/lib/agent-runtime/identity'
+import { mapRunToOtelTrace } from '@/lib/agent-runtime/otel'
 import { createFixturePlanner, createOpenAiPlanner } from '@/lib/agent-runtime/planners'
 import { createRuntimeRateLimiter, getRuntimeClientIdentifier } from '@/lib/agent-runtime/rate-limit'
 import { runServerAgent } from '@/lib/agent-runtime/runner'
@@ -42,6 +43,11 @@ export async function GET(request: Request) {
   const limiter = createRuntimeRateLimiter()
   const identity = resolveRuntimeIdentity(request)
   const runId = new URL(request.url).searchParams.get('id')
+  const format = new URL(request.url).searchParams.get('format')
+
+  if (format !== null && format !== 'otel') {
+    return NextResponse.json({ error: 'format 仅支持 otel。' }, { status: 400, headers: noStoreHeaders() })
+  }
 
   if (!runId) {
     return jsonResponse({
@@ -77,6 +83,11 @@ export async function GET(request: Request) {
     }
     const record = await store.get(identity.actorId, parsedRunId.data)
     if (!record) return NextResponse.json({ error: '运行记录不存在或已过期。' }, { status: 404, headers: rateLimitHeaders(rateLimit) })
+    if (format === 'otel') {
+      // 记录保存时刻减去最后一条事件的相对耗时，作为整段运行的近似绝对起点。
+      const startedAtUnixMs = Date.parse(record.storedAt) - (record.run.trace.at(-1)?.elapsedMs ?? 0)
+      return NextResponse.json(mapRunToOtelTrace(record.run, { startedAtUnixMs }), { headers: rateLimitHeaders(rateLimit) })
+    }
     return NextResponse.json(record, { headers: rateLimitHeaders(rateLimit) })
   } catch {
     return NextResponse.json({ error: '运行仓储暂时不可用。' }, { status: 503, headers: noStoreHeaders() })

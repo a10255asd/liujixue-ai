@@ -1,6 +1,6 @@
 # Agent Runtime Verified 候选
 
-更新时间：2026-07-17
+更新时间：2026-07-18
 
 本文档是“受控任务执行 Agent”从 `prototype` 走向 `verified` 的专项交接文件。项目总成熟度仍以 `PROJECT_EVIDENCE_AUDIT.md` 为准。
 
@@ -26,6 +26,7 @@
 - 新增 `save_learning_note` 写工具；只有 `notes:write` 权限且用户逐次批准后才执行。
 - 学习笔记以 `runId + callId` 作为幂等键，重复审批或网络重试不会重复创建。
 - 原五类权限、预算、重试、审批和副作用轨迹继续作为安全回归基线。
+- 运行轨迹可经 `GET /api/agent/run?id=<runId>&format=otel` 导出为对齐 OTel GenAI 语义约定的 span JSON（结构对齐，非完整 OTLP wire format），映射逻辑在 `lib/agent-runtime/otel.ts` 纯函数内。
 - 1440px 与 390px 已完成真实浏览器验收，服务端运行返回 2 个工具结果和 8 条事件。
 
 已完成：Vercel Redis、生产签名身份、同会话回放、跨会话拒绝、审批幂等和跨 deployment 恢复。未完成真实模型生产实测与成本基线，因此不得改为 `verified`。
@@ -46,6 +47,7 @@ lib/agent-runtime/tools.ts              严格工具 Schema、权限守卫、真
 lib/agent-runtime/mcp.ts                最小 MCP server 协议层：握手、tools/list 与 tools/call，复用 tools.ts
 lib/agent-runtime/planners.ts           确定性规划器与 Responses 适配器
 lib/agent-runtime/runner.ts             最多四步的服务端编排循环
+lib/agent-runtime/otel.ts               运行轨迹 → OTel GenAI 语义约定对齐 span JSON 的纯映射
 lib/agent-runtime/evaluation.ts         规划契约评测
 lib/agent-runtime/redis-rest.ts         Upstash/Vercel Redis REST 命令适配
 lib/agent-runtime/rate-limit.ts         内存/Redis 固定窗口限流
@@ -55,6 +57,7 @@ lib/agent-runtime/production-smoke.ts   生产可用性与完整发布门禁
 scripts/run-agent-baseline.ts           真实模型基线命令和 JSON 产物
 scripts/smoke-agent-production.ts       线上冒烟 CLI 与可选 JSON 留档
 tests/agent-runtime.test.ts             运行时单元测试
+tests/agent-runtime-otel.test.ts        OTel span 映射单元测试
 tests/agent-runtime-infrastructure.test.ts
                                         限流、Redis 命令和回放测试
 tests/mcp-protocol.test.ts              MCP 协议单元测试

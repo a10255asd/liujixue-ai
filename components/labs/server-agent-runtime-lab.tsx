@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowUpRight, Check, Database, FilePenLine, LoaderCircle, Play, Search, ServerCog, ShieldCheck, TerminalSquare, X } from 'lucide-react'
+import { ArrowUpRight, Check, Database, Download, FilePenLine, LoaderCircle, Play, Search, ServerCog, ShieldCheck, TerminalSquare, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -80,6 +80,8 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
   const [loading, setLoading] = useState(false)
   const [pendingRunId, setPendingRunId] = useState<string | null>(null)
   const [writeToolsEnabled, setWriteToolsEnabled] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
   const persistenceLabel = run?.persistence === 'redis-24h'
     ? 'Redis 保存 24 小时，可按 runId 回放'
     : run?.persistence === 'ephemeral-memory'
@@ -149,6 +151,28 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
   async function resolveApproval(decision: 'approve' | 'reject') {
     if (!run?.pendingApproval) return
     await execute({ approvalRunId: run.runId, decision })
+  }
+
+  async function exportOtelTrace() {
+    if (!run || exporting) return
+    setExporting(true)
+    setExportError(null)
+    try {
+      const response = await fetch(`/api/agent/run?id=${run.runId}&format=otel`, { cache: 'no-store' })
+      const payload = await response.json() as { error?: string }
+      if (!response.ok) throw new Error(payload.error ?? 'OTel 导出失败。')
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = `agent-run-${run.runId}.otel.json`
+      anchor.click()
+      URL.revokeObjectURL(url)
+    } catch (caught) {
+      setExportError(caught instanceof Error ? caught.message : 'OTel 导出失败。')
+    } finally {
+      setExporting(false)
+    }
   }
 
   return (
@@ -239,6 +263,18 @@ export function ServerAgentRuntimeLab({ evaluationCases, evaluationPassRate }: {
                   </article>
                 ))}
               </div>
+              <div className={styles.traceToolbar}>
+                <span>运行轨迹 · {run.trace.length} 条事件</span>
+                {run.persistence === 'response-only' ? (
+                  <small>仅响应模式不保留运行记录，启用仓储后可导出 OTel JSON</small>
+                ) : (
+                  <button disabled={exporting} onClick={exportOtelTrace} type="button">
+                    {exporting ? <LoaderCircle className="spin" size={14} /> : <Download size={14} />}
+                    {exporting ? '导出中' : '导出 OTel JSON'}
+                  </button>
+                )}
+              </div>
+              {exportError ? <p className={styles.traceExportError}>{exportError}</p> : null}
               <ol className="runtime-trace" data-testid="runtime-server-trace">
                 {run.trace.map((event) => (
                   <li key={event.sequence}><span>{String(event.sequence).padStart(2, '0')}</span><div><strong>{event.title}</strong><p>{event.detail}</p></div><time>+{event.elapsedMs}ms</time></li>

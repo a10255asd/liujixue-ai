@@ -177,3 +177,12 @@ npm run build
 - 新增 10 项单测（笔记隔离/降级 7 项、lab 映射完整性 3 项），单测总数 89 全部通过；内容校验、typecheck、lint 通过；webpack `next build` 本机死锁仍未恢复，构建验证继续用 `next build --turbopack`（152 静态页）。
 - 实测证据：`next start` 下完成 无会话降级 → 发起运行 → 审批 → 真实 Upstash Redis 写入 → 带 Cookie 读回 1 条笔记 的完整闭环；第二会话读取为空；测试 actor 的 note/run/checkpoint 共 5 个 Redis 键已删除，无后台进程残留。
 - 注意：`next start` 以 production 模式运行，无 `AGENT_SESSION_SECRET` 时笔记接口返回 `identity-disabled`，这是预期降级；本地联调笔记流程需显式设置该变量。笔记 Redis 读取依赖 SCAN，单 actor 笔记量受 24h TTL 与人工审批约束，量级小，未建索引。
+
+2026-07-18（OTel 可观测性导出）：
+
+- 新增 `lib/agent-runtime/otel.ts` 纯函数 `mapRunToOtelTrace`：把一次 run 的 trace + usage 映射为对齐 OpenTelemetry GenAI 语义约定（open-telemetry/semantic-conventions-genai，Development 状态）的 span 树 JSON。根 span `invoke_agent liujixue-controlled-agent` → 轮次 span（真实模型 `chat <model>` CLIENT；确定性 planner `plan` INTERNAL）→ 工具子 span `execute_tool <tool>`；属性用 `gen_ai.*`，平台事实用 `liujixue.runtime.*`。明确文档化为“结构对齐的 JSON 导出”，非完整 OTLP wire format，零新依赖。
+- 关键语义决策：token usage 只聚合在根 span（逐轮拆分属于伪造，trace 不持久化逐轮用量）；确定性模式省略模型/provider/usage 属性而非伪造；审批等待/拒绝 → 工具 span UNSET + span event（approval_requested/approval_rejected）；工具失败 ERROR(_OTHER)、预算拦截 ERROR(budget_exceeded)；跨检查点恢复的调用按 callId 归并同一 span。traceId/spanId 由 runId 经 SHA-256 确定性派生，纳秒用 BigInt。
+- 导出通道 `GET /api/agent/run?id=<runId>&format=otel`：复用签名会话授权、回放限流与 actor 隔离（跨会话 404）；未知 format 400；绝对时间用 `storedAt - 最后事件 elapsedMs` 近似锚定。前端轨迹区新增“导出 OTel JSON”按钮（下载 `agent-run-<runId>.otel.json`，response-only 时降级说明）；受控 Agent 页新增 trace → OTel 映射讲解区块。
+- 新增 11 项单测（`tests/agent-runtime-otel.test.ts`），单测总数 100 全部通过；validate:content、typecheck、lint 通过；webpack 构建死锁未恢复，继续 `next build --turbopack`（152 静态页）。
+- 实测证据：`next start`（需显式 `AGENT_SESSION_SECRET`，production 模式无回退密钥）下完成 fixture 2 工具 run → 同会话回放 200 → `format=otel` 200（6 span 结构校验通过）→ 跨会话回放/导出 404 → 未知 format 400；390px 无横向溢出；3 个测试 run 的 6 个 Redis 键已删除，无后台进程残留。
+- 遗留：GenAI 语义约定仍为 Development 状态，`gen_ai.*` 属性名未来可能调整，升级时以 otel.ts 文件头注释的对齐清单为准逐条核对；导出的 JSON 不能被 OTel collector 直接 ingest，接生产后端需用官方 SDK 重新仪表化。
