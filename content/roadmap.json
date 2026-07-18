@@ -97,6 +97,7 @@
       "what-is-token",
       "context-window",
       "model-selection",
+      "llm-determinism",
       "secrets-and-data-boundaries"
     ],
     "questionRefs": [
@@ -390,6 +391,8 @@
     "knowledgeRefs": [
       "mcp-architecture",
       "mcp-primitives",
+      "mcp-transports",
+      "mcp-lifecycle",
       "mcp-security"
     ],
     "questionRefs": [

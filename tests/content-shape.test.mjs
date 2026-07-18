@@ -71,7 +71,7 @@ test('non-stage-0 knowledge points reach at least 85% roadmap coverage', () => {
   const stage0 = stages.find((stage) => stage.slug === 'stage-0-beginner-foundations')
   const stage0Refs = new Set(stage0.knowledgeRefs)
   const pool = knowledge.map((item) => item.slug).filter((slug) => !stage0Refs.has(slug))
-  assert.equal(pool.length, 33, '非第 0 阶段知识点池应为 33 个')
+  assert.equal(pool.length, 36, '非第 0 阶段知识点池应为 36 个')
 
   const referenced = new Set(stages.flatMap((stage) => stage.knowledgeRefs ?? []))
   const covered = pool.filter((slug) => referenced.has(slug))

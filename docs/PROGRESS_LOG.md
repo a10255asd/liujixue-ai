@@ -10,6 +10,18 @@
 
 ## 已完成
 
+### 2026-07-18：补 3 个进阶知识点并关闭两处路线图内容缺口
+
+- 新增 3 个知识点，全部 `published`、`lastReviewedAt: 2026-07-18`，结构与长度对齐现有 MCP 条目（单段 explanation + engineeringNotes/example/commonMistakes/interviewAnswer），术语首次出现给一句人话解释：
+  - `mcp-transports`（mcp，进阶）：stdio（本地子进程、进程即会话、免网络鉴权）与 Streamable HTTP（远程服务、SSE 回推、自管鉴权与多客户端）的握手方式、会话管理、鉴权差异与选型规则；引用站内事实——`POST /api/mcp` 是 Streamable HTTP 的单请求无状态子集。relatedQuestions：`mcp-transports`、`mcp-server-design`；relatedProjects：`mcp-file-assistant`。
+  - `mcp-lifecycle`（mcp，进阶）：initialize 握手与协议版本协商（本站支持 2024-11-05 / 2025-03-26 / 2025-06-18，未知版本回退服务端最新）、capability negotiation（tools.listChanged）、notifications/initialized 不应答、错误码 -32700/-32600/-32601/-32602 与 isError 的两层语义、会话终止；`/labs/mcp-tools` 可逐帧观察完整轨迹。relatedQuestions：`mcp-capability-negotiation`、`mcp-debugging`；relatedProjects：`mcp-file-assistant`。
+  - `llm-determinism`（llm，进阶）：temperature=0 仍不逐字复现的三层来源（浮点求和顺序、服务端拼批、推理栈版本）、seed 参数真实边界、工程对策（结构化输出锁字段、评估用语义断言、快照测试留容忍度）；开头显式衔接入门条目 `temperature-and-sampling`。relatedQuestions：`temperature-and-determinism`、`structured-output-vs-json-mode`；relatedProjects：`prompt-debugger`。
+- references 只引 `resources.json` 已有官方条目：MCP 两条用 `mcp-docs`、`mcp-architecture`（modelcontextprotocol.io），`llm-determinism` 用 `openai-platform-docs`、`openai-structured-outputs`，符合 `REFERENCE_SOURCES.md` 官方优先。
+- 路线图挂载（只改 knowledgeRefs，questionRefs 未动）：`mcp-ecosystem` 按学习顺序重排为 `mcp-architecture` → `mcp-primitives` → `mcp-transports` → `mcp-lifecycle` → `mcp-security`；`ai-user-basics` 变为 `what-is-token` → `context-window` → `model-selection` → `llm-determinism` → `secrets-and-data-boundaries`（`llm-determinism` 是进阶条目，按由浅入深放在入门的 `model-selection` 之后、"AI 应用边界"条目之前）。
+- 缺口关闭：上一里程碑记录的两处缺口全部关闭——`mcp-ecosystem` 知识点 3 → 5（补齐 Transport 与生命周期）；`ai-user-basics` "非确定性"主题有专属知识点。非第 0 阶段知识点路线覆盖率保持 100%。
+- 测试：`tests/content-shape.test.mjs` 非第 0 阶段知识点池断言 33 → 36（内容增长的必要基线更新）；其余断言（知识点 ≥ 30、覆盖率 ≥ 85%、全部 published）不变并继续通过。
+- 验证记录：`npm run validate:content`（8 阶段、44 知识点、95 面试题）、`npm run typecheck`、`npm run lint`、`npm run test:unit`（113 项通过）全部通过；webpack 构建死锁未恢复（已知环境问题），`npx next build --turbopack` 通过，生成 178 个静态页面（175 + 3 个知识点详情页）。
+
 ### 2026-07-18：路线图全部 8 个阶段挂载知识点引用与自测题引用
 
 - 背景：上一里程碑只给第 0 阶段挂了 `knowledgeRefs` / `questionRefs`，原 7 个阶段（order 2-8）仍只有自由文本 topics，路线体验不连续。本次为 7 个阶段全部补齐两个字段，仅新增字段，不改 title/topics/projectRefs/resourceRefs/order 等既有字段。
@@ -280,11 +292,12 @@
 - MCP 生产服务器 curl 实测：initialize 返回 protocolVersion、capabilities 与 serverInfo；notifications/initialized 返回 202 空响应；tools/list 返回 2 个只读工具及其严格 Schema；tools/call 两个工具均 `isError: false`；save_learning_note 返回 -32602；未知 method 返回 -32601；非法 JSON 返回 -32700；GET 返回 405。
 - Playwright 桌面与手机共 53 项通过、1 项按设备条件跳过（生产服务器 + 签名会话）；`/labs/mcp-tools` 在 1440px 与 390px 均无横向溢出，完整协议会话真实往返可见。
 - 第 0 阶段内容层验证：`validate:content`（41 知识点、95 面试题）、`typecheck`、`lint`、109 项单元测试全部通过；`next build --turbopack` 通过，生成 175 个静态页面；新知识点与新面试题详情页 HTML 抽查渲染正常。
+- 3 个进阶知识点批次验证：`validate:content`（44 知识点、95 面试题）、`typecheck`、`lint`、113 项单元测试全部通过；`next build --turbopack` 通过，生成 178 个静态页面。
 
 ## 当前数据规模
 
-- 路线阶段：7。
-- 知识点：本地 41（入门 15），线上合并服务器内容后 45。
+- 路线阶段：8。
+- 知识点：本地 44（入门 15），线上合并服务器内容后 48。
 - 面试题：本地 95（初级 28），线上合并服务器内容后 103。
 - 服务器学习路径集合：3。
 - 学习路径集合条目：10。
@@ -299,7 +312,7 @@
 - 核心训练路径：3。
 - 交付任务：7。
 - 真实 JD 样本：6。
-- 生产构建静态页面：175（历史验证记录中的更小数字为当时 Batch 事实，不 retroactive 修改）。
+- 生产构建静态页面：178（历史验证记录中的更小数字为当时 Batch 事实，不 retroactive 修改）。
 
 ## 下一步推荐
 

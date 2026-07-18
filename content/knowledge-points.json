@@ -535,6 +535,47 @@
     ]
   },
   {
+    "slug": "llm-determinism",
+    "title": "非确定性与输出复现",
+    "category": "llm",
+    "level": "进阶",
+    "summary": "temperature=0 只是每步取最高概率路径，不保证逐字复现；真正的稳定性靠结构化约束与语义断言。",
+    "whyItMatters": "把复现寄托在采样参数上，评估和回归测试就会随机失败；弄清非确定性来源，才能设计可测试、可上线的 LLM 功能。",
+    "explanation": "入门条目“温度与采样”讲过 temperature=0 是尽量走最高概率路径（贪心解码）；进阶的事实是，即便如此，同一输入两次调用仍可能逐字不同，因为计算过程没有被冻结。差异有三个来源：浮点——GPU 并行求和顺序不固定，softmax 对末位差异敏感，两个概率几乎并列的候选会因此换序；批处理——服务端把你的请求与别人拼批，批大小会改变归约结果，你的输出受别人流量影响；推理栈——内核、驱动、量化与服务端版本持续演进，云厂商不向你冻结。seed 参数的边界同样要认清：它只在同一厂商、同一实现版本内尽量复现采样路径，不跨版本、不跨厂商担保，也盖不住浮点与拼批差异——当调试辅助用，不当接口契约。工程对策是把“必须一致”从参数转移到结构：用结构化输出把必须一致的字段变成 Schema 约束；评估写语义断言（字段相等、标签合法、引用存在）而非整段精确匹配；快照测试对自由文本留容忍度，真正要逐字确定的规则放进代码执行。",
+    "engineeringNotes": [
+      "temperature=0 与 seed 当调试辅助，不当稳定性契约",
+      "必须一致的字段用 Schema 约束生成",
+      "评估断言写语义条件，不做整段文本精确匹配",
+      "记录模型与推理栈版本，复现问题先对齐版本"
+    ],
+    "example": "工单抽取用 Schema 约束为 category、priority 两个枚举字段后，temperature=0 下字段基本稳定；同一 Prompt 的自由文本理由仍可能换说法，评估只断言字段与枚举合法性——prompt-debugger 的回归报表就是按 Schema 通过率与业务通过率分别统计，而不是比对整段文本。",
+    "commonMistakes": [
+      "temperature=0 后断言两次调用逐字相等",
+      "以为 seed 能跨模型版本、跨厂商复现",
+      "回归测试对整段自由文本做精确 diff，流水线随机失败"
+    ],
+    "interviewAnswer": "temperature=0 是贪心解码，不保证逐字复现：浮点求和顺序、服务端拼批和推理栈版本都会扰动末位概率；seed 只在同一实现内尽量复现采样。工程上把稳定性上移——结构化输出锁定必须一致的字段，评估用语义断言，快照测试留容忍度。",
+    "relatedQuestions": [
+      "temperature-and-determinism",
+      "structured-output-vs-json-mode"
+    ],
+    "relatedProjects": [
+      "prompt-debugger"
+    ],
+    "references": [
+      "openai-platform-docs",
+      "openai-structured-outputs"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
     "slug": "function-calling",
     "title": "函数调用与工具回路",
     "category": "agent",
@@ -1315,6 +1356,88 @@
     ],
     "status": "published",
     "lastReviewedAt": "2026-07-15",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "mcp-transports",
+    "title": "MCP Transport：stdio 与 Streamable HTTP",
+    "category": "mcp",
+    "level": "进阶",
+    "summary": "MCP 数据层（JSON-RPC 消息）不变，传输层二选一：本地子进程走 stdio，远程服务走 Streamable HTTP。",
+    "whyItMatters": "Transport 决定进程管理、鉴权方式、会话边界和故障模式；选型错误会把本地工具拖进网络复杂度，或让远程服务无法多客户端共享。",
+    "explanation": "Transport（传输层）只负责搬运 JSON-RPC 消息，方法、参数和结果在两种方式下完全一致。stdio 模式下 Host 把 Server 作为子进程拉起，消息写进子进程的标准输入输出，进程即会话，权限继承操作系统用户，不需要网络鉴权——Claude Desktop 接本地工具就是这个形态。Streamable HTTP 把 Server 当远程服务：Client 用 HTTP POST 发消息，服务端可用 SSE（Server-Sent Events，服务器向客户端的单向推送流）回推消息，并用会话头维护多客户端状态；鉴权（通常 OAuth 或 Bearer Token）、TLS 和水平扩展都要自己解决。选型规则很直接：要用本地文件、本地命令、跟随用户机器权限，选 stdio；要做团队共享的远程服务、统一鉴权和多客户端接入，选 Streamable HTTP。本站 POST /api/mcp 就是后者的一个无状态子集：单 POST 单响应、不开 SSE、不维持会话，专门用来演示数据层。",
+    "engineeringNotes": [
+      "本地集成用 stdio，远程共享服务用 Streamable HTTP",
+      "stdio 要管进程生命周期：启动参数、stderr 日志、退出重启",
+      "远程形态先解决鉴权与 TLS，再暴露工具",
+      "无状态单请求子集最易起步，SSE 推送可后补"
+    ],
+    "example": "Claude Desktop 配置里的 command 加 args 拉起本地 Server 就是 stdio；本站 POST /api/mcp 用一次普通 HTTP POST 跑同一套 JSON-RPC（initialize、tools/list、tools/call），curl 即可复现，是 Streamable HTTP 的单请求模式。",
+    "commonMistakes": [
+      "给远程共享服务套 stdio，每台客户端机器都得装一遍 Server",
+      "stdio Server 把日志写进 stdout，污染 JSON-RPC 消息流（日志必须走 stderr）",
+      "远程 Server 不做鉴权就把工具暴露到公网"
+    ],
+    "interviewAnswer": "数据层不变，传输层二选一：stdio 是本地子进程、进程即会话、免网络鉴权，适合桌面宿主与本地工具；Streamable HTTP 是远程服务，要自己处理鉴权、TLS 与多客户端会话，适合共享部署。按部署形态选，不按功能选。",
+    "relatedQuestions": [
+      "mcp-transports",
+      "mcp-server-design"
+    ],
+    "relatedProjects": [
+      "mcp-file-assistant"
+    ],
+    "references": [
+      "mcp-docs",
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
+    "authors": [
+      "Jixue Lab"
+    ],
+    "reviewers": [
+      "Codex content review"
+    ]
+  },
+  {
+    "slug": "mcp-lifecycle",
+    "title": "MCP 会话生命周期与错误码",
+    "category": "mcp",
+    "level": "进阶",
+    "summary": "MCP 会话从 initialize 握手开始，协商协议版本与能力，initialized 通知就绪后进入请求/响应循环，直到连接终止。",
+    "whyItMatters": "绝大多数“工具调不动”的故障出在生命周期早期：版本没协商、能力没对上、通知顺序错。按生命周期分层排查，比只盯模型输出有效得多。",
+    "explanation": "握手由 Client 发 initialize 发起，携带它支持的 protocolVersion（协议版本按日期命名，如 2025-06-18）；Server 回应一个双方兼容的版本——本站的实现是：请求版本在支持列表（2024-11-05、2025-03-26、2025-06-18）内就照用，否则回退到服务端最新版本，由 Client 决定是否继续。同一条响应还完成 capability negotiation（能力协商）：Server 声明提供什么能力（如 tools.listChanged 表示工具列表变化时是否主动通知），Client 也在 initialize 里声明自己的能力（如 roots、sampling），此后只能使用双方都声明过的能力。Client 确认后必须发 notifications/initialized（通知是没有 id、不应答的消息），会话才算就绪，之后才是 tools/list、tools/call 这类正常请求/响应。协议错误用 JSON-RPC 标准错误码：-32700 解析失败、-32600 非法请求（如缺 id）、-32601 未知方法、-32602 参数不合法；注意工具执行失败不是协议错误，按 MCP 约定返回带 isError: true 的正常结果。终止没有专门方法：stdio 关进程、HTTP 断连接或删会话。本站 /labs/mcp-tools 把 initialize 到 notifications/initialized、tools/list、tools/call 的完整轨迹逐帧展示，可直接观察每条消息原文。",
+    "engineeringNotes": [
+      "先核对 protocolVersion 与错误码，再怀疑业务逻辑",
+      "只调用协商过的能力；listChanged 为 false 就别等变更推送",
+      "-32602 是参数问题，isError 是执行问题，处置路径不同",
+      "notifications/* 不应答，等响应就是死等"
+    ],
+    "example": "对 POST /api/mcp 发 initialize 并指定 protocolVersion 为 2024-11-05，响应回同一版本、capabilities { tools: { listChanged: false } } 与 serverInfo；不带 id 发 notifications/initialized 得到 202 空响应，再 tools/list 拿工具清单——这套轨迹可在 /labs/mcp-tools 逐帧复现。",
+    "commonMistakes": [
+      "跳过 initialize 直接 tools/call",
+      "把 isError 的工具失败当成协议错误去重连",
+      "凭服务名猜能力，不看 initialize 返回的 capabilities"
+    ],
+    "interviewAnswer": "生命周期是 initialize 协商版本与能力，initialized 通知就绪，然后请求/响应循环，最后连接终止。错误分两层：协议层走标准错误码 -32700/-32600/-32601/-32602，工具执行失败走结果里的 isError；分清这两层，排障才不会乱。",
+    "relatedQuestions": [
+      "mcp-capability-negotiation",
+      "mcp-debugging"
+    ],
+    "relatedProjects": [
+      "mcp-file-assistant"
+    ],
+    "references": [
+      "mcp-docs",
+      "mcp-architecture"
+    ],
+    "status": "published",
+    "lastReviewedAt": "2026-07-18",
     "authors": [
       "Jixue Lab"
     ],

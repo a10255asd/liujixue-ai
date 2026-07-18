@@ -202,3 +202,11 @@ npm run build
 - 内容缺口（如实记录，未硬凑）：`mcp-ecosystem` 仅 3 个知识点可挂（内容库 MCP 类共 3 个，无 Transport 独立知识点）；`ai-user-basics` 的"非确定性"主题无专属知识点，由自测题 `temperature-and-determinism` 覆盖。
 - 测试更新：`tests/content-shape.test.mjs` 删除"其余阶段不应携带 ref"的过期断言，新增"每阶段 knowledgeRefs ≥ 3 / questionRefs ≥ 4 且全部 published"与"33 个非第 0 阶段知识点覆盖率 ≥85%"两个用例，单测总数 113。
 - 验证：内容校验、类型检查、Lint、113 项单元测试通过；webpack 构建死锁未恢复（已知环境问题），`next build --turbopack` 通过；`next start` 抽查 `/roadmap`，8 个阶段均渲染 `stage-refs` 区块，抽查知识点/面试题详情链接均 200，server 已关闭无后台进程残留。
+
+2026-07-18（进阶知识点补齐与缺口关闭）：
+
+- 新增 3 个知识点并挂入路线图：`mcp-transports`（stdio 与 Streamable HTTP 的握手、会话、鉴权差异与选型）、`mcp-lifecycle`（initialize 握手、协议版本协商、能力协商、错误码 -32700/-32600/-32601/-32602 与 isError 两层语义）、`llm-determinism`（temperature=0 仍不逐字复现的来源与结构化输出/语义断言对策，衔接入门条目 `temperature-and-sampling`），全部 published。
+- 站内事实引用：MCP 两条均引用 `POST /api/mcp`（Streamable HTTP 单请求无状态子集）与 `/labs/mcp-tools`（逐帧协议轨迹）；references 只引 `resources.json` 已有官方条目。
+- 路线图：`mcp-ecosystem` knowledgeRefs 重排为 `mcp-architecture` → `mcp-primitives` → `mcp-transports` → `mcp-lifecycle` → `mcp-security`；`ai-user-basics` 在 `model-selection` 后插入 `llm-determinism`；questionRefs 未动。上一批记录的两处内容缺口（MCP Transport 与生命周期、非确定性专属知识点）关闭，非第 0 阶段覆盖率保持 100%。
+- 测试基线：`tests/content-shape.test.mjs` 非第 0 阶段知识点池断言 33 → 36，其余断言不变。
+- 验证：内容校验（44 知识点）、类型检查、Lint、113 项单元测试通过；webpack 构建死锁未恢复（已知环境问题），`next build --turbopack` 通过（178 静态页）。
