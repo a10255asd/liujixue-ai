@@ -5,10 +5,12 @@ const routes = [
   '/tracks',
   '/roadmap',
   '/knowledge',
+  '/knowledge/rag-from-zero-to-one',
   '/agent',
   '/career',
   '/career/calibration',
   '/interview',
+  '/interview/llm-temperature-top-p-tradeoffs',
   '/projects',
   '/labs/prompt-regression',
   '/labs/rag-retrieval',
@@ -31,6 +33,18 @@ for (const route of routes) {
   })
 }
 
+test('server-backed detail pages expose content and question evidence', async ({ page }) => {
+  await page.goto('/knowledge/rag-from-zero-to-one')
+  await expect(page.getByText('内容档案', { exact: true })).toBeVisible()
+  await expect(page.getByText('内容 ID', { exact: true })).toBeVisible()
+  await expect(page.getByText('参考来源', { exact: true })).toBeVisible()
+
+  await page.goto('/interview/llm-temperature-top-p-tradeoffs')
+  await expect(page.getByRole('heading', { name: '题目背景' })).toBeVisible()
+  await expect(page.getByText('题目档案', { exact: true })).toBeVisible()
+  await expect(page.getByText('面试官可能追问', { exact: true })).toBeVisible()
+})
+
 test('mobile navigation exposes the site matrix portals', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile-only navigation check')
   await page.goto('/')
@@ -43,7 +57,7 @@ test('interview filters are shareable through the URL', async ({ page }) => {
   await page.goto('/interview')
   await page.getByLabel('分类').selectOption('mcp')
   await expect(page).toHaveURL(/category=mcp/)
-  await expect(page.locator('.content-card')).toHaveCount(8)
+  await expect(page.locator('.content-card')).toHaveCount(12)
 
   await page.getByLabel('难度').selectOption('高级')
   await expect(page).toHaveURL(/level=%E9%AB%98%E7%BA%A7/)

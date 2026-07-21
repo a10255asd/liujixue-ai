@@ -44,6 +44,13 @@ type ApiKnowledgeItem = {
   sources?: ApiSource[] | null
   questionDetail?: ApiQuestionDetail | null
   updatedAt?: string | null
+  publishedAt?: string | null
+  createdAt?: string | null
+  safetyLevel?: string | null
+  disclaimerType?: string | null
+  asOfDate?: string | null
+  sourceCount?: number | null
+  viewCount?: number | null
 }
 
 type ApiKnowledgeCollectionItem = {
@@ -102,6 +109,50 @@ export type InterviewSetCollection = {
   summary: string
   itemCount: number
   items: InterviewSetCollectionItem[]
+}
+
+export type ApiContentSource = {
+  sourceType: string
+  title: string
+  url: string | null
+  publisher: string | null
+}
+
+export type ApiContentMeta = {
+  publicId: string
+  topicCode: string
+  tags: string[]
+  sources: ApiContentSource[]
+  updatedAt: string | null
+  publishedAt: string | null
+  safetyLevel: string | null
+  disclaimerType: string | null
+  asOfDate: string | null
+  sourceCount: number
+  viewCount: number
+}
+
+export type ApiQuestionMeta = {
+  questionText: string | null
+  expectedAnswerMarkdown: string | null
+  evaluationPoints: string[]
+  followUpQuestions: string[]
+  roles: string[]
+  techTags: string[]
+  answerTimeMinutes: number | null
+}
+
+export type KnowledgePointDetail = KnowledgePoint & {
+  api?: ApiContentMeta & {
+    bodyMarkdown: string | null
+  }
+}
+
+export type InterviewQuestionDetail = InterviewQuestion & {
+  api?: ApiContentMeta & {
+    bodyMarkdown: string | null
+    questionDetail: ApiQuestionMeta | null
+  }
 }
 
 const API_BASE_URL =
@@ -201,6 +252,46 @@ function sourceRefs(item: ApiKnowledgeItem): string[] {
   return sources?.length ? sources : ['liujixue-api-knowledge']
 }
 
+function toApiSources(item: ApiKnowledgeItem): ApiContentSource[] {
+  return (item.sources ?? [])
+    .map((source) => ({
+      sourceType: source.sourceType ?? 'source',
+      title: source.title ?? source.url ?? '未命名来源',
+      url: source.url ?? null,
+      publisher: source.publisher ?? null
+    }))
+    .filter((source) => source.title)
+}
+
+function toApiMeta(item: ApiKnowledgeItem): ApiContentMeta {
+  return {
+    publicId: item.publicId,
+    topicCode: item.topicCode ?? 'ai',
+    tags: item.tags ?? [],
+    sources: toApiSources(item),
+    updatedAt: item.updatedAt ?? null,
+    publishedAt: item.publishedAt ?? null,
+    safetyLevel: item.safetyLevel ?? null,
+    disclaimerType: item.disclaimerType ?? null,
+    asOfDate: item.asOfDate ?? null,
+    sourceCount: item.sourceCount ?? item.sources?.length ?? 0,
+    viewCount: item.viewCount ?? 0
+  }
+}
+
+function toQuestionMeta(detail?: ApiQuestionDetail | null): ApiQuestionMeta | null {
+  if (!detail) return null
+  return {
+    questionText: detail.questionText ?? null,
+    expectedAnswerMarkdown: detail.expectedAnswerMarkdown ?? null,
+    evaluationPoints: detail.evaluationPoints ?? [],
+    followUpQuestions: detail.followUpQuestions ?? [],
+    roles: detail.roles ?? [],
+    techTags: detail.techTags ?? [],
+    answerTimeMinutes: detail.answerTimeMinutes ?? null
+  }
+}
+
 function auditFields() {
   return {
     status: 'published' as const,
@@ -237,6 +328,16 @@ function toKnowledgePoint(item: ApiKnowledgeItem): KnowledgePoint {
   }
 }
 
+function toKnowledgePointDetail(item: ApiKnowledgeItem): KnowledgePointDetail {
+  return {
+    ...toKnowledgePoint(item),
+    api: {
+      ...toApiMeta(item),
+      bodyMarkdown: item.bodyMarkdown ?? null
+    }
+  }
+}
+
 function toInterviewQuestion(item: ApiKnowledgeItem): InterviewQuestion {
   const detail = item.questionDetail
   const expected = detail?.expectedAnswerMarkdown ?? item.bodyMarkdown ?? item.summary ?? item.title
@@ -259,6 +360,17 @@ function toInterviewQuestion(item: ApiKnowledgeItem): InterviewQuestion {
     projectConnection: '回答时尽量连接到一个可运行项目、评测记录、日志或复盘材料。',
     references: sourceRefs(item),
     ...auditFields()
+  }
+}
+
+function toInterviewQuestionDetail(item: ApiKnowledgeItem): InterviewQuestionDetail {
+  return {
+    ...toInterviewQuestion(item),
+    api: {
+      ...toApiMeta(item),
+      bodyMarkdown: item.bodyMarkdown ?? null,
+      questionDetail: toQuestionMeta(item.questionDetail)
+    }
   }
 }
 
@@ -361,6 +473,12 @@ export async function getKnowledgeBySlugWithApi(slug: string): Promise<Knowledge
   return getKnowledgeBySlug(slug)
 }
 
+export async function getKnowledgeDetailWithApi(slug: string): Promise<KnowledgePointDetail | null> {
+  const remote = await getRemoteItem(slug)
+  if (remote?.contentType === 'article') return toKnowledgePointDetail(remote)
+  return getKnowledgeBySlug(slug)
+}
+
 export async function getInterviewQuestionsWithApi(): Promise<InterviewQuestion[]> {
   const remote = (await getRemoteInterviewQuestions()).map(toInterviewQuestion)
   return uniqueBy([...remote, ...getInterviewQuestions()], (item) => item.id)
@@ -369,6 +487,12 @@ export async function getInterviewQuestionsWithApi(): Promise<InterviewQuestion[
 export async function getInterviewQuestionByIdWithApi(id: string): Promise<InterviewQuestion | null> {
   const remote = await getRemoteInterviewQuestion(id)
   if (remote?.contentType === 'interview_question') return toInterviewQuestion(remote)
+  return getInterviewQuestionById(id)
+}
+
+export async function getInterviewQuestionDetailWithApi(id: string): Promise<InterviewQuestionDetail | null> {
+  const remote = await getRemoteInterviewQuestion(id)
+  if (remote?.contentType === 'interview_question') return toInterviewQuestionDetail(remote)
   return getInterviewQuestionById(id)
 }
 

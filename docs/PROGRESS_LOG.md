@@ -1,14 +1,22 @@
 # AI 学习知识库进度日志
 
-更新时间：2026-07-18
+更新时间：2026-07-22
 
 本文档只记录已完成、验证结果、当前状态和下一步，供不同 AI agent 无缝接手。产品方向看 `PRODUCT_DESIGN.md`，技术实现看 `TECHNICAL_DESIGN.md`。
 
 ## 当前里程碑
 
-状态：Batch 10 服务器面试题组已接入。Prompt 回归、可评估 RAG、受控 Agent、Agent 评测和 MCP 工具协议五个实验原型均可运行，真实 JD 岗位校准与固定模拟面试闭环已完成；AI 知识库、面试题库、学习路径集合和面试题组均已接入 `liujixue-api` 服务器知识库，并保留本地 JSON 兜底；6 个项目当前为 4 个 `prototype`、2 个 `blueprint`、0 个 `verified`。线上基础设施继续沿用已接通的 GitHub、Vercel 和 `ai.liujixue.cn`。
+状态：Batch 11 服务器详情页增强已完成。Prompt 回归、可评估 RAG、受控 Agent、Agent 评测和 MCP 工具协议五个实验原型均可运行，真实 JD 岗位校准与固定模拟面试闭环已完成；AI 知识库、面试题库、学习路径集合、面试题组和服务器详情元数据均已接入 `liujixue-api` 服务器知识库，并保留本地 JSON 兜底；6 个项目当前为 4 个 `prototype`、2 个 `blueprint`、0 个 `verified`。线上基础设施继续沿用已接通的 GitHub、Vercel 和 `ai.liujixue.cn`。
 
 ## 已完成
+
+### 2026-07-22：Batch 11 服务器详情页增强
+
+- 新增 `KnowledgePointDetail`、`InterviewQuestionDetail`、`ApiContentMeta` 和 `ApiQuestionMeta`，详情页可读取服务器 `publicId`、topic、tags、sources、更新时间、发布时间、安全等级和题目扩展字段。
+- `/knowledge/[slug]` 切换为 `getKnowledgeDetailWithApi`，在标题区展示服务器标签，侧栏展示服务器信息、更新时间、发布日、publicId 和内容来源；无 API 时继续回退本地 JSON。
+- `/interview/[id]` 切换为 `getInterviewQuestionDetailWithApi`，展示建议回答时长、岗位方向、服务器更新时间、topic、publicId、技术标签、来源数量、安全等级和题目资料；考察点、追问、完整回答仍沿用统一训练结构。
+- 新增详情页元数据样式，保持工程手册气质；1440px 和 390px 完整页面截图已检查，知识详情与面试详情均无横向溢出。
+- 新增 2 项单元测试，覆盖知识详情和面试详情的服务器元数据保留；端到端测试增加两个详情路由与服务器证据断言，避免后续适配层压平时丢字段。
 
 ### 2026-07-18：新增 4 道 MCP 初级面试题，mcp 学习路径形成难度梯度
 
@@ -308,12 +316,14 @@
 - Playwright 桌面与手机共 53 项通过、1 项按设备条件跳过（生产服务器 + 签名会话）；`/labs/mcp-tools` 在 1440px 与 390px 均无横向溢出，完整协议会话真实往返可见。
 - 第 0 阶段内容层验证：`validate:content`（41 知识点、95 面试题）、`typecheck`、`lint`、109 项单元测试全部通过；`next build --turbopack` 通过，生成 175 个静态页面；新知识点与新面试题详情页 HTML 抽查渲染正常。
 - 3 个进阶知识点批次验证：`validate:content`（44 知识点、95 面试题）、`typecheck`、`lint`、113 项单元测试全部通过；`next build --turbopack` 通过，生成 178 个静态页面。
+- Batch 11 详情页增强验证：`npm run test:unit` 115 项通过，`npm run typecheck`、`npm run lint`、`npm run build` 全部通过；生产构建生成 182 个静态页面。
+- Batch 11 浏览器验收：Playwright 59 项通过、1 项按设备条件跳过；`/knowledge/rag-from-zero-to-one` 和 `/interview/llm-temperature-top-p-tradeoffs` 在 1440px 与 390px 下均显示服务器元数据、publicId、标签或题目资料，横向溢出为 0；四张完整页面截图已人工检查。
 
 ## 当前数据规模
 
 - 路线阶段：8。
 - 知识点：本地 44（入门 15），线上合并服务器内容后 48。
-- 面试题：本地 95（初级 28），线上合并服务器内容后 103。
+- 面试题：本地 99（初级 32），线上合并服务器内容后 107。
 - 服务器学习路径集合：3。
 - 学习路径集合条目：10。
 - 服务器面试题组：3。
@@ -327,16 +337,16 @@
 - 核心训练路径：3。
 - 交付任务：7。
 - 真实 JD 样本：6。
-- 生产构建静态页面：178（历史验证记录中的更小数字为当时 Batch 事实，不 retroactive 修改）。
+- 生产构建静态页面：182（历史验证记录中的更小数字为当时 Batch 事实，不 retroactive 修改）。
 
 ## 下一步推荐
 
 内容平台化：
 
 1. 补一个更顺手的后台或审核导入流，让 AI、运动学、投资和心理学内容不用长期依赖命令行脚本。
-2. 优化 API 详情页渲染，完整展示 `body_md`、来源、标签、追问、评分点和更新时间。
-3. 扩充服务器 AI 题库与知识库时，继续保留本地 JSON 作为兜底和回归样本。
-4. 给运动学、投资和心理学子站补前端入口与公开页面，同时继续让高风险内容走审核状态。
+2. 扩充服务器 AI 题库与知识库时，继续保留本地 JSON 作为兜底和回归样本。
+3. 给运动学、投资和心理学子站补前端入口与公开页面，同时继续让高风险内容走审核状态。
+4. 继续完善服务器来源数据，优先给高价值文章和面试题补真实 source 链接。
 
 项目证据化：
 
