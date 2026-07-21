@@ -318,6 +318,7 @@
 - 3 个进阶知识点批次验证：`validate:content`（44 知识点、95 面试题）、`typecheck`、`lint`、113 项单元测试全部通过；`next build --turbopack` 通过，生成 178 个静态页面。
 - Batch 11 详情页增强验证：`npm run test:unit` 115 项通过，`npm run typecheck`、`npm run lint`、`npm run build` 全部通过；生产构建生成 182 个静态页面。
 - Batch 11 浏览器验收：Playwright 59 项通过、1 项按设备条件跳过；`/knowledge/rag-from-zero-to-one` 和 `/interview/llm-temperature-top-p-tradeoffs` 在 1440px 与 390px 下均显示服务器元数据、publicId、标签或题目资料，横向溢出为 0；四张完整页面截图已人工检查。
+- Batch 11 生产部署：Vercel 部署 `dpl_3xsD1jCBkujxCdK8sCNagYQxJ6Zq`（`liujixue-pc2jorewr-a10255asds-projects.vercel.app`）已为 `Ready` 并 alias 到 `https://ai.liujixue.cn`；正式域名 HTML 抽检确认内容档案、题目档案、题目背景和服务器内容 ID 均已上线。
 
 ## 当前数据规模
 

@@ -161,6 +161,7 @@ npm run build
 - Batch 10 已完成 Vercel 生产部署，`https://liujixue-a9pz1wzw5-a10255asds-projects.vercel.app` 已 alias 到 `https://ai.liujixue.cn`，`https://ai.liujixue.cn/interview` 返回 200 并展示服务器面试题组。
 - 完成 Batch 11 服务器详情页增强：`/knowledge/[slug]` 和 `/interview/[id]` 使用详情增强模型读取 `publicId`、topic、tags、sources、发布时间、更新时间、安全等级、建议回答时长、岗位方向和技术标签；无 API 时仍回退本地 JSON。
 - Batch 11 验证通过：115 项单元测试、类型检查、Lint、生产构建通过，生成 182 个静态页面；Playwright 59 项通过、1 项按设备条件跳过，`/knowledge/rag-from-zero-to-one` 与 `/interview/llm-temperature-top-p-tradeoffs` 在 1440px 和 390px 下均显示服务器元数据且横向溢出为 0。
+- Batch 11 已部署到 Vercel 生产环境，正式域名 `https://ai.liujixue.cn` 已确认内容档案、题目档案、题目背景和服务器内容 ID 可见；具体当前部署编号始终以 `vercel inspect ai.liujixue.cn` 为准。
 
 2026-07-18：
 
