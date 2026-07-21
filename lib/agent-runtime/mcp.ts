@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { z } from 'zod'
 
 import { runtimeToolNameSchema, type RuntimeToolName } from './contracts'
@@ -198,7 +200,7 @@ export async function handleMcpPayload(payload: unknown): Promise<McpHttpResult>
 
     try {
       const observation = await executeRuntimeTool({
-        callId: `mcp-${globalThis.crypto.randomUUID()}`,
+        callId: `mcp-${randomUUID()}`,
         name: params.data.name as RuntimeToolName,
         arguments: params.data.arguments ?? {},
         permissions: mcpToolPermissions
